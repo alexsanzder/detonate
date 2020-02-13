@@ -1,16 +1,28 @@
-import React, { useState, useEffect } from "react";
-import SheetProvider from "./SheetProvider";
+import * as React from 'react';
+import { Grommet } from 'grommet';
 
-import { Button, Navbar, Toolbar } from "sancho";
-import "./App.css";
+import SheetProvider from './SheetProvider';
+import Header from './components/Header';
+
+const theme = {
+  global: {
+    font: {
+      family: 'Roboto',
+      size: '18px',
+      height: '20px',
+    },
+  },
+};
 
 const App = () => {
-  const [state, setstate] = useState({ signedIn: false });
-
   return (
-    <SheetProvider>
-      <div className="App"></div>
-    </SheetProvider>
+    <div className='App'>
+      <Grommet theme={theme} plain>
+        <SheetProvider>
+          <Header gridArea='' />
+        </SheetProvider>
+      </Grommet>
+    </div>
   );
 };
 

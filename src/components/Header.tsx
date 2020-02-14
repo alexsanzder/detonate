@@ -1,7 +1,9 @@
-import * as React from 'react';
-import styled from 'styled-components';
-import { Box, Button, DropButton, Heading, Text } from 'grommet';
-import { User, Notification, Configure, Github } from 'grommet-icons';
+import * as React from "react";
+import styled from "styled-components";
+
+import { Box, Button, DropButton, Heading, Text } from "grommet";
+import { User, Notification, Configure, Github } from "grommet-icons";
+import { GoogleContext } from "../contexts/GoogleContext";
 
 interface HeaderProps {
   className?: string;
@@ -18,50 +20,50 @@ const Header: React.FC<HeaderProps> = ({ gridArea }) => {
   return (
     <Box
       gridArea={gridArea}
-      height='80px'
-      width='100vw'
-      direction='row'
-      align='center'
-      gap='xsmall'
+      height="80px"
+      width="100vw"
+      direction="row"
+      align="center"
+      gap="xsmall"
     >
       <Box
-        background='brand'
-        width='300px'
-        height='100%'
-        align='center'
-        justify='center'
-        direction='row'
-        style={{ cursor: 'pointer' }}
+        background="brand"
+        width="300px"
+        height="100%"
+        align="center"
+        justify="center"
+        direction="row"
+        style={{ cursor: "pointer" }}
       >
-        Logo{' '}
+        Logo
       </Box>
       <Box
-        background='brand'
-        align='center'
-        justify='between'
-        direction='row'
-        width='100%'
-        height='100%'
-        pad='small'
+        background="brand"
+        align="center"
+        justify="between"
+        direction="row"
+        width="100%"
+        height="100%"
+        pad="small"
       >
-        <Box direction='row' gap='medium'>
+        <Box direction="row" gap="medium">
           <Button>Overview</Button>
           <Button>Tasks</Button>
         </Box>
-        <Box direction='row' alignSelf='end' align='center'>
+        <Box direction="row" alignSelf="end" align="center">
           {/* <TextInput height="50px" style={{ width: '300px' }} /> */}
           <Button icon={<Configure />} />
           <DropButton
-            id='header-notification-btn'
+            id="header-notification-btn"
             icon={<Notification />}
-            dropAlign={{ top: 'bottom', right: 'left' }}
+            dropAlign={{ top: "bottom", right: "left" }}
             dropContent={
               <Box
-                id='header-notification-drop-content'
-                width='200px'
-                height='200px'
-                align='center'
-                justify='center'
+                id="header-notification-drop-content"
+                width="200px"
+                height="200px"
+                align="center"
+                justify="center"
               >
                 {notifcations.length > 0 ? (
                   <Box> We have notifications! </Box>
@@ -75,29 +77,12 @@ const Header: React.FC<HeaderProps> = ({ gridArea }) => {
               </Box>
             }
           />
-          <DropButton
-            icon={<User />}
-            dropAlign={{ top: 'bottom', right: 'right' }}
-            dropContent={
-              <Box
-                id='header-user-drop-content'
-                width='200px'
-                height='200px'
-                align='center'
-                justify='between'
-                direction='column'
-              >
-                <Heading level='5'>user.name</Heading>
-                <Button
-                  margin='small'
-                  icon={<Github />}
-                  label='Profile'
-                  color='brand'
-                  primary
-                />
-              </Box>
-            }
-          />
+          <GoogleContext.Consumer>
+            {({ googleUser }) => {
+              console.log(googleUser);
+              googleUser ? <>User</> : <>No User</>;
+            }}
+          </GoogleContext.Consumer>
         </Box>
       </Box>
     </Box>

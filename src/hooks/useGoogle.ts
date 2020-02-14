@@ -13,6 +13,7 @@ export const useGoogle = ({ scope, discoveryDocs }: UseGoogleOptions): any => {
   const [isLoaded] = useScript(GOOGLE_API_SOURCE, "gapi");
   const [isInitialized, setInitialized] = useState(false);
   const [isAuthorized, setAuthorized] = useState(false);
+  const [googleUser, setGoogleUser] = useState();
 
   useEffect(() => {
     const initClient = async () => {
@@ -27,9 +28,9 @@ export const useGoogle = ({ scope, discoveryDocs }: UseGoogleOptions): any => {
       GoogleAuth.isSignedIn.listen(signedIn => {
         setAuthorized(signedIn);
       });
-      const googleUser = GoogleAuth.currentUser.get();
-      setAuthorized(googleUser.isSignedIn());
-      console.log(googleUser.getBasicProfile());
+      const currentUser = GoogleAuth.currentUser.get();
+      setAuthorized(currentUser.isSignedIn());
+      setGoogleUser(currentUser.getBasicProfile());
     };
 
     if (isLoaded) {
@@ -44,6 +45,7 @@ export const useGoogle = ({ scope, discoveryDocs }: UseGoogleOptions): any => {
   return {
     isInitialized,
     isAuthorized,
+    googleUser,
     signIn: gapi.auth2.getAuthInstance().signIn,
     signOut: gapi.auth2.getAuthInstance().signOut,
     client: gapi.client

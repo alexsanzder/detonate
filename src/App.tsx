@@ -1,28 +1,61 @@
-import * as React from 'react';
-import { Grommet } from 'grommet';
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import * as React from "react";
+import { Grommet, Button, Box, Layer } from "grommet";
+import { Login, Logout } from "grommet-icons";
 
-import SheetProvider from './SheetProvider';
-import Header from './components/Header';
+import { useGoogle } from "./hooks/useGoogle";
+
+// import SheetProvider from './SheetProvider';
+import Header from "./components/Header";
+import Spinner from "./components/Spinner";
 
 const theme = {
   global: {
     font: {
-      family: 'Roboto',
-      size: '18px',
-      height: '20px',
-    },
-  },
+      family: "Roboto",
+      size: "18px",
+      height: "20px"
+    }
+  }
 };
 
+const discoveryDocs = [
+  "https://sheets.googleapis.com/$discovery/rest?version=v4"
+];
+const scope = [
+  "https://www.googleapis.com/auth/spreadsheets.readonly",
+  "https://www.googleapis.com/auth/drive.metadata.readonly"
+].join(" ");
+
 const App = () => {
+  const { isInitialized, isAuthorized, signIn, signOut, client } = useGoogle({
+    scope,
+    discoveryDocs
+  });
+
   return (
-    <div className='App'>
-      <Grommet theme={theme} plain>
-        <SheetProvider>
-          <Header gridArea='' />
-        </SheetProvider>
-      </Grommet>
-    </div>
+    <Grommet theme={theme} full>
+      {isInitialized ? (
+        <Layer full animation="fadeIn">
+          {!isAuthorized ? (
+            <Box fill align="center" justify="center">
+              <Button icon={<Login />} label="Sign In" onClick={signIn} />
+            </Box>
+          ) : (
+            <>
+              <Header gridArea="" />
+              <Box fill align="center" justify="center">
+                <Button icon={<Logout />} label="Sign out" onClick={signOut} />
+              </Box>
+            </>
+          )}
+        </Layer>
+      ) : (
+        <Layer full>
+          <Spinner />
+        </Layer>
+      )}
+    </Grommet>
   );
 };
 

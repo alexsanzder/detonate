@@ -9,6 +9,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "globals": {
+    "process": true,
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
@@ -29,7 +30,6 @@
   "rules": {
     "react/prop-types": 0,
     "no-unused-vars": "warn",
-    /*"no-unused-vars": "off",*/
     "semi": 1,
     "react/jsx-filename-extension": [
       "error",
@@ -40,6 +40,9 @@
     "import/no-unresolved": ["error", { "ignore": ["^react$", "csstype"] }],
     "@typescript-eslint/no-angle-bracket-type-assertion": 0,
     "@typescript-eslint/indent": ["error", 2]
+    // "@typescript-eslint/explicit-function-return-type": {
+    //   "allowExpressions": true
+    // }
   },
   "parser": "@typescript-eslint/parser",
   "settings": {

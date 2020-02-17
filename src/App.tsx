@@ -40,7 +40,7 @@ const App = () => {
     discoveryDocs
   });
   return (
-    <GoogleContext.Provider value={{ isAuthorized, googleUser }}>
+    <GoogleContext.Provider value={googleUser}>
       <Grommet theme={theme} full>
         {isInitialized ? (
           <Layer full animation="fadeIn">

@@ -3,7 +3,21 @@ import { useState, useEffect } from "react";
 import { useScript } from "./useScript";
 
 const GOOGLE_API_SOURCE = "https://apis.google.com/js/api.js";
-
+export interface GoogleProfile {
+  googleId?: string;
+  imageUrl?: string;
+  email?: string;
+  name?: string;
+  givenName?: string;
+  familyName?: string;
+}
+export interface GoogleUser extends gapi.auth2.GoogleUser {
+  googleId?: string;
+  tokenObj?: gapi.auth2.AuthResponse;
+  tokenId?: string;
+  accessToken?: string;
+  profileObj?: GoogleProfile;
+}
 export interface UseGoogleOptions {
   scope?: string | undefined;
   discoveryDocs?: string[] | undefined;
@@ -30,7 +44,16 @@ export const useGoogle = ({ scope, discoveryDocs }: UseGoogleOptions): any => {
       });
       const currentUser = GoogleAuth.currentUser.get();
       setAuthorized(currentUser.isSignedIn());
-      setGoogleUser(currentUser.getBasicProfile());
+
+      const basicProfile = currentUser.getBasicProfile();
+      setGoogleUser({
+        googleId: basicProfile.getId(),
+        imageUrl: basicProfile.getImageUrl(),
+        email: basicProfile.getEmail(),
+        name: basicProfile.getName(),
+        givenName: basicProfile.getGivenName(),
+        familyName: basicProfile.getFamilyName()
+      });
     };
 
     if (isLoaded) {

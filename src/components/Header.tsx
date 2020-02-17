@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { Box, Button, DropButton, Heading, Text } from "grommet";
-import { User, Notification, Configure, Github } from "grommet-icons";
+import { User, Notification, Configure } from "grommet-icons";
 import { GoogleContext } from "../contexts/GoogleContext";
 
 interface HeaderProps {
@@ -12,7 +12,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ gridArea }) => {
   const [notifcations, setNotifications] = React.useState<any[]>([]);
-
+  const googleUser = React.useContext(GoogleContext);
+  console.log(googleUser);
   React.useEffect(() => {
     setNotifications([]);
   }, []);
@@ -24,7 +25,6 @@ const Header: React.FC<HeaderProps> = ({ gridArea }) => {
       width="100vw"
       direction="row"
       align="center"
-      gap="xsmall"
     >
       <Box
         background="brand"
@@ -48,7 +48,6 @@ const Header: React.FC<HeaderProps> = ({ gridArea }) => {
       >
         <Box direction="row" gap="medium">
           <Button>Overview</Button>
-          <Button>Tasks</Button>
         </Box>
         <Box direction="row" alignSelf="end" align="center">
           {/* <TextInput height="50px" style={{ width: '300px' }} /> */}
@@ -77,12 +76,24 @@ const Header: React.FC<HeaderProps> = ({ gridArea }) => {
               </Box>
             }
           />
-          <GoogleContext.Consumer>
-            {({ googleUser }) => {
-              console.log(googleUser);
-              googleUser ? <>User</> : <>No User</>;
-            }}
-          </GoogleContext.Consumer>
+          {googleUser && (
+            <DropButton
+              icon={<User />}
+              dropAlign={{ top: "bottom", right: "right" }}
+              dropContent={
+                <Box
+                  id="header-user-drop-content"
+                  width="200px"
+                  height="200px"
+                  align="center"
+                  justify="between"
+                  direction="column"
+                >
+                  <Heading level="5">{googleUser.name}</Heading>
+                </Box>
+              }
+            />
+          )}
         </Box>
       </Box>
     </Box>

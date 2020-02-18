@@ -1,24 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import * as React from "react";
-import { Grommet, Button, Box, Layer } from "grommet";
-import { Login, Logout } from "grommet-icons";
-import { GoogleContext } from "./contexts/GoogleContext";
-
-import { useGoogle } from "./hooks/useGoogle";
-
-// import SheetProvider from './SheetProvider';
-import Header from "./components/Header";
+import { Container, Content, Footer } from "rsuite";
+import Header from "./components/AppHeader";
+import Login from "./components/Login";
 import Spinner from "./components/Spinner";
 
-const theme = {
-  global: {
-    font: {
-      family: "Roboto",
-      size: "18px",
-      height: "20px"
-    }
-  }
-};
+import GoogleContext from "./contexts/useGoogleAuth";
+import { useGoogleLogin } from "./hooks/useGoogleLogin";
+
+import "rsuite/dist/styles/rsuite-default.css";
 
 const discoveryDocs = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4"
@@ -29,44 +19,29 @@ const scope = [
 ].join(" ");
 
 const App = () => {
-  const {
-    isInitialized,
-    isAuthorized,
-    signIn,
-    signOut,
-    googleUser
-  } = useGoogle({
-    scope,
-    discoveryDocs
+  const googleAuth = useGoogleLogin({
+    apiKey: process.env.REACT_APP_GOOGLE_APP_ID,
+    clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    discoveryDocs,
+    scope
   });
   return (
-    <GoogleContext.Provider value={googleUser}>
-      <Grommet theme={theme} full>
-        {isInitialized ? (
-          <Layer full animation="fadeIn">
-            {!isAuthorized ? (
-              <Box fill align="center" justify="center">
-                <Button icon={<Login />} label="Sign In" onClick={signIn} />
-              </Box>
-            ) : (
-              <>
-                <Header gridArea="" />
-                <Box fill align="center" justify="center">
-                  <Button
-                    icon={<Logout />}
-                    label="Sign out"
-                    onClick={signOut}
-                  />
-                </Box>
-              </>
-            )}
-          </Layer>
-        ) : (
-          <Layer full>
-            <Spinner />
-          </Layer>
-        )}
-      </Grommet>
+    <GoogleContext.Provider value={googleAuth}>
+      {googleAuth.isInitialized ? (
+        <Container>
+          {googleAuth.isSignedIn ? (
+            <Container>
+              <Header />
+              <Content>Content</Content>
+              <Footer>Footer</Footer>
+            </Container>
+          ) : (
+            <Login />
+          )}
+        </Container>
+      ) : (
+        <Spinner />
+      )}
     </GoogleContext.Provider>
   );
 };

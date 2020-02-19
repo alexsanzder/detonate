@@ -20,8 +20,8 @@ export interface UseGoogleType {
   currentUser: any | undefined;
   isSignedIn: boolean;
   isInitialized: boolean;
-  handleSignIn: any;
-  handleSignOut: any;
+  handleSignIn: () => Promise<void> | undefined;
+  handleSignOut: () => void | undefined;
 }
 
 export const useGoogleLogin = ({

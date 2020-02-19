@@ -45,11 +45,7 @@ const Login = () => {
                 </FormGroup>
                 <FormGroup>
                   <ButtonToolbar>
-                    <Button
-                      appearance="primary"
-                      onClick={() => handleSignIn()}
-                      block
-                    >
+                    <Button appearance="primary" onClick={handleSignIn} block>
                       <Icon icon="google" /> Sign in with Google
                     </Button>
                   </ButtonToolbar>

@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import * as React from "react";
-import { Container, Content, Footer } from "rsuite";
-import Header from "./components/AppHeader";
-import Login from "./components/Login";
-import Spinner from "./components/Spinner";
+import { Container, Content, Footer, FlexboxGrid, Button, Icon } from "rsuite";
 
 import GoogleContext from "./contexts/useGoogleAuth";
 import { useGoogleLogin } from "./hooks/useGoogleLogin";
 
+import Header from "./components/Header";
+import Login from "./components/Login";
+import Spinner from "./components/Spinner";
+import Timer from "./components/Timer";
+
 import "rsuite/dist/styles/rsuite-default.css";
+import Summary from "./components/Summary";
 
 const discoveryDocs = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4"
@@ -30,11 +33,20 @@ const App = () => {
       {googleAuth.isInitialized ? (
         <Container>
           {googleAuth.isSignedIn ? (
-            <Container>
+            <>
               <Header />
-              <Content>Content</Content>
-              <Footer>Footer</Footer>
-            </Container>
+              <Content>
+                <Timer />
+                <Summary />
+              </Content>
+              <Footer>
+                <FlexboxGrid justify="center">
+                  <Button appearance="ghost">
+                    <Icon icon="google" /> See more on Google Sheets
+                  </Button>
+                </FlexboxGrid>
+              </Footer>
+            </>
           ) : (
             <Login />
           )}

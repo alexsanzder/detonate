@@ -11,11 +11,11 @@ import {
 } from "rsuite";
 import styled from "styled-components";
 
-import GoogleAuthContext from "./../contexts/useGoogleAuth";
-
+import GoogleAuthContext from "../contexts/useGoogleAuth";
+import logo from ".././logo.svg";
 const Style = styled.div`
   .rs-avatar {
-    margin: 8px;
+    margin: 5px 15px 5px 5px;
   }
 `;
 
@@ -28,11 +28,21 @@ const AppHeader: React.FC = () => {
     <Style>
       <Header>
         <Navbar appearance="inverse">
-          <Navbar.Header>Time Sheets</Navbar.Header>
+          <Navbar.Header>
+            <img
+              src={logo}
+              alt="Detoanate Time Tracking"
+              height={55}
+              style={{ padding: "5px 15px 5px 15px", cursor: "none" }}
+            />
+            <>detonate</>
+          </Navbar.Header>
           <Navbar.Body>
             <Nav pullRight>
               <Whisper placement="bottom" trigger="hover" speaker={tooltip}>
-                <Nav.Item icon={<Icon icon="table" size="lg" />}></Nav.Item>
+                <Nav.Item
+                  icon={<Icon icon="external-link" size="lg" />}
+                ></Nav.Item>
               </Whisper>
 
               <Dropdown

@@ -1,12 +1,14 @@
-import * as React from "react";
-import { UseGoogleType } from "../hooks/useGoogleLogin";
+import * as React from 'react';
+import { UseGoogleType } from '../hooks/useGoogle';
 
 const GoogleAuthContext = React.createContext<Partial<UseGoogleType>>({
   currentUser: undefined,
   isSignedIn: false,
   isInitialized: false,
   handleSignIn: undefined,
-  handleSignOut: undefined
+  handleSignOut: undefined,
+  projects: undefined,
+  records: undefined,
 });
 
 export default GoogleAuthContext;

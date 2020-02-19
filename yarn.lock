@@ -1326,7 +1326,7 @@
   dependencies:
     "@types/gapi" "*"
 
-"@types/gapi.client.sheets@^4.0.3":
+"@types/gapi.client.sheets@v4":
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/@types/gapi.client.sheets/-/gapi.client.sheets-4.0.3.tgz#4f303c29485b3e2b0c6b00c53fd9e16d0ff6ae90"
   integrity sha512-0cJ02nkLGkDY9tMdkn2y0UO58yRWbe/lqRjxiqn2oWuJ19GHu6gnfmyRSfikqM8hEs7gSsvYNAsuFbkRACmaig==

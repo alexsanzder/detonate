@@ -15,6 +15,7 @@ export interface UseGoogleOptions {
   apiKey?: string | undefined;
   scope?: string | undefined;
   discoveryDocs?: string[] | undefined;
+  spreadsheetId?: string | "1Lqm0iIOp5BYMtws8B5LOEy-wRC-fhOH6aPVFb5-N7Us";
 }
 export interface UseGoogleType {
   currentUser: any | undefined;
@@ -28,12 +29,30 @@ export const useGoogleLogin = ({
   clientId,
   apiKey,
   scope,
-  discoveryDocs
+  discoveryDocs,
+  spreadsheetId
 }: UseGoogleOptions) => {
   const [isLoaded] = useScript(GOOGLE_API_SOURCE, "gapi");
   const [isInitialized, setInitialized] = useState(false);
   const [isSignedIn, setSignedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState();
+
+  const load = async () => {
+    window.gapi.client.load("sheets", "v4", async () => {
+      const response = await window.gapi.client.sheets.spreadsheets.values.batchGet(
+        {
+          spreadsheetId: "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
+          ranges: ["projects!A2:B", "aSa!A2:G"]
+        }
+      );
+      const valueRanges = response.result.valueRanges;
+      console.log(valueRanges);
+      const projects = valueRanges && valueRanges[0];
+      const records = valueRanges && valueRanges[1];
+      console.log(projects);
+      console.log(records);
+    });
+  };
 
   useEffect(() => {
     const initClient = async () => {
@@ -50,6 +69,7 @@ export const useGoogleLogin = ({
       setSignedIn(gAuth.isSignedIn.get());
       const currentUser = gAuth.currentUser.get().getBasicProfile();
       setCurrentUser(currentUser);
+      load();
     };
 
     if (isLoaded) {

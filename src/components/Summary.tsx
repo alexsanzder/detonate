@@ -51,8 +51,7 @@ const Summary = () => {
                     textOverflow: "ellipsis"
                   }}
                 >
-                  PSHEILSOHN-561 Shop/Start Site Config: Artikel und Marken
-                  definieren
+                  CREATEAPP-56 Change Webpack allowing sass and less loaders
                 </p>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={4} style={{ textAlign: "right" }}>
@@ -66,8 +65,8 @@ const Summary = () => {
             >
               <FlexboxGrid.Item colspan={20}>
                 <TagGroup>
-                  <Tag>PSHEILSOHN-561</Tag>
-                  <Tag>Heil&Sohn</Tag>
+                  <Tag>CREATEAPP-60</Tag>
+                  <Tag>Facebook</Tag>
                 </TagGroup>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={4} style={{ textAlign: "right" }}>

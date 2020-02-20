@@ -41,6 +41,8 @@ const AppHeader: React.FC = () => {
             <Nav pullRight>
               <Whisper placement="bottom" trigger="hover" speaker={tooltip}>
                 <Nav.Item
+                  target="_blank"
+                  href="https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=1594442596"
                   icon={<Icon icon="external-link" size="lg" />}
                 ></Nav.Item>
               </Whisper>

@@ -1,8 +1,8 @@
 /* global gapi */
-import { useState, useEffect } from 'react';
-import { useScript } from './useScript';
+import { useState, useEffect } from "react";
+import { useScript } from "./useScript";
 
-const GOOGLE_API_SOURCE = 'https://apis.google.com/js/api.js';
+const GOOGLE_API_SOURCE = "https://apis.google.com/js/api.js";
 
 export interface GoogleUser extends gapi.auth2.GoogleUser {
   googleId?: string;
@@ -15,7 +15,7 @@ export interface UseGoogleOptions {
   apiKey?: string | undefined;
   scope?: string | undefined;
   discoveryDocs?: string[] | undefined;
-  spreadsheetId?: string | '1Lqm0iIOp5BYMtws8B5LOEy-wRC-fhOH6aPVFb5-N7Us';
+  spreadsheetId?: string | "1Lqm0iIOp5BYMtws8B5LOEy-wRC-fhOH6aPVFb5-N7Us";
 }
 export interface UseGoogleType {
   currentUser: any | undefined;
@@ -24,17 +24,30 @@ export interface UseGoogleType {
   handleSignIn: () => Promise<void> | undefined;
   handleSignOut: () => Promise<void> | undefined;
   projects: string[];
-  records: string[];
+  records: Record[];
 }
+
+export interface Record {
+  id: string;
+  name: string;
+  date: string;
+  company: string;
+  project: string;
+  description: string;
+  ticket: string;
+  time: string;
+}
+
+const tablName = "aSa";
 
 export const useGoogle = ({
   clientId,
   apiKey,
   scope,
   discoveryDocs,
-  spreadsheetId,
+  spreadsheetId
 }: UseGoogleOptions) => {
-  const [isLoaded] = useScript(GOOGLE_API_SOURCE, 'gapi');
+  const [isScriptLoaded] = useScript(GOOGLE_API_SOURCE, "gapi");
   const [GoogleAuth, setGoogleAuth] = useState();
   const [isInitialized, setInitialized] = useState(false);
   const [isSignedIn, setSignedIn] = useState(false);
@@ -42,16 +55,48 @@ export const useGoogle = ({
   const [records, setRecords] = useState();
   const [projects, setProjects] = useState();
 
-  const load = async () => {
-    gapi.client.load('sheets', 'v4', async () => {
+  const parseProjects = (value: any, index: number) => {
+    return {
+      id: `${tablName}!A${index + 2}`,
+      company: value[0],
+      project: value[1]
+    };
+  };
+
+  const parseRecords = (value: any, index: number) => {
+    return {
+      id: `${tablName}!A${index + 2}`,
+      name: value[0],
+      date: value[1],
+      company: value[2],
+      project: value[3],
+      description: value[4],
+      ticket: value[5],
+      time: value[6]
+    };
+  };
+
+  const loadTable = async () => {
+    gapi.client.load("sheets", "v4", async () => {
       const response = await gapi.client.sheets.spreadsheets.values.batchGet({
-        spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
-        ranges: ['projects!A2:B', 'aSa!A2:G'],
+        spreadsheetId: "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
+        ranges: ["projects!A2:B", `${tablName}!A2:G`]
       });
       const valueRanges = response.result.valueRanges;
-      const projects = valueRanges && valueRanges[0].values;
+      const projects =
+        valueRanges && valueRanges[0].values?.map(parseProjects).reverse();
       setProjects(projects);
-      const records = valueRanges && valueRanges[1].values;
+      const records =
+        valueRanges && valueRanges[1].values?.map(parseRecords).reverse();
+      const reduce = records?.reduce((obj: any, item: any) => {
+        if (!obj[item.date] === item.date) {
+          obj[item.date] = { item };
+        } else {
+          obj[item.date] = { item };
+        }
+        return obj;
+      }, []);
+      console.log(reduce);
       setRecords(records);
     });
   };
@@ -60,6 +105,7 @@ export const useGoogle = ({
     const initClient = async () => {
       await gapi.client.init({ apiKey, clientId, discoveryDocs, scope });
       setInitialized(true);
+
       const gAuth = gapi.auth2.getAuthInstance();
       setGoogleAuth(gAuth);
 
@@ -67,13 +113,13 @@ export const useGoogle = ({
       setCurrentUser(currentUser);
 
       //Load spredsheet data
-      load();
+      loadTable();
     };
 
-    if (isLoaded) {
-      gapi.load('client:auth2', initClient);
+    if (isScriptLoaded) {
+      gapi.load("client:auth2", initClient);
     }
-  }, [clientId, apiKey, discoveryDocs, scope, isLoaded]);
+  }, [clientId, apiKey, discoveryDocs, scope, isScriptLoaded]);
 
   useEffect(() => {
     if (GoogleAuth) {
@@ -82,7 +128,9 @@ export const useGoogle = ({
         if (signedIn) {
           const profile = GoogleAuth.currentUser.get().getBasicProfile();
           setCurrentUser(profile);
-          load();
+
+          //Load spredsheet data
+          loadTable();
         }
       });
 
@@ -110,6 +158,6 @@ export const useGoogle = ({
     isInitialized,
     isSignedIn,
     projects,
-    records,
+    records
   };
 };

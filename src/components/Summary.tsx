@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   Content,
   FlexboxGrid,
@@ -14,11 +14,11 @@ import {
   IconStack,
   Icon,
   TagGroup,
-  Tag,
-} from 'rsuite';
-import styled from 'styled-components';
+  Tag
+} from "rsuite";
+import styled from "styled-components";
 
-import GoogleAuthContext from './../contexts/useGoogleAuth';
+import GoogleAuthContext from "./../contexts/useGoogleAuth";
 
 const Style = styled.div`
    {
@@ -30,12 +30,12 @@ const { Paragraph } = Placeholder;
 
 const PanelHeader = () => {
   return (
-    <FlexboxGrid justify='space-between'>
+    <FlexboxGrid justify="space-between">
       <FlexboxGrid.Item colspan={20}>Tue, 18 Feb</FlexboxGrid.Item>
       <FlexboxGrid.Item
         colspan={3}
         style={{
-          textAlign: 'right',
+          textAlign: "right"
         }}
       >
         23:20:56
@@ -45,60 +45,56 @@ const PanelHeader = () => {
 };
 const Summary = () => {
   const { records } = React.useContext(GoogleAuthContext);
+
   return (
     <Style>
       <Panel header={<PanelHeader />} bordered>
         <List hover>
           {records ? (
-            records.map((record, idx) => (
-              <List.Item key={idx}>
-                <FlexboxGrid justify='space-between' align='middle'>
+            records.map(record => (
+              <List.Item key={record.id}>
+                <FlexboxGrid justify="space-between" align="middle">
                   <FlexboxGrid.Item colspan={20}>
                     <p
                       style={{
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
                       }}
                     >
-                      {/* Title */}
-                      {record[4]}
+                      {record.description}
                     </p>
                   </FlexboxGrid.Item>
                   <FlexboxGrid.Item
                     colspan={4}
                     style={{
-                      textAlign: 'right',
+                      textAlign: "right"
                     }}
                   >
-                    {/* Time */}
-                    {record[6]}
+                    {record.time}
                   </FlexboxGrid.Item>
                 </FlexboxGrid>
                 <FlexboxGrid
-                  justify='space-between'
-                  align='middle'
+                  justify="space-between"
+                  align="middle"
                   style={{
-                    marginTop: '1rem',
+                    marginTop: "1rem"
                   }}
                 >
                   <FlexboxGrid.Item colspan={20}>
                     <TagGroup>
-                      {/* Ticket */}
-                      {record[5] && <Tag>{record[5]}</Tag>}
-                      {/* Project */}
-                      {record[3] && <Tag>{record[3]}</Tag>}
-                      {/* Company */}
-                      {record[2] && <Tag>{record[2]}</Tag>}
+                      {<Tag color="blue">{record.company}</Tag>}
+                      {<Tag>{record.ticket}</Tag>}
+                      {<Tag>{record.project}</Tag>}
                     </TagGroup>
                   </FlexboxGrid.Item>
                   <FlexboxGrid.Item
                     colspan={4}
                     style={{
-                      textAlign: 'right',
+                      textAlign: "right"
                     }}
                   >
-                    <Icon icon='play' size='lg' />
+                    <Icon icon="play" size="lg" />
                   </FlexboxGrid.Item>
                 </FlexboxGrid>
               </List.Item>

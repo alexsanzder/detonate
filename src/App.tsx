@@ -36,11 +36,11 @@ const App = () => {
           {googleAuth.isSignedIn ? (
             <>
               <Header />
-              <Content>
+              <Content style={{ marginTop: "56px" }}>
                 <Timer />
                 <Summary />
               </Content>
-              <Footer>
+              <Footer style={{ padding: "0px 0px 20px" }}>
                 <FlexboxGrid justify="center">
                   <Button
                     target="_blank"

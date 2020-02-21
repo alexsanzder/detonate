@@ -7,7 +7,8 @@ import {
   Icon,
   Avatar,
   Whisper,
-  Tooltip
+  Tooltip,
+  Container
 } from "rsuite";
 import styled from "styled-components";
 
@@ -26,7 +27,7 @@ const AppHeader: React.FC = () => {
 
   return (
     <Style>
-      <Header>
+      <Header style={{ position: "fixed", width: "100%", zIndex: 1000 }}>
         <Navbar appearance="inverse">
           <Navbar.Header>
             <img

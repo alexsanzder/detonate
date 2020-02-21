@@ -1,8 +1,8 @@
 /* global gapi */
-import { useState, useEffect } from "react";
-import { useScript } from "./useScript";
+import { useState, useEffect } from 'react';
+import { useScript } from './useScript';
 
-const GOOGLE_API_SOURCE = "https://apis.google.com/js/api.js";
+const GOOGLE_API_SOURCE = 'https://apis.google.com/js/api.js';
 
 export interface GoogleUser extends gapi.auth2.GoogleUser {
   googleId?: string;
@@ -15,7 +15,7 @@ export interface UseGoogleOptions {
   apiKey?: string | undefined;
   scope?: string | undefined;
   discoveryDocs?: string[] | undefined;
-  spreadsheetId?: string | "1Lqm0iIOp5BYMtws8B5LOEy-wRC-fhOH6aPVFb5-N7Us";
+  spreadsheetId?: string | '1Lqm0iIOp5BYMtws8B5LOEy-wRC-fhOH6aPVFb5-N7Us';
 }
 export interface UseGoogleType {
   currentUser: any | undefined;
@@ -25,6 +25,7 @@ export interface UseGoogleType {
   handleSignOut: () => Promise<void> | undefined;
   projects: any;
   records: any;
+  append: () => Promise<any>;
 }
 
 export interface Record {
@@ -38,16 +39,21 @@ export interface Record {
   time: number;
 }
 
-const tablName = "aSa";
+export interface Project {
+  id: string;
+  company: string;
+  project: string;
+}
+
+const tablName = 'aSa';
 
 export const useGoogle = ({
   clientId,
   apiKey,
   scope,
   discoveryDocs,
-  spreadsheetId
-}: UseGoogleOptions) => {
-  const [isScriptLoaded] = useScript(GOOGLE_API_SOURCE, "gapi");
+}: UseGoogleOptions): Partial<UseGoogleType> => {
+  const [isScriptLoaded] = useScript(GOOGLE_API_SOURCE, 'gapi');
   const [GoogleAuth, setGoogleAuth] = useState();
   const [isInitialized, setInitialized] = useState(false);
   const [isSignedIn, setSignedIn] = useState(false);
@@ -55,11 +61,11 @@ export const useGoogle = ({
   const [records, setRecords] = useState();
   const [projects, setProjects] = useState();
 
-  const parseProjects = (value: any, index: number) => {
+  const parseProjects = (value: any, index: number): Project => {
     return {
       id: `${tablName}!A${index + 2}`,
       company: value[0],
-      project: value[1]
+      project: value[1],
     };
   };
 
@@ -72,11 +78,11 @@ export const useGoogle = ({
       project: value[3],
       description: value[4],
       ticket: value[5],
-      time: parseFloat(value[6])
+      time: parseFloat(value[6]),
     };
   };
 
-  const groupBy = (array: any, key: any): any => {
+  const groupBy = (array: any, key: any): object => {
     return array.reduce((result: any, currentValue: string) => {
       // If an array already present for key, push it to the array. Else create an array and push the object
       (result[currentValue[key]] = result[currentValue[key]] || []).push(
@@ -86,25 +92,37 @@ export const useGoogle = ({
     }, {});
   };
 
-  const loadTable = async () => {
-    gapi.client.load("sheets", "v4", async () => {
+  const loadTable = async (): Promise<void> => {
+    gapi.client.load('sheets', 'v4', async () => {
       const response = await gapi.client.sheets.spreadsheets.values.batchGet({
-        spreadsheetId: "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
-        ranges: ["projects!A2:B", `${tablName}!A2:G`]
+        spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+        ranges: ['projects!A2:B', `${tablName}!A2:G`],
       });
       const valueRanges = response.result.valueRanges;
       const projects =
         valueRanges && valueRanges[0].values?.map(parseProjects).reverse();
-      setProjects(groupBy(projects, "company"));
+      setProjects(groupBy(projects, 'company'));
 
       const records =
         valueRanges && valueRanges[1].values?.map(parseRecords).reverse();
-      setRecords(groupBy(records, "date"));
+      setRecords(groupBy(records, 'date'));
+    });
+  };
+
+  const append = async () => {
+    return await gapi.client.sheets.spreadsheets.values.append({
+      spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+      range: `${tablName}!A2:G2`,
+      valueInputOption: 'RAW',
+      insertDataOption: 'INSERT_ROWS',
+      resource: {
+        values: [['Alex Sanz', '31.01.2020']],
+      },
     });
   };
 
   useEffect(() => {
-    const initClient = async () => {
+    const initClient = async (): Promise<void> => {
       await gapi.client.init({ apiKey, clientId, discoveryDocs, scope });
       setInitialized(true);
 
@@ -119,7 +137,7 @@ export const useGoogle = ({
     };
 
     if (isScriptLoaded) {
-      gapi.load("client:auth2", initClient);
+      gapi.load('client:auth2', initClient);
     }
   }, [clientId, apiKey, discoveryDocs, scope, isScriptLoaded]);
 
@@ -140,11 +158,11 @@ export const useGoogle = ({
     }
   }, [GoogleAuth]);
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (): Promise<void> => {
     await gapi.auth2.getAuthInstance().signIn();
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (): Promise<void> => {
     gapi.auth2.getAuthInstance().signOut();
     //gapi.auth2.getAuthInstance().disconnect();
   };
@@ -160,6 +178,7 @@ export const useGoogle = ({
     isInitialized,
     isSignedIn,
     projects,
-    records
+    records,
+    append,
   };
 };

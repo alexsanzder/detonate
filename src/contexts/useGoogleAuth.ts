@@ -9,6 +9,7 @@ const GoogleAuthContext = React.createContext<Partial<UseGoogleType>>({
   handleSignOut: undefined,
   projects: undefined,
   records: undefined,
+  append: undefined,
 });
 
 export default GoogleAuthContext;

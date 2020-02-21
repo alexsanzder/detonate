@@ -1,13 +1,15 @@
-import * as React from "react";
+import * as React from 'react';
+import GoogleAuthContext from './../contexts/useGoogleAuth';
+
 import {
   FlexboxGrid,
   Panel,
   Form,
   FormControl,
   IconButton,
-  Icon
-} from "rsuite";
-import styled from "styled-components";
+  Icon,
+} from 'rsuite';
+import styled from 'styled-components';
 
 const Style = styled.div`
   .read-only input {
@@ -27,6 +29,7 @@ const Style = styled.div`
 const Timer = () => {
   const [isActive, setIsActive] = React.useState(false);
   const [seconds, setSeconds] = React.useState(0);
+  const { append } = React.useContext(GoogleAuthContext);
 
   const getTimeFromSeconds = (totalSeconds: number): string => {
     //const days = Math.floor(totalSeconds / (60 * 60 * 24));
@@ -34,8 +37,8 @@ const Timer = () => {
     const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
     const seconds = Math.floor(totalSeconds % 60);
 
-    return `${("0" + hours).slice(-2)}:${("0" + minutes).slice(-2)}:${(
-      "0" + seconds
+    return `${('0' + hours).slice(-2)}:${('0' + minutes).slice(-2)}:${(
+      '0' + seconds
     ).slice(-2)}`;
   };
 
@@ -53,6 +56,8 @@ const Timer = () => {
 
   const handleOnStart = () => {
     setIsActive(true);
+    const add = append && append();
+    console.log(add);
   };
   const handleOnStop = () => {
     setIsActive(false);
@@ -63,29 +68,29 @@ const Timer = () => {
       <Panel
         shaded
         style={{
-          position: "fixed",
-          width: "100%",
+          position: 'fixed',
+          width: '100%',
           zIndex: 10000,
-          height: "82px",
-          backgroundColor: "white"
+          height: '82px',
+          backgroundColor: 'white',
         }}
       >
         <Form>
-          <FlexboxGrid justify="space-between" align="middle">
+          <FlexboxGrid justify='space-between' align='middle'>
             {!isActive ? (
               <>
                 <FlexboxGrid.Item colspan={22}>
                   <FormControl
-                    name="work"
-                    size="lg"
-                    placeholder="What are you working on?"
-                    width="100%"
+                    name='work'
+                    size='lg'
+                    placeholder='What are you working on?'
+                    width='100%'
                   />
                 </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={2} style={{ textAlign: "right" }}>
+                <FlexboxGrid.Item colspan={2} style={{ textAlign: 'right' }}>
                   <IconButton
-                    icon={<Icon icon="play" />}
-                    color="green"
+                    icon={<Icon icon='play' />}
+                    color='green'
                     circle
                     onClick={handleOnStart}
                   />
@@ -95,25 +100,25 @@ const Timer = () => {
               <>
                 <FlexboxGrid.Item colspan={18}>
                   <FormControl
-                    name="description"
-                    size="lg"
+                    name='description'
+                    size='lg'
                     readOnly
-                    value="(no description)"
+                    value='(no description)'
                   />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={4}>
                   <FormControl
-                    name="time"
-                    size="lg"
+                    name='time'
+                    size='lg'
                     readOnly
-                    className="timer"
+                    className='timer'
                     value={getTimeFromSeconds(seconds)}
                   />
                 </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={2} style={{ textAlign: "right" }}>
+                <FlexboxGrid.Item colspan={2} style={{ textAlign: 'right' }}>
                   <IconButton
-                    icon={<Icon icon="stop" />}
-                    color="red"
+                    icon={<Icon icon='stop' />}
+                    color='red'
                     circle
                     onClick={handleOnStop}
                   />

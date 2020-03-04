@@ -1,1 +1,1 @@
-## Timesheets - Time Tracking with Google Sheets
+## Detonate Timesheets - Time Tracking with Google Sheets

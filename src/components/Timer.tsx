@@ -91,7 +91,7 @@ const Timer = () => {
         'no project',
         'Working on',
         'no ticket',
-        'running..',
+        '=now()',
       ]));
 
     const { result } = append;
@@ -102,7 +102,6 @@ const Timer = () => {
 
   const handleStop = () => {
     const fraction = fractionConvert(seconds);
-    console.log(fraction);
     updateRecord &&
       updateRecord(updatedRange, [
         null,

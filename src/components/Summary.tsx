@@ -46,16 +46,16 @@ const PanelHeader = ({ date, records }: any) => {
   const total = records.reduce((acc: any, curr: any) => {
     return acc + curr.time;
   }, 0);
-  const options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  };
+
   const splits = date.split('.');
   const formatedDate = new Date(splits.reverse().join('-')).toLocaleDateString(
     'de-DE',
-    options
+    {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }
   );
   return (
     <FlexboxGrid justify='space-between'>
@@ -121,10 +121,10 @@ const Summary = () => {
                             <FlexboxGrid.Item colspan={20}>
                               <TagGroup>
                                 {record.company && <Tag>{record.company}</Tag>}
-                                {record.ticket && <Tag>{record.ticket}</Tag>}
                                 {record.project && (
                                   <Tag>{record.project && record.project}</Tag>
                                 )}
+                                {record.ticket && <Tag>{record.ticket}</Tag>}
                               </TagGroup>
                             </FlexboxGrid.Item>
                             <FlexboxGrid.Item

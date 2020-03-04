@@ -83,7 +83,7 @@ export const useGoogle = ({
       project: value[3],
       description: value[4],
       ticket: value[5],
-      time: parseFloat(value[6]),
+      time: value[6],
     };
   };
 
@@ -102,6 +102,8 @@ export const useGoogle = ({
     gapi.client.load('sheets', 'v4', async () => {
       const response = await gapi.client.sheets.spreadsheets.values.batchGet({
         spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+        valueRenderOption: 'UNFORMATTED_VALUE',
+        dateTimeRenderOption: 'FORMATTED_STRING',
         ranges: ['projects!A2:B', `${tablName}!A2:G`],
       });
 
@@ -170,7 +172,7 @@ export const useGoogle = ({
     return await gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
       range: `${tablName}!A2:G2`,
-      valueInputOption: 'RAW',
+      valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       resource: {
         values: [record],
@@ -182,7 +184,7 @@ export const useGoogle = ({
     return await gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
       range: range,
-      valueInputOption: 'RAW',
+      valueInputOption: 'USER_ENTERED',
       resource: {
         values: [record],
       },

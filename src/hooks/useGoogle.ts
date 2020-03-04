@@ -29,7 +29,7 @@ export interface UseGoogleType {
   appendRecord: (record: string[]) => Promise<any> | undefined;
   updateRecord: (
     range: string,
-    record: (number | null)[]
+    record: (string | number | null)[]
   ) => Promise<any> | undefined;
 }
 
@@ -180,7 +180,10 @@ export const useGoogle = ({
     });
   };
 
-  const updateRecord = async (range: string, record: (number | null)[]) => {
+  const updateRecord = async (
+    range: string,
+    record: (string | number | null)[]
+  ) => {
     return await gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
       range: range,

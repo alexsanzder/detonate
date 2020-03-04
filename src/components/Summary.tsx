@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   Icon,
   FlexboxGrid,
@@ -6,11 +6,11 @@ import {
   Placeholder,
   List,
   TagGroup,
-  Tag
-} from "rsuite";
-import styled from "styled-components";
-import GoogleAuthContext from "./../contexts/useGoogleAuth";
-import { Record } from "./../hooks/useGoogle";
+  Tag,
+} from 'rsuite';
+import styled from 'styled-components';
+import GoogleAuthContext from './../contexts/useGoogleAuth';
+import { Record } from './../hooks/useGoogle';
 
 const Style = styled.div`
   padding: 10px 20px;
@@ -33,11 +33,11 @@ const timeConvert = (fraction: number): string => {
   const seconds = Math.floor(allseconds % 60);
 
   const formatted =
-    ("0" + (hours % 12)).substr(-2) +
-    ":" +
-    ("0" + minutes).substr(-2) +
-    ":" +
-    ("0" + seconds).substr(-2);
+    ('0' + (hours % 12)).substr(-2) +
+    ':' +
+    ('0' + minutes).substr(-2) +
+    ':' +
+    ('0' + seconds).substr(-2);
 
   return formatted;
 };
@@ -47,23 +47,23 @@ const PanelHeader = ({ date, records }: any) => {
     return acc + curr.time;
   }, 0);
   const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
-  const splits = date.split(".");
-  const formatedDate = new Date(splits.reverse().join("-")).toLocaleDateString(
-    "de-DE",
+  const splits = date.split('.');
+  const formatedDate = new Date(splits.reverse().join('-')).toLocaleDateString(
+    'de-DE',
     options
   );
   return (
-    <FlexboxGrid justify="space-between">
+    <FlexboxGrid justify='space-between'>
       <FlexboxGrid.Item colspan={20}>{formatedDate}</FlexboxGrid.Item>
       <FlexboxGrid.Item
         colspan={3}
         style={{
-          textAlign: "right"
+          textAlign: 'right',
         }}
       >
         {timeConvert(total)}
@@ -76,7 +76,7 @@ const Summary = () => {
 
   return (
     <Style>
-      <List bordered={false} className="list-summary" size="lg">
+      <List bordered={false} className='list-summary' size='lg'>
         {records ? (
           Object.keys(records).map((date: string) => {
             return (
@@ -90,13 +90,13 @@ const Summary = () => {
                     {records[date].map((record: Record) => {
                       return (
                         <List.Item key={record.id}>
-                          <FlexboxGrid justify="space-between" align="middle">
+                          <FlexboxGrid justify='space-between' align='middle'>
                             <FlexboxGrid.Item colspan={20}>
                               <p
                                 style={{
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis"
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
                                 }}
                               >
                                 {record.description}
@@ -105,17 +105,17 @@ const Summary = () => {
                             <FlexboxGrid.Item
                               colspan={4}
                               style={{
-                                textAlign: "right"
+                                textAlign: 'right',
                               }}
                             >
                               {timeConvert(record.time)}
                             </FlexboxGrid.Item>
                           </FlexboxGrid>
                           <FlexboxGrid
-                            justify="space-between"
-                            align="middle"
+                            justify='space-between'
+                            align='middle'
                             style={{
-                              marginTop: "1rem"
+                              marginTop: '1rem',
                             }}
                           >
                             <FlexboxGrid.Item colspan={20}>
@@ -130,10 +130,10 @@ const Summary = () => {
                             <FlexboxGrid.Item
                               colspan={4}
                               style={{
-                                textAlign: "right"
+                                textAlign: 'right',
                               }}
                             >
-                              <Icon icon="play" size="lg" />
+                              <Icon icon='play' size='lg' />
                             </FlexboxGrid.Item>
                           </FlexboxGrid>
                         </List.Item>

@@ -25,7 +25,12 @@ export interface UseGoogleType {
   handleSignOut: () => Promise<void> | undefined;
   projects: any;
   records: any;
-  append: () => Promise<any>;
+  loadTable: () => Promise<void> | undefined;
+  appendRecord: (record: string[]) => Promise<any> | undefined;
+  updateRecord: (
+    range: string,
+    record: (number | null)[]
+  ) => Promise<any> | undefined;
 }
 
 export interface Record {
@@ -84,7 +89,8 @@ export const useGoogle = ({
 
   const groupBy = (array: any, key: any): object => {
     return array.reduce((result: any, currentValue: string) => {
-      // If an array already present for key, push it to the array. Else create an array and push the object
+      // If an array already present for key, push it to the array. Else create an
+      // array and push the object
       (result[currentValue[key]] = result[currentValue[key]] || []).push(
         currentValue
       );
@@ -98,26 +104,19 @@ export const useGoogle = ({
         spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
         ranges: ['projects!A2:B', `${tablName}!A2:G`],
       });
+
       const valueRanges = response.result.valueRanges;
-      const projects =
-        valueRanges && valueRanges[0].values?.map(parseProjects).reverse();
-      setProjects(groupBy(projects, 'company'));
+      if (valueRanges) {
+        const projects =
+          valueRanges[0].values &&
+          valueRanges[0].values.map(parseProjects).reverse();
+        setProjects(groupBy(projects, 'company'));
 
-      const records =
-        valueRanges && valueRanges[1].values?.map(parseRecords).reverse();
-      setRecords(groupBy(records, 'date'));
-    });
-  };
-
-  const append = async () => {
-    return await gapi.client.sheets.spreadsheets.values.append({
-      spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
-      range: `${tablName}!A2:G2`,
-      valueInputOption: 'RAW',
-      insertDataOption: 'INSERT_ROWS',
-      resource: {
-        values: [['Alex Sanz', '31.01.2020']],
-      },
+        const records =
+          valueRanges[1].values &&
+          valueRanges[1].values.map(parseRecords).reverse();
+        setRecords(groupBy(records, 'date'));
+      }
     });
   };
 
@@ -167,6 +166,29 @@ export const useGoogle = ({
     //gapi.auth2.getAuthInstance().disconnect();
   };
 
+  const appendRecord = async (record: string[]) => {
+    return await gapi.client.sheets.spreadsheets.values.append({
+      spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+      range: `${tablName}!A2:G2`,
+      valueInputOption: 'RAW',
+      insertDataOption: 'INSERT_ROWS',
+      resource: {
+        values: [record],
+      },
+    });
+  };
+
+  const updateRecord = async (range: string, record: (number | null)[]) => {
+    return await gapi.client.sheets.spreadsheets.values.update({
+      spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+      range: range,
+      valueInputOption: 'RAW',
+      resource: {
+        values: [record],
+      },
+    });
+  };
+
   if (!isInitialized) {
     return { isInitialized };
   }
@@ -179,6 +201,8 @@ export const useGoogle = ({
     isSignedIn,
     projects,
     records,
-    append,
+    loadTable,
+    appendRecord,
+    updateRecord,
   };
 };

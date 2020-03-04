@@ -27,9 +27,23 @@ const Style = styled.div`
 `;
 
 const Timer = () => {
+  const {
+    appendRecord,
+    updateRecord,
+    currentUser,
+    loadTable,
+  } = React.useContext(GoogleAuthContext);
   const [isActive, setIsActive] = React.useState(false);
+  const [isReload, setIsReload] = React.useState(false);
+
   const [seconds, setSeconds] = React.useState(0);
-  const { append } = React.useContext(GoogleAuthContext);
+
+  const [updatedRange, setUpdatedRange] = React.useState();
+
+  const fractionConvert = (seconds: number): number => {
+    const hours = seconds / (60 * 60);
+    return hours;
+  };
 
   const getTimeFromSeconds = (totalSeconds: number): string => {
     //const days = Math.floor(totalSeconds / (60 * 60 * 24));
@@ -54,12 +68,52 @@ const Timer = () => {
     return () => window.clearInterval(interval);
   }, [isActive, seconds]);
 
-  const handleOnStart = () => {
+  React.useEffect(() => {
+    if (isReload && !isActive) {
+      setSeconds(0);
+
+      //Load spredsheet data
+      loadTable && loadTable();
+    }
+  }, [isReload, isActive]);
+
+  const handleStart = async () => {
+    const append =
+      appendRecord &&
+      (await appendRecord([
+        currentUser.getName(),
+        new Date().toLocaleDateString('de-DE', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }),
+        'no company',
+        'no project',
+        'Working on',
+        'no ticket',
+        'running..',
+      ]));
+
+    const { result } = append;
+    setUpdatedRange(result.updates.updatedRange);
+    setIsReload(false);
     setIsActive(true);
-    const add = append && append();
-    console.log(add);
   };
-  const handleOnStop = () => {
+
+  const handleStop = () => {
+    const fraction = fractionConvert(seconds);
+    console.log(fraction);
+    updateRecord &&
+      updateRecord(updatedRange, [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        fraction,
+      ]);
+    setIsReload(true);
     setIsActive(false);
   };
 
@@ -76,56 +130,64 @@ const Timer = () => {
         }}
       >
         <Form>
-          <FlexboxGrid justify='space-between' align='middle'>
-            {!isActive ? (
-              <>
-                <FlexboxGrid.Item colspan={22}>
-                  <FormControl
-                    name='work'
-                    size='lg'
-                    placeholder='What are you working on?'
-                    width='100%'
-                  />
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={2} style={{ textAlign: 'right' }}>
-                  <IconButton
-                    icon={<Icon icon='play' />}
-                    color='green'
-                    circle
-                    onClick={handleOnStart}
-                  />
-                </FlexboxGrid.Item>
-              </>
-            ) : (
-              <>
-                <FlexboxGrid.Item colspan={18}>
-                  <FormControl
-                    name='description'
-                    size='lg'
-                    readOnly
-                    value='(no description)'
-                  />
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={4}>
-                  <FormControl
-                    name='time'
-                    size='lg'
-                    readOnly
-                    className='timer'
-                    value={getTimeFromSeconds(seconds)}
-                  />
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={2} style={{ textAlign: 'right' }}>
-                  <IconButton
-                    icon={<Icon icon='stop' />}
-                    color='red'
-                    circle
-                    onClick={handleOnStop}
-                  />
-                </FlexboxGrid.Item>
-              </>
-            )}
-          </FlexboxGrid>
+          {!isActive ? (
+            <FlexboxGrid justify='space-between' align='middle'>
+              <FlexboxGrid.Item colspan={22}>
+                <FormControl
+                  name='work'
+                  size='lg'
+                  placeholder='What are you working on?'
+                  width='100%'
+                />
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item
+                colspan={2}
+                style={{
+                  textAlign: 'right',
+                }}
+              >
+                <IconButton
+                  icon={<Icon icon='play' />}
+                  color='green'
+                  circle
+                  onClick={handleStart}
+                />
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          ) : (
+            <FlexboxGrid justify='space-between' align='middle'>
+              <FlexboxGrid.Item colspan={18}>
+                <FormControl
+                  name='description'
+                  size='lg'
+                  readOnly
+                  value='(no description)'
+                />
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item colspan={4}>
+                <FormControl
+                  name='time'
+                  size='lg'
+                  readOnly
+                  className='timer'
+                  value={getTimeFromSeconds(seconds)}
+                />
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item
+                colspan={2}
+                style={{
+                  textAlign: 'right',
+                }}
+              >
+                <IconButton
+                  icon={<Icon icon='stop' />}
+                  color='red'
+                  circle
+                  onClick={handleStop}
+                />
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          )}
         </Form>
       </Panel>
     </Style>

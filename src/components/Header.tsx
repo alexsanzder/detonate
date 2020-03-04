@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   Header,
   Nav,
@@ -8,12 +8,11 @@ import {
   Avatar,
   Whisper,
   Tooltip,
-  Container
-} from "rsuite";
-import styled from "styled-components";
+} from 'rsuite';
+import styled from 'styled-components';
 
-import GoogleAuthContext from "../contexts/useGoogleAuth";
-import logo from ".././logo.svg";
+import GoogleAuthContext from '../contexts/useGoogleAuth';
+import logo from '.././logo.svg';
 const Style = styled.div`
   .rs-avatar {
     margin: 5px 15px 5px 5px;
@@ -27,35 +26,35 @@ const AppHeader: React.FC = () => {
 
   return (
     <Style>
-      <Header style={{ position: "fixed", width: "100%", zIndex: 1000 }}>
-        <Navbar appearance="inverse">
+      <Header style={{ position: 'fixed', width: '100%', zIndex: 1000 }}>
+        <Navbar appearance='inverse'>
           <Navbar.Header>
             <img
               src={logo}
-              alt="Detoanate Time Tracking"
+              alt='Detoanate Time Tracking'
               height={55}
-              style={{ padding: "5px 15px 5px 15px", cursor: "none" }}
+              style={{ padding: '5px 15px 5px 15px', cursor: 'none' }}
             />
             <>detonate</>
           </Navbar.Header>
           <Navbar.Body>
             <Nav pullRight>
-              <Whisper placement="bottom" trigger="hover" speaker={tooltip}>
+              <Whisper placement='bottom' trigger='hover' speaker={tooltip}>
                 <Nav.Item
-                  target="_blank"
-                  href="https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=1594442596"
-                  icon={<Icon icon="external-link" size="lg" />}
+                  target='_blank'
+                  href='https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=1594442596'
+                  icon={<Icon icon='external-link' size='lg' />}
                 ></Nav.Item>
               </Whisper>
 
               <Dropdown
-                placement="bottomEnd"
+                placement='bottomEnd'
                 renderTitle={(): JSX.Element => {
                   return (
                     <Avatar
                       circle
                       src={currentUser && currentUser.getImageUrl()}
-                      alt="AS"
+                      alt='AS'
                     >
                       AS
                     </Avatar>
@@ -63,11 +62,11 @@ const AppHeader: React.FC = () => {
                 }}
               >
                 <Dropdown.Item>
-                  <Icon icon="cog" /> Settings
+                  <Icon icon='cog' /> Settings
                 </Dropdown.Item>
                 <Dropdown.Item divider />
                 <Dropdown.Item onClick={handleSignOut}>
-                  <Icon icon="sign-out" /> Logout
+                  <Icon icon='sign-out' /> Logout
                 </Dropdown.Item>
               </Dropdown>
             </Nav>

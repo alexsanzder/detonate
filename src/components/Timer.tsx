@@ -9,11 +9,12 @@ import {
   FormControl,
   IconButton,
   Icon,
-  Drawer,
   Modal,
   Button,
   ButtonToolbar,
-  InputPicker,
+  TagPicker,
+  SelectPicker,
+  Divider,
 } from 'rsuite';
 import styled from 'styled-components';
 
@@ -39,20 +40,20 @@ const Timer: React.FC = (): JSX.Element => {
     currentUser,
     loadTable,
     projects,
+    records,
   } = React.useContext(GoogleAuthContext);
 
   const [isActive, setIsActive] = React.useState(false);
   const [isReload, setIsReload] = React.useState(false);
   const [seconds, setSeconds] = React.useState(0);
-
   const [updatedRange, setUpdatedRange] = React.useState();
   const [colSpan, setColSpan] = React.useState(22);
-
-  const [mode, setMode] = React.useState('default');
-  const readOnly = mode === 'readonly';
-
-  const [value, setValue] = React.useState('');
+  const [description, setDescription] = React.useState<string>('');
+  const [company, setCompany] = React.useState<string | null>(null);
+  const [project, setProject] = React.useState<string | null>(null);
+  const [ticket, setTicket] = React.useState<string | null>(null);
   const [show, setShow] = React.useState(false);
+  const [readOnly, setReadOnly] = React.useState(false);
 
   const fractionConvert = (seconds: number): number => {
     const hours = seconds / (60 * 60);
@@ -92,7 +93,7 @@ const Timer: React.FC = (): JSX.Element => {
   }, [isReload, isActive]);
 
   const handleOnChange = React.useCallback((value: string) => {
-    setValue(value);
+    setDescription(value);
   }, []);
 
   const handleOnClick = () => {
@@ -102,9 +103,9 @@ const Timer: React.FC = (): JSX.Element => {
   const handleOnStart = async () => {
     setIsReload(false);
     setIsActive(true);
-    setMode('readonly');
+    setReadOnly(true);
     setColSpan(17);
-    setValue(value.length > 0 ? value : '(no description)');
+    setDescription(description ? description : '(no description)');
 
     const append =
       appendRecord &&
@@ -115,11 +116,11 @@ const Timer: React.FC = (): JSX.Element => {
           month: '2-digit',
           day: '2-digit',
         }),
-        'no company',
-        'no project',
-        value.length > 0 ? value : '(no description)',
-        'no ticket',
-        '=now()',
+        '(no company)',
+        '(no project)',
+        description ? description : '(no description)',
+        '(no ticket)',
+        'running...',
       ]));
 
     const { result } = append;
@@ -132,22 +133,42 @@ const Timer: React.FC = (): JSX.Element => {
       updateRecord(updatedRange, [
         null,
         null,
-        null,
-        null,
-        value,
-        null,
+        company,
+        project,
+        description,
+        ticket,
         fraction,
       ]);
     setIsReload(true);
     setIsActive(false);
-    setValue('');
-    setMode('default');
+    setDescription('');
+    setProject(null);
+    setCompany(null);
+    setTicket(null);
+
+    setReadOnly(false);
     setColSpan(22);
   };
 
   const handleOnHide = () => {
     setShow(false);
   };
+
+  const handleOnSelect = React.useCallback((value: string, item: any) => {
+    setProject(item.project);
+    setCompany(item.company);
+  }, []);
+
+  const handleOnTagSelect = React.useCallback((value: string[]) => {
+    setTicket(value.join(', '));
+  }, []);
+
+  const uniqueTickets =
+    records &&
+    Array.from(new Set(records.map((a: any) => a.ticket))).map(ticket => {
+      return records.find((a: any) => a.ticket === ticket);
+    });
+
   return (
     <Style>
       <Panel
@@ -169,7 +190,7 @@ const Timer: React.FC = (): JSX.Element => {
                 placeholder='What are you working on?'
                 width='100%'
                 readOnly={readOnly}
-                value={value}
+                value={description}
                 onChange={handleOnChange}
               />
               <Modal
@@ -179,10 +200,19 @@ const Timer: React.FC = (): JSX.Element => {
                 backdrop={true}
                 onHide={handleOnHide}
               >
+                <Modal.Header>
+                  <Modal.Title>Edit Timer</Modal.Title>
+                </Modal.Header>
                 <Modal.Body>
                   <Form fluid>
                     <FormGroup>
                       <FormControl
+                        style={{
+                          padding: 4,
+                          color: '#999',
+                          textAlign: 'center',
+                          fontSize: 'x-large',
+                        }}
                         name='timer'
                         size='lg'
                         readOnly={true}
@@ -195,17 +225,8 @@ const Timer: React.FC = (): JSX.Element => {
                         size='lg'
                         placeholder='What are you working on?'
                         width='100%'
-                        value={value}
+                        value={description}
                         onChange={handleOnChange}
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <FormControl
-                        block
-                        name='company'
-                        size='lg'
-                        accepter={InputPicker}
-                        data={projects}
                       />
                     </FormGroup>
                     <FormGroup>
@@ -213,51 +234,54 @@ const Timer: React.FC = (): JSX.Element => {
                         block
                         name='project'
                         size='lg'
-                        accepter={InputPicker}
+                        accepter={SelectPicker}
+                        placeholder='Project?'
                         data={projects}
+                        labelKey={'project'}
+                        valueKey={'id'}
+                        groupBy={'company'}
+                        onSelect={(value: any, item: any) =>
+                          handleOnSelect(value, item)
+                        }
                       />
                     </FormGroup>
+
                     <FormGroup>
                       <FormControl
                         block
                         creatable
                         name='ticket'
                         size='lg'
-                        accepter={InputPicker}
-                        data={projects}
+                        accepter={TagPicker}
+                        placeholder='Ticket?'
+                        data={uniqueTickets}
+                        labelKey={'ticket'}
+                        valueKey={'ticket'}
+                        onSelect={(value: any) => handleOnTagSelect(value)}
                       />
                     </FormGroup>
                   </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button onClick={handleOnHide} appearance='primary'>
-                    Ok
-                  </Button>
-                  <Button onClick={handleOnHide} appearance='subtle'>
-                    Cancel
+                  <ButtonToolbar>
+                    <Button block onClick={handleOnHide} appearance='primary'>
+                      Ok
+                    </Button>
+                    <Button block onClick={handleOnHide} appearance='default'>
+                      Cancel
+                    </Button>
+                  </ButtonToolbar>
+                  <Divider />
+                  <Button
+                    block
+                    onClick={handleOnHide}
+                    appearance='ghost'
+                    color='red'
+                  >
+                    Delete
                   </Button>
                 </Modal.Footer>
               </Modal>
-              {/* <Drawer
-                full
-                show={show}
-                placement='top'
-                backdrop={true}
-                onHide={handleOnHide}
-              >
-                <Drawer.Header></Drawer.Header>
-                <Drawer.Body>
-                  <Form></Form>
-                </Drawer.Body>
-                <Drawer.Footer style={{ bottom: '10px' }}>
-                  <Button onClick={handleOnHide} appearance='primary'>
-                    Confirm
-                  </Button>
-                  <Button onClick={handleOnHide} appearance='subtle'>
-                    Cancel
-                  </Button>
-                </Drawer.Footer>
-              </Drawer> */}
             </FlexboxGrid.Item>
             {!isActive ? (
               <React.Fragment>

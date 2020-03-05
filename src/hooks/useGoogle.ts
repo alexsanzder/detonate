@@ -87,17 +87,6 @@ export const useGoogle = ({
     };
   };
 
-  const groupBy = (array: any, key: any): object => {
-    return array.reduce((result: any, currentValue: string) => {
-      // If an array already present for key, push it to the array. Else create an
-      // array and push the object
-      (result[currentValue[key]] = result[currentValue[key]] || []).push(
-        currentValue
-      );
-      return result;
-    }, {});
-  };
-
   const loadTable = async (): Promise<void> => {
     gapi.client.load('sheets', 'v4', async () => {
       const response = await gapi.client.sheets.spreadsheets.values.batchGet({
@@ -108,17 +97,17 @@ export const useGoogle = ({
       });
 
       const valueRanges = response.result.valueRanges;
-      if (valueRanges) {
-        const projects =
-          valueRanges[0].values &&
-          valueRanges[0].values.map(parseProjects).reverse();
-        setProjects(groupBy(projects, 'company'));
+      const projects =
+        valueRanges &&
+        valueRanges[0].values &&
+        valueRanges[0].values.map(parseProjects).reverse();
+      setProjects(projects);
 
-        const records =
-          valueRanges[1].values &&
-          valueRanges[1].values.map(parseRecords).reverse();
-        setRecords(groupBy(records, 'date'));
-      }
+      const records =
+        valueRanges &&
+        valueRanges[1].values &&
+        valueRanges[1].values.map(parseRecords).reverse();
+      setRecords(records);
     });
   };
 

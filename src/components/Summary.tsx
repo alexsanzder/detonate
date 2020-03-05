@@ -7,6 +7,8 @@ import {
   List,
   TagGroup,
   Tag,
+  ButtonGroup,
+  IconButton,
 } from 'rsuite';
 import styled from 'styled-components';
 import GoogleAuthContext from './../contexts/useGoogleAuth';
@@ -42,8 +44,8 @@ const timeConvert = (fraction: number): string => {
   return formatted;
 };
 
-const PanelHeader = ({ date, records }: any) => {
-  const total = records.reduce((acc: any, curr: any) => {
+const PanelHeader = ({ date, data }: any) => {
+  const total = data.reduce((acc: any, curr: any) => {
     return acc + curr.time;
   }, 0);
 
@@ -71,23 +73,32 @@ const PanelHeader = ({ date, records }: any) => {
     </FlexboxGrid>
   );
 };
+
 const Summary = () => {
   const { records } = React.useContext(GoogleAuthContext);
+
+  const data =
+    records &&
+    records.reduce((r: any, a: any) => {
+      r[a.date] = r[a.date] || [];
+      r[a.date].push(a);
+      return r;
+    }, Object.create(null));
 
   return (
     <Style>
       <List bordered={false} className='list-summary' size='lg'>
-        {records ? (
-          Object.keys(records).map((date: string) => {
+        {data ? (
+          Object.keys(data).map((date: string) => {
             return (
               <List.Item key={date}>
                 <Panel
-                  header={<PanelHeader date={date} records={records[date]} />}
+                  header={<PanelHeader date={date} data={data[date]} />}
                   bordered
                   shaded
                 >
                   <List hover bordered={false}>
-                    {records[date].map((record: Record) => {
+                    {data[date].map((record: Record) => {
                       return (
                         <List.Item key={record.id}>
                           <FlexboxGrid justify='space-between' align='middle'>
@@ -133,7 +144,18 @@ const Summary = () => {
                                 textAlign: 'right',
                               }}
                             >
-                              <Icon icon='play' size='lg' />
+                              <ButtonGroup>
+                                <IconButton
+                                  appearance='subtle'
+                                  color='blue'
+                                  icon={<Icon icon='edit2' size='lg' />}
+                                />
+                                <IconButton
+                                  appearance='subtle'
+                                  color='green'
+                                  icon={<Icon icon='play' size='lg' />}
+                                />
+                              </ButtonGroup>
                             </FlexboxGrid.Item>
                           </FlexboxGrid>
                         </List.Item>

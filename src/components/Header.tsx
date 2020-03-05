@@ -12,7 +12,7 @@ import {
 import styled from 'styled-components';
 
 import GoogleAuthContext from '../contexts/useGoogleAuth';
-import logo from '.././logo.svg';
+import logo from '.././logo-detonate2.svg';
 const Style = styled.div`
   .rs-avatar {
     margin: 5px 15px 5px 5px;
@@ -32,10 +32,9 @@ const AppHeader: React.FC = () => {
             <img
               src={logo}
               alt='Detoanate Time Tracking'
-              height={55}
-              style={{ padding: '5px 15px 5px 15px', cursor: 'none' }}
+              height={50}
+              style={{ padding: '10px 15px 5px 15px', cursor: 'none' }}
             />
-            <>detonate</>
           </Navbar.Header>
           <Navbar.Body>
             <Nav pullRight>

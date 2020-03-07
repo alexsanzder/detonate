@@ -2,7 +2,9 @@
 import * as React from 'react';
 import { Container, Content, Footer, FlexboxGrid, Button, Icon } from 'rsuite';
 
-import GoogleContext from './contexts/useGoogleAuth';
+import AppContext from './contexts/useApp';
+
+import GoogleAuthContext from './contexts/useGoogleAuth';
 import { useGoogle } from './hooks/useGoogle';
 
 import Header from './components/Header';
@@ -31,58 +33,71 @@ const App = () => {
     scope,
     spreadsheetId: process.env.REACT_APP_GOOGLE_SHEET_ID,
   });
-  const [theme, setTheme] = React.useState('light');
 
-  const toggleTheme = () => {
-    // if the theme is not light, then set it to dark
-    if (theme === 'light') {
-      setTheme('dark');
-      // otherwise, it should be light
-    } else {
-      setTheme('light');
-    }
+  const [running, setRunning] = React.useState(false);
+  const [reload, setReload] = React.useState(false);
+
+  const { loadTable } = React.useContext(GoogleAuthContext);
+
+  const toggleRunning = () => {
+    setRunning(!running);
+  };
+
+  const toggleReload = () => {
+    setReload(!reload);
   };
 
   return (
-    <GoogleContext.Provider value={googleAuth}>
-      {googleAuth.isInitialized ? (
-        <Container>
-          {googleAuth.isSignedIn ? (
-            <React.Fragment>
-              <Header toggleTheme={toggleTheme} logo={logo} />
-              <Content
-                style={{
-                  marginTop: '56px',
-                }}
-              >
-                <Timer />
-                <Summary />
-              </Content>
-              <Footer
-                style={{
-                  padding: '0px 0px 20px',
-                }}
-              >
-                <FlexboxGrid justify='center'>
-                  <Button
-                    target='_blank'
-                    href='https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48'
-                    appearance='ghost'
-                  >
-                    <Icon icon='google' />
-                    See more on Google Sheets
-                  </Button>
-                </FlexboxGrid>
-              </Footer>
-            </React.Fragment>
-          ) : (
-            <Login />
-          )}
-        </Container>
-      ) : (
-        <Spinner />
-      )}
-    </GoogleContext.Provider>
+    <AppContext.Provider
+      value={{
+        locale: 'de-DE',
+        running: running,
+        toggleRunning: toggleRunning,
+        reload: reload,
+        toggleReload: toggleReload,
+      }}
+    >
+      <GoogleAuthContext.Provider value={googleAuth}>
+        {googleAuth.isInitialized ? (
+          <Container>
+            {googleAuth.isSignedIn ? (
+              <React.Fragment>
+                <Header logo={logo} />
+
+                <Content
+                  style={{
+                    marginTop: '56px',
+                  }}
+                >
+                  <Timer />
+                  <Summary />
+                </Content>
+                <Footer
+                  style={{
+                    padding: '0px 0px 20px',
+                  }}
+                >
+                  <FlexboxGrid justify='center'>
+                    <Button
+                      target='_blank'
+                      href='https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48'
+                      appearance='ghost'
+                    >
+                      <Icon icon='google' />
+                      See more on Google Sheets
+                    </Button>
+                  </FlexboxGrid>
+                </Footer>
+              </React.Fragment>
+            ) : (
+              <Login />
+            )}
+          </Container>
+        ) : (
+          <Spinner />
+        )}
+      </GoogleAuthContext.Provider>
+    </AppContext.Provider>
   );
 };
 

@@ -1,4 +1,6 @@
-import * as React from "react";
+import * as React from 'react';
+import styled from 'styled-components';
+
 import {
   Content,
   FlexboxGrid,
@@ -9,11 +11,10 @@ import {
   Icon,
   ControlLabel,
   FormControl,
-  ButtonToolbar
-} from "rsuite";
-import styled from "styled-components";
+  ButtonToolbar,
+} from 'rsuite';
 
-import GoogleAuthContext from "./../contexts/useGoogleAuth";
+import GoogleAuthContext from './../contexts/useGoogleAuth';
 
 const Style = styled.div`
   width: 100%;
@@ -31,22 +32,22 @@ const Login = () => {
   return (
     <Style>
       <Content>
-        <FlexboxGrid justify="center">
+        <FlexboxGrid justify='center'>
           <FlexboxGrid.Item colspan={12}>
             <Panel header={<h3>Login</h3>} bordered>
               <Form fluid>
                 <FormGroup>
                   <ControlLabel>Sheet Name</ControlLabel>
-                  <FormControl name="name" />
+                  <FormControl name='name' />
                 </FormGroup>
                 <FormGroup>
                   <ControlLabel>Google Sheet ID</ControlLabel>
-                  <FormControl name="sheetId" />
+                  <FormControl name='sheetId' />
                 </FormGroup>
                 <FormGroup>
                   <ButtonToolbar>
-                    <Button appearance="primary" onClick={handleSignIn} block>
-                      <Icon icon="google" /> Sign in with Google
+                    <Button appearance='primary' onClick={handleSignIn} block>
+                      <Icon icon='google' /> Sign in with Google
                     </Button>
                   </ButtonToolbar>
                 </FormGroup>

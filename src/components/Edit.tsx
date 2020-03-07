@@ -1,4 +1,7 @@
 import * as React from 'react';
+import styled from 'styled-components';
+
+import AppContext from './../contexts/useApp';
 import GoogleAuthContext from './../contexts/useGoogleAuth';
 import { Record } from './../hooks/useGoogle';
 
@@ -13,21 +16,21 @@ import {
   SelectPicker,
   Divider,
 } from 'rsuite';
-import styled from 'styled-components';
+import { ItemDataType } from 'rsuite/lib/@types/common';
 
 type EditProps = {
   show: boolean;
   record: Record;
   onHide: () => void;
-  onReload: (arg0: boolean) => void;
 };
 
 const Edit: React.FC<EditProps> = ({
   show,
   record,
   onHide,
-  onReload,
 }: EditProps): JSX.Element => {
+  const { toggleReload } = React.useContext(AppContext);
+
   const { projects, records, updateRecord } = React.useContext(
     GoogleAuthContext
   );
@@ -88,8 +91,8 @@ const Edit: React.FC<EditProps> = ({
         ticket && ticket.join(', '),
         fraction,
       ]);
+    toggleReload && toggleReload();
     onHide();
-    onReload(true);
   };
 
   const handleOnTimeChange = React.useCallback((value: string) => {
@@ -108,9 +111,16 @@ const Edit: React.FC<EditProps> = ({
     setTicket(value);
   }, []);
 
-  const handleOnTicketSelect = React.useCallback((value: string, item: any) => {
-    setProject(item.project);
-    setCompany(item.company);
+  const handleOnProjectSelect = React.useCallback(
+    (value: string, item: any) => {
+      setProject(item.project);
+      setCompany(item.company);
+    },
+    []
+  );
+
+  const handleOnTicketSelect = React.useCallback((value: string[]) => {
+    setTicket(value);
   }, []);
 
   const handleOnShow = () => {
@@ -175,6 +185,9 @@ const Edit: React.FC<EditProps> = ({
                   groupBy={'company'}
                   value={project}
                   onChange={handleProjectChange}
+                  onSelect={(value: string, item: ItemDataType): void =>
+                    handleOnProjectSelect(value, item)
+                  }
                 />
               </FormGroup>
 
@@ -191,8 +204,8 @@ const Edit: React.FC<EditProps> = ({
                   valueKey={'ticket'}
                   value={ticket}
                   onChange={handleTicketChange}
-                  onSelect={(value: any, item: any) =>
-                    handleOnTicketSelect(value, item)
+                  onSelect={(value: string[]): void =>
+                    handleOnTicketSelect(value)
                   }
                 />
               </FormGroup>

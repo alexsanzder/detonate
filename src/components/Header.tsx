@@ -1,4 +1,6 @@
 import * as React from 'react';
+import styled from 'styled-components';
+
 import {
   Header,
   Nav,
@@ -9,12 +11,11 @@ import {
   Whisper,
   Tooltip,
 } from 'rsuite';
-import styled from 'styled-components';
 
+import AppContext from './../contexts/useApp';
 import GoogleAuthContext from '../contexts/useGoogleAuth';
 
 type HeaderProps = {
-  toggleTheme: () => void;
   logo: string;
 };
 
@@ -23,9 +24,9 @@ const SyncTooltip = <Tooltip>Sync Google Sheets</Tooltip>;
 const DarkModeTooltip = <Tooltip>Toggle dark/light mode</Tooltip>;
 
 const AppHeader: React.FC<HeaderProps> = ({
-  toggleTheme,
   logo,
 }: HeaderProps): JSX.Element => {
+  const { toggleReload } = React.useContext(AppContext);
   const { currentUser, handleSignOut } = React.useContext(GoogleAuthContext);
 
   return (
@@ -52,7 +53,10 @@ const AppHeader: React.FC<HeaderProps> = ({
           <Navbar.Body>
             <Nav pullRight>
               <Whisper placement='bottom' trigger='hover' speaker={SyncTooltip}>
-                <Nav.Item icon={<Icon icon='reload' size='lg' />}></Nav.Item>
+                <Nav.Item
+                  icon={<Icon icon='reload' size='lg' />}
+                  onClick={toggleReload}
+                ></Nav.Item>
               </Whisper>
               <Whisper placement='bottom' trigger='hover' speaker={OpenTooltip}>
                 <Nav.Item
@@ -66,10 +70,7 @@ const AppHeader: React.FC<HeaderProps> = ({
                 trigger='hover'
                 speaker={DarkModeTooltip}
               >
-                <Nav.Item
-                  icon={<Icon icon='sun-o' size='lg' />}
-                  onClick={toggleTheme}
-                ></Nav.Item>
+                <Nav.Item icon={<Icon icon='sun-o' size='lg' />}></Nav.Item>
               </Whisper>
               <Dropdown
                 placement='bottomEnd'

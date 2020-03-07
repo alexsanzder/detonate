@@ -1,4 +1,7 @@
 import * as React from 'react';
+import styled from 'styled-components';
+
+import AppContext from './../contexts/useApp';
 import GoogleAuthContext from './../contexts/useGoogleAuth';
 
 import {
@@ -16,22 +19,6 @@ import {
   SelectPicker,
   Divider,
 } from 'rsuite';
-import styled from 'styled-components';
-
-const Style = styled.div`
-  .read-only input {
-    border-color: transparent;
-    &.timer {
-      text-align: right;
-    }
-  }
-  .rs-input {
-    &-lg {
-      font-weight: 600;
-      width: 100%;
-    }
-  }
-`;
 
 const Timer: React.FC = (): JSX.Element => {
   const {
@@ -43,7 +30,8 @@ const Timer: React.FC = (): JSX.Element => {
     records,
   } = React.useContext(GoogleAuthContext);
 
-  const [isActive, setIsActive] = React.useState(false);
+  const { locale, running, toggleRunning } = React.useContext(AppContext);
+
   const [isReload, setIsReload] = React.useState(false);
   const [seconds, setSeconds] = React.useState(0);
   const [updatedRange, setUpdatedRange] = React.useState();
@@ -73,24 +61,24 @@ const Timer: React.FC = (): JSX.Element => {
 
   React.useEffect(() => {
     let interval: number | undefined = undefined;
-    if (isActive) {
+    if (running) {
       interval = window.setInterval(() => {
         setSeconds(seconds => seconds + 1);
       }, 1000);
-    } else if (!isActive && seconds !== 0) {
+    } else if (!running && seconds !== 0) {
       window.clearInterval(interval);
     }
     return () => window.clearInterval(interval);
-  }, [isActive, seconds]);
+  }, [running, seconds]);
 
   React.useEffect(() => {
-    if (isReload && !isActive) {
+    if (isReload && !running) {
       setSeconds(0);
 
       //Load spredsheet data
       loadTable && loadTable();
     }
-  }, [isReload, isActive]);
+  }, [isReload, running]);
 
   const handleOnChange = React.useCallback((value: string) => {
     setDescription(value);
@@ -102,7 +90,7 @@ const Timer: React.FC = (): JSX.Element => {
 
   const handleOnStart = async () => {
     setIsReload(false);
-    setIsActive(true);
+    toggleRunning && toggleRunning();
     setReadOnly(true);
     setColSpan(16);
     setDescription(description ? description : '(no description)');
@@ -111,7 +99,7 @@ const Timer: React.FC = (): JSX.Element => {
       appendRecord &&
       (await appendRecord([
         currentUser.getName(),
-        new Date().toLocaleDateString('de-DE', {
+        new Date().toLocaleDateString(locale, {
           year: 'numeric',
           month: '2-digit',
           day: '2-digit',
@@ -120,7 +108,7 @@ const Timer: React.FC = (): JSX.Element => {
         '(no project)',
         description ? description : '(no description)',
         '(no ticket)',
-        'running...',
+        '0',
       ]));
 
     const { result } = append;
@@ -140,7 +128,7 @@ const Timer: React.FC = (): JSX.Element => {
         fraction,
       ]);
     setIsReload(true);
-    setIsActive(false);
+    toggleRunning && toggleRunning();
     setDescription('');
     setProject(null);
     setCompany(null);
@@ -285,7 +273,7 @@ const Timer: React.FC = (): JSX.Element => {
                 </Modal.Footer>
               </Modal>
             </FlexboxGrid.Item>
-            {!isActive ? (
+            {!running ? (
               <React.Fragment>
                 <FlexboxGrid.Item
                   colspan={2}
@@ -341,5 +329,20 @@ const Timer: React.FC = (): JSX.Element => {
     </Style>
   );
 };
+
+const Style = styled.div`
+  .read-only input {
+    border-color: transparent;
+    &.timer {
+      text-align: right;
+    }
+  }
+  .rs-input {
+    &-lg {
+      font-weight: 600;
+      width: 100%;
+    }
+  }
+`;
 
 export default Timer;

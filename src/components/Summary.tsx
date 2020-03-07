@@ -1,4 +1,6 @@
 import * as React from 'react';
+import styled from 'styled-components';
+import GoogleAuthContext from './../contexts/useGoogleAuth';
 import {
   Icon,
   FlexboxGrid,
@@ -7,26 +9,11 @@ import {
   List,
   TagGroup,
   Tag,
-  ButtonGroup,
+  ButtonToolbar,
   IconButton,
 } from 'rsuite';
-import styled from 'styled-components';
-import GoogleAuthContext from './../contexts/useGoogleAuth';
 import { Record } from './../hooks/useGoogle';
-
-const Style = styled.div`
-  padding: 10px 20px;
-  margin-top: 82px;
-  .list-summary {
-    box-shadow: none;
-    .rs-list-item-lg {
-      box-shadow: none;
-    }
-    .rs-panel-body {
-      padding-bottom: 0;
-    }
-  }
-`;
+import Edit from './Edit';
 
 const timeConvert = (fraction: number): string => {
   const hours = Math.floor(fraction);
@@ -75,7 +62,18 @@ const PanelHeader = ({ date, data }: any) => {
 };
 
 const Summary = () => {
-  const { records } = React.useContext(GoogleAuthContext);
+  const { records, loadTable } = React.useContext(GoogleAuthContext);
+  const [reload, setReload] = React.useState(false);
+
+  const [show, setShow] = React.useState(false);
+  const [record, setRecord] = React.useState();
+
+  React.useEffect(() => {
+    if (reload && !show) {
+      //Load spredsheet data
+      loadTable && loadTable();
+    }
+  }, [reload, show]);
 
   const data =
     records &&
@@ -85,8 +83,22 @@ const Summary = () => {
       return r;
     }, Object.create(null));
 
+  const handleToogleEdit = (record: any) => {
+    setShow(!show);
+    setRecord(record);
+  };
+
+  const handleOnHide = () => {
+    setShow(false);
+  };
   return (
     <Style>
+      <Edit
+        show={show}
+        record={record}
+        onHide={handleOnHide}
+        onReload={setReload}
+      />
       <List bordered={false} className='list-summary' size='lg'>
         {data ? (
           Object.keys(data).map((date: string) => {
@@ -97,7 +109,7 @@ const Summary = () => {
                   bordered
                   shaded
                 >
-                  <List hover bordered={false}>
+                  <List bordered={false}>
                     {data[date].map((record: Record) => {
                       return (
                         <List.Item key={record.id}>
@@ -144,18 +156,21 @@ const Summary = () => {
                                 textAlign: 'right',
                               }}
                             >
-                              <ButtonGroup>
+                              <ButtonToolbar>
                                 <IconButton
+                                  circle
                                   appearance='subtle'
                                   color='blue'
                                   icon={<Icon icon='edit2' size='lg' />}
+                                  onClick={() => handleToogleEdit(record)}
                                 />
                                 <IconButton
+                                  circle
                                   appearance='subtle'
                                   color='green'
                                   icon={<Icon icon='play' size='lg' />}
                                 />
-                              </ButtonGroup>
+                              </ButtonToolbar>
                             </FlexboxGrid.Item>
                           </FlexboxGrid>
                         </List.Item>
@@ -188,5 +203,19 @@ const Summary = () => {
     </Style>
   );
 };
+
+const Style = styled.div`
+  padding: 10px 20px;
+  margin-top: 82px;
+  .list-summary {
+    box-shadow: none;
+    .rs-list-item-lg {
+      box-shadow: none;
+    }
+    .rs-panel-body {
+      padding-bottom: 0;
+    }
+  }
+`;
 
 export default Summary;

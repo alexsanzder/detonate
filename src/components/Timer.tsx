@@ -104,7 +104,7 @@ const Timer: React.FC = (): JSX.Element => {
     setIsReload(false);
     setIsActive(true);
     setReadOnly(true);
-    setColSpan(17);
+    setColSpan(16);
     setDescription(description ? description : '(no description)');
 
     const append =
@@ -176,13 +176,15 @@ const Timer: React.FC = (): JSX.Element => {
         style={{
           position: 'fixed',
           width: '100%',
-          zIndex: 1000,
+          zIndex: 10,
           height: '82px',
-          backgroundColor: 'white',
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          backgroundColor: '#1a1d24',
         }}
       >
         <Form>
-          <FlexboxGrid justify='space-between' align='middle'>
+          <FlexboxGrid align='middle'>
             <FlexboxGrid.Item colspan={colSpan}>
               <FormControl
                 name='description'
@@ -311,7 +313,7 @@ const Timer: React.FC = (): JSX.Element => {
                   />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item
-                  colspan={3}
+                  colspan={4}
                   style={{
                     textAlign: 'right',
                   }}

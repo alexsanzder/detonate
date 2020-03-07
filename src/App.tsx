@@ -10,7 +10,9 @@ import Login from './components/Login';
 import Spinner from './components/Spinner';
 import Timer from './components/Timer';
 
-import 'rsuite/dist/styles/rsuite-default.css';
+import 'rsuite/dist/styles/rsuite-dark.css';
+import logo from './logo-detonate2.svg';
+
 import Summary from './components/Summary';
 
 const discoveryDocs = [
@@ -29,29 +31,50 @@ const App = () => {
     scope,
     spreadsheetId: process.env.REACT_APP_GOOGLE_SHEET_ID,
   });
+  const [theme, setTheme] = React.useState('light');
+
+  const toggleTheme = () => {
+    // if the theme is not light, then set it to dark
+    if (theme === 'light') {
+      setTheme('dark');
+      // otherwise, it should be light
+    } else {
+      setTheme('light');
+    }
+  };
+
   return (
     <GoogleContext.Provider value={googleAuth}>
       {googleAuth.isInitialized ? (
         <Container>
           {googleAuth.isSignedIn ? (
-            <>
-              <Header />
-              <Content style={{ marginTop: '56px' }}>
+            <React.Fragment>
+              <Header toggleTheme={toggleTheme} logo={logo} />
+              <Content
+                style={{
+                  marginTop: '56px',
+                }}
+              >
                 <Timer />
                 <Summary />
               </Content>
-              <Footer style={{ padding: '0px 0px 20px' }}>
+              <Footer
+                style={{
+                  padding: '0px 0px 20px',
+                }}
+              >
                 <FlexboxGrid justify='center'>
                   <Button
                     target='_blank'
-                    href='https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=1594442596'
+                    href='https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48'
                     appearance='ghost'
                   >
-                    <Icon icon='google' /> See more on Google Sheets
+                    <Icon icon='google' />
+                    See more on Google Sheets
                   </Button>
                 </FlexboxGrid>
               </Footer>
-            </>
+            </React.Fragment>
           ) : (
             <Login />
           )}

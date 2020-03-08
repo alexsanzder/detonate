@@ -68,27 +68,6 @@ export const useGoogle = ({
   const [projects, setProjects] = useState();
   const [sheetProperties, setSheetProperties] = useState();
 
-  const parseProjects = (value: any[], index: number): Project => {
-    return {
-      id: `${tablName}!A${index + 2}`,
-      company: value[0],
-      project: value[1],
-    };
-  };
-
-  const parseRecords = (value: any[], index: number): Record => {
-    return {
-      id: `${tablName}!A${index + 2}`,
-      name: value[0],
-      date: value[1],
-      company: value[2],
-      project: value[3],
-      description: value[4],
-      ticket: value[5],
-      time: value[6],
-    };
-  };
-
   const loadTable = async (): Promise<void> => {
     gapi.client.load('sheets', 'v4', async () => {
       const request = {
@@ -122,7 +101,7 @@ export const useGoogle = ({
         majorDimension: 'ROWS',
         ranges: [
           'projects!A2:B',
-          `${tablName}!A${rowCount && rowCount - 20}:G`,
+          `${tablName}!A${rowCount && rowCount - 21}:G`,
         ],
       });
 
@@ -130,14 +109,37 @@ export const useGoogle = ({
       const projects =
         valueRanges &&
         valueRanges[0].values &&
-        valueRanges[0].values.map(parseProjects).reverse();
+        valueRanges[0].values
+          .map(
+            (value: any[], index: number): Project => {
+              return {
+                id: `${tablName}!A${index + 2}`,
+                company: value[0],
+                project: value[1],
+              };
+            }
+          )
+          .reverse();
       setProjects(projects);
 
       const records =
         valueRanges &&
         valueRanges[1].values &&
         valueRanges[1].values
-          .map(parseRecords)
+          .map(
+            (value: any[], index: number): Record => {
+              return {
+                id: `${tablName}!A${rowCount && rowCount - 21 + index}`,
+                name: value[0],
+                date: value[1],
+                company: value[2],
+                project: value[3],
+                description: value[4],
+                ticket: value[5],
+                time: value[6],
+              };
+            }
+          )
           .reverse()
           .filter(record => record.time !== undefined);
       setRecords(records);
@@ -190,7 +192,7 @@ export const useGoogle = ({
     //gapi.auth2.getAuthInstance().disconnect();
   };
 
-  const appendRecord = async (record: string[]) => {
+  const appendRecord = async (record: string[]): Promise<any> => {
     return await gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
       range: `${tablName}!A2:G2`,

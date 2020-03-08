@@ -27,7 +27,9 @@ const AppHeader: React.FC<HeaderProps> = ({
   logo,
 }: HeaderProps): JSX.Element => {
   const { toggleReload } = React.useContext(AppContext);
-  const { currentUser, handleSignOut } = React.useContext(GoogleAuthContext);
+  const { currentUser, handleSignOut, sheetProperties } = React.useContext(
+    GoogleAuthContext
+  );
 
   return (
     <Style>
@@ -61,7 +63,7 @@ const AppHeader: React.FC<HeaderProps> = ({
               <Whisper placement='bottom' trigger='hover' speaker={OpenTooltip}>
                 <Nav.Item
                   target='_blank'
-                  href='https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=1594442596'
+                  href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${sheetProperties?.sheetId}`}
                   icon={<Icon icon='external-link' size='lg' />}
                 ></Nav.Item>
               </Whisper>
@@ -76,11 +78,7 @@ const AppHeader: React.FC<HeaderProps> = ({
                 placement='bottomEnd'
                 renderTitle={(): JSX.Element => {
                   return (
-                    <Avatar
-                      circle
-                      src={currentUser && currentUser.getImageUrl()}
-                      alt='AS'
-                    >
+                    <Avatar circle src={currentUser?.getImageUrl()} alt='AS'>
                       AS
                     </Avatar>
                   );

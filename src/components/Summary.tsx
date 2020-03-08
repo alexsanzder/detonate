@@ -65,7 +65,7 @@ const PanelHeader = ({ date, data }: any): JSX.Element => {
   );
 };
 
-const Summary = () => {
+const Summary = (): JSX.Element => {
   const { reload, toggleReload } = React.useContext(AppContext);
   const { records, loadTable } = React.useContext(GoogleAuthContext);
 
@@ -80,13 +80,11 @@ const Summary = () => {
     }
   }, [reload]);
 
-  const data =
-    records &&
-    records.reduce((r: any, a: Record) => {
-      r[a.date] = r[a.date] || [];
-      r[a.date].push(a);
-      return r;
-    }, Object.create(null));
+  const data = records?.reduce((r: any, a: Record) => {
+    r[a.date] = r[a.date] || [];
+    r[a.date].push(a);
+    return r;
+  }, Object.create(null));
 
   const handleToogleEdit = (record: Record): void => {
     setShow(!show);
@@ -103,98 +101,99 @@ const Summary = () => {
           <Edit show={show} record={record} onHide={handleOnHide} />
           <List bordered={false} className='list-summary' size='lg'>
             {data ? (
-              Object.keys(data).map((date: string) => {
-                return (
-                  <List.Item key={date}>
-                    <Panel
-                      header={<PanelHeader date={date} data={data[date]} />}
-                      bordered
-                      shaded
-                    >
-                      <List bordered={false}>
-                        {data[date].map((record: Record) => {
-                          return (
-                            <List.Item key={record.id}>
-                              <FlexboxGrid
-                                justify='space-between'
-                                align='middle'
-                              >
-                                <FlexboxGrid.Item colspan={20}>
-                                  <p
+              Object.keys(data).map(
+                (date: string) =>
+                  data[date][0].time !== undefined && (
+                    <List.Item key={date}>
+                      <Panel
+                        header={<PanelHeader date={date} data={data[date]} />}
+                        bordered
+                        shaded
+                      >
+                        <List bordered={false}>
+                          {data[date].map((record: Record) => {
+                            return (
+                              <List.Item key={record.id}>
+                                <FlexboxGrid
+                                  justify='space-between'
+                                  align='middle'
+                                >
+                                  <FlexboxGrid.Item colspan={20}>
+                                    <p
+                                      style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                      }}
+                                    >
+                                      {record.description}
+                                    </p>
+                                  </FlexboxGrid.Item>
+                                  <FlexboxGrid.Item
+                                    colspan={4}
                                     style={{
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
+                                      textAlign: 'right',
                                     }}
                                   >
-                                    {record.description}
-                                  </p>
-                                </FlexboxGrid.Item>
-                                <FlexboxGrid.Item
-                                  colspan={4}
+                                    {timeConvert(record.time)}
+                                  </FlexboxGrid.Item>
+                                </FlexboxGrid>
+                                <FlexboxGrid
+                                  justify='space-between'
+                                  align='middle'
                                   style={{
-                                    textAlign: 'right',
+                                    marginTop: '1rem',
                                   }}
                                 >
-                                  {timeConvert(record.time)}
-                                </FlexboxGrid.Item>
-                              </FlexboxGrid>
-                              <FlexboxGrid
-                                justify='space-between'
-                                align='middle'
-                                style={{
-                                  marginTop: '1rem',
-                                }}
-                              >
-                                <FlexboxGrid.Item colspan={20}>
-                                  <TagGroup>
-                                    {record.company && (
-                                      <Tag>{record.company}</Tag>
-                                    )}
-                                    {record.project && (
-                                      <Tag>
-                                        {record.project && record.project}
-                                      </Tag>
-                                    )}
-                                    {record.ticket && (
-                                      <Tag>{record.ticket}</Tag>
-                                    )}
-                                  </TagGroup>
-                                </FlexboxGrid.Item>
-                                <FlexboxGrid.Item
-                                  colspan={4}
-                                  style={{
-                                    textAlign: 'right',
-                                  }}
-                                >
-                                  <ButtonToolbar>
-                                    <IconButton
-                                      circle
-                                      appearance='subtle'
-                                      color='blue'
-                                      icon={<Icon icon='edit2' size='lg' />}
-                                      onClick={(): void =>
-                                        handleToogleEdit(record)
-                                      }
-                                    />
-                                    <IconButton
-                                      circle
-                                      appearance='subtle'
-                                      color='green'
-                                      icon={<Icon icon='play' size='lg' />}
-                                      onClick={toggleRunning}
-                                    />
-                                  </ButtonToolbar>
-                                </FlexboxGrid.Item>
-                              </FlexboxGrid>
-                            </List.Item>
-                          );
-                        })}
-                      </List>
-                    </Panel>
-                  </List.Item>
-                );
-              })
+                                  <FlexboxGrid.Item colspan={20}>
+                                    <TagGroup>
+                                      {record.company && (
+                                        <Tag>{record.company}</Tag>
+                                      )}
+                                      {record.project && (
+                                        <Tag>
+                                          {record.project && record.project}
+                                        </Tag>
+                                      )}
+                                      {record.ticket && (
+                                        <Tag>{record.ticket}</Tag>
+                                      )}
+                                    </TagGroup>
+                                  </FlexboxGrid.Item>
+                                  <FlexboxGrid.Item
+                                    colspan={4}
+                                    style={{
+                                      textAlign: 'right',
+                                    }}
+                                  >
+                                    <ButtonToolbar>
+                                      <IconButton
+                                        circle
+                                        appearance='subtle'
+                                        color='blue'
+                                        icon={<Icon icon='edit2' size='lg' />}
+                                        onClick={(): void =>
+                                          handleToogleEdit(record)
+                                        }
+                                      />
+                                      <IconButton
+                                        circle
+                                        appearance='subtle'
+                                        color='green'
+                                        icon={<Icon icon='play' size='lg' />}
+                                        onClick={toggleRunning}
+                                      />
+                                    </ButtonToolbar>
+                                  </FlexboxGrid.Item>
+                                </FlexboxGrid>
+                              </List.Item>
+                            );
+                          })}
+                        </List>
+                      </Panel>
+                    </List.Item>
+                  )
+              )
             ) : (
               <List.Item>
                 <Panel

@@ -31,6 +31,7 @@ export interface UseGoogleType {
     range: string,
     record: (string | number | null)[]
   ) => Promise<any> | undefined;
+  sheetProperties: any;
 }
 
 export interface Record {
@@ -65,8 +66,9 @@ export const useGoogle = ({
   const [currentUser, setCurrentUser] = useState();
   const [records, setRecords] = useState();
   const [projects, setProjects] = useState();
+  const [sheetProperties, setSheetProperties] = useState();
 
-  const parseProjects = (value: any, index: number): Project => {
+  const parseProjects = (value: any[], index: number): Project => {
     return {
       id: `${tablName}!A${index + 2}`,
       company: value[0],
@@ -74,7 +76,7 @@ export const useGoogle = ({
     };
   };
 
-  const parseRecords = (value: any, index: number): Record => {
+  const parseRecords = (value: any[], index: number): Record => {
     return {
       id: `${tablName}!A${index + 2}`,
       name: value[0],
@@ -89,11 +91,39 @@ export const useGoogle = ({
 
   const loadTable = async (): Promise<void> => {
     gapi.client.load('sheets', 'v4', async () => {
+      const request = {
+        // The spreadsheet to request.
+        spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48', // TODO: Update placeholder value.
+
+        resource: {
+          dataFilters: [
+            {
+              a1Range: tablName,
+            },
+          ],
+
+          includeGridData: false,
+        },
+      };
+
+      const sheetProperties = await gapi.client.sheets.spreadsheets.getByDataFilter(
+        request
+      );
+      const properties =
+        sheetProperties.result.sheets &&
+        sheetProperties.result.sheets[0].properties;
+      setSheetProperties(properties);
+
+      const rowCount = properties?.gridProperties?.rowCount;
       const response = await gapi.client.sheets.spreadsheets.values.batchGet({
         spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
         valueRenderOption: 'UNFORMATTED_VALUE',
         dateTimeRenderOption: 'FORMATTED_STRING',
-        ranges: ['projects!A2:B', `${tablName}!A2:G`],
+        majorDimension: 'ROWS',
+        ranges: [
+          'projects!A2:B',
+          `${tablName}!A${rowCount && rowCount - 20}:G`,
+        ],
       });
 
       const valueRanges = response.result.valueRanges;
@@ -106,7 +136,10 @@ export const useGoogle = ({
       const records =
         valueRanges &&
         valueRanges[1].values &&
-        valueRanges[1].values.map(parseRecords).reverse();
+        valueRanges[1].values
+          .map(parseRecords)
+          .reverse()
+          .filter(record => record.time !== undefined);
       setRecords(records);
     });
   };
@@ -172,7 +205,7 @@ export const useGoogle = ({
   const updateRecord = async (
     range: string,
     record: (string | number | null)[]
-  ) => {
+  ): Promise<any> => {
     return await gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
       range: range,
@@ -198,5 +231,6 @@ export const useGoogle = ({
     loadTable,
     appendRecord,
     updateRecord,
+    sheetProperties,
   };
 };

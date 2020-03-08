@@ -151,11 +151,11 @@ const Timer: React.FC = (): JSX.Element => {
     setTicket(value.join(', '));
   }, []);
 
-  const uniqueTickets =
-    records &&
-    Array.from(new Set(records.map((a: any) => a.ticket))).map(ticket => {
-      return records.find((a: any) => a.ticket === ticket);
-    });
+  const uniqueTickets = Array.from(
+    new Set(records?.map((a: any) => a.ticket))
+  ).map(ticket => {
+    return records.find((a: any) => a.ticket === ticket);
+  });
 
   return (
     <Style>

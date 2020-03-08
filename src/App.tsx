@@ -37,8 +37,6 @@ const App = () => {
   const [running, setRunning] = React.useState(false);
   const [reload, setReload] = React.useState(false);
 
-  const { loadTable } = React.useContext(GoogleAuthContext);
-
   const toggleRunning = () => {
     setRunning(!running);
   };
@@ -80,7 +78,7 @@ const App = () => {
                   <FlexboxGrid justify='center'>
                     <Button
                       target='_blank'
-                      href='https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48'
+                      href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${googleAuth.sheetProperties?.sheetId}`}
                       appearance='ghost'
                     >
                       <Icon icon='google' />

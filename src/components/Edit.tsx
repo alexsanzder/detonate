@@ -17,6 +17,7 @@ import {
   Divider,
 } from 'rsuite';
 import { ItemDataType } from 'rsuite/lib/@types/common';
+import { getSeconds, getFraction, getTimeFormated } from '../utils/time';
 
 type EditProps = {
   show: boolean;
@@ -30,7 +31,6 @@ const Edit: React.FC<EditProps> = ({
   onHide,
 }: EditProps): JSX.Element => {
   const { toggleReload } = React.useContext(AppContext);
-
   const { projects, records, updateRecord } = React.useContext(
     GoogleAuthContext
   );
@@ -41,43 +41,15 @@ const Edit: React.FC<EditProps> = ({
   const [project, setProject] = React.useState<string | null>(null);
   const [ticket, setTicket] = React.useState<string[]>([]);
 
-  const getSeconds = (time: string): number => {
-    return time
-      .split(':')
-      .reverse()
-      .reduce((prev, curr, i) => prev + parseInt(curr) * Math.pow(60, i), 0);
-  };
-
-  const fractionConvert = (seconds: number): number => {
-    const hours = seconds / (60 * 60);
-    return hours;
-  };
-
-  const timeFormat = (fraction: number): string => {
-    const hours = Math.floor(fraction);
-    const allseconds = 3600 * (fraction - hours);
-    const minutes = Math.floor(allseconds / 60);
-    const seconds = Math.floor(allseconds % 60);
-
-    const formatted =
-      ('0' + (hours % 12)).substr(-2) +
-      ':' +
-      ('0' + minutes).substr(-2) +
-      ':' +
-      ('0' + seconds).substr(-2);
-
-    return formatted;
-  };
-
-  const tickets = Array.from(new Set(records?.map((a: any) => a.ticket))).map(
-    ticket => {
-      return records.find((a: any) => a.ticket === ticket);
-    }
-  );
+  const tickets = Array.from(
+    new Set(records?.map((record: Record) => record.ticket))
+  ).map(ticket => {
+    return records.find((record: Record) => record.ticket === ticket);
+  });
 
   const handleUpdate = (): void => {
     const seconds = time ? getSeconds(time) : 0;
-    const fraction = fractionConvert(seconds);
+    const fraction = getFraction(seconds);
 
     updateRecord &&
       updateRecord(record.id, [
@@ -121,8 +93,8 @@ const Edit: React.FC<EditProps> = ({
     setTicket(value);
   }, []);
 
-  const handleOnShow = () => {
-    setTime(timeFormat(record.time));
+  const handleOnShow = (): void => {
+    setTime(getTimeFormated(record.time));
     setDescription(record.description);
     setProject(record.project);
     setTicket(record.ticket.split(', '));
@@ -200,7 +172,9 @@ const Edit: React.FC<EditProps> = ({
                 valueKey='ticket'
                 value={ticket}
                 onChange={handleTicketChange}
-                onSelect={(value: any) => handleOnTicketSelect(value)}
+                onSelect={(value: string[]): void =>
+                  handleOnTicketSelect(value)
+                }
               />
             </FormGroup>
           </Form>

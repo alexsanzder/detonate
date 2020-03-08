@@ -20,6 +20,8 @@ import {
   Divider,
 } from 'rsuite';
 
+import { getFraction, getTimeFromSeconds } from '../utils/time';
+
 const Timer: React.FC = (): JSX.Element => {
   const {
     appendRecord,
@@ -42,22 +44,6 @@ const Timer: React.FC = (): JSX.Element => {
   const [ticket, setTicket] = React.useState<string | null>(null);
   const [show, setShow] = React.useState(false);
   const [readOnly, setReadOnly] = React.useState(false);
-
-  const fractionConvert = (seconds: number): number => {
-    const hours = seconds / (60 * 60);
-    return hours;
-  };
-
-  const getTimeFromSeconds = (totalSeconds: number): string => {
-    //const days = Math.floor(totalSeconds / (60 * 60 * 24));
-    const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
-    const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
-    const seconds = Math.floor(totalSeconds % 60);
-
-    return `${('0' + hours).slice(-2)}:${('0' + minutes).slice(-2)}:${(
-      '0' + seconds
-    ).slice(-2)}`;
-  };
 
   React.useEffect(() => {
     let interval: number | undefined = undefined;
@@ -116,7 +102,7 @@ const Timer: React.FC = (): JSX.Element => {
   };
 
   const handleOnStop = (): void => {
-    const fraction = fractionConvert(seconds);
+    const fraction = getFraction(seconds);
     updateRecord &&
       updateRecord(updatedRange, [
         null,

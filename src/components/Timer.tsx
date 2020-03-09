@@ -29,7 +29,7 @@ const Timer: React.FC = (): JSX.Element => {
     appendRecord,
     updateRecord,
     currentUser,
-    loadTable,
+    deleteRecord,
     projects,
     records,
   } = React.useContext(GoogleAuthContext);
@@ -78,11 +78,11 @@ const Timer: React.FC = (): JSX.Element => {
     setDescription(value);
   }, []);
 
-  const handleOnClick = (): void => {
+  const handleEdit = (): void => {
     setShow(true);
   };
 
-  const handleOnPlay = async (): Promise<void> => {
+  const handlePlay = async (): Promise<void> => {
     toggleRunning && toggleRunning();
     //toggleReload && toggleReload();
     setReadOnly(true);
@@ -108,7 +108,7 @@ const Timer: React.FC = (): JSX.Element => {
     setUpdatedRange(append?.result?.updates?.updatedRange);
   };
 
-  const handleOnStop = async (): Promise<void> => {
+  const handleStop = async (): Promise<void> => {
     const fraction = getFraction(seconds);
     updateRecord &&
       (await updateRecord(updatedRange, [
@@ -120,8 +120,8 @@ const Timer: React.FC = (): JSX.Element => {
         ticket,
         fraction,
       ]));
-    toggleRunning && toggleRunning();
     toggleReload && toggleReload();
+    toggleRunning && toggleRunning();
     setDescription('');
     setProject(null);
     setCompany(null);
@@ -129,6 +129,20 @@ const Timer: React.FC = (): JSX.Element => {
 
     setReadOnly(false);
     setColSpan(22);
+  };
+
+  const handleDelete = (): void => {
+    const index = updatedRange.split(':');
+    deleteRecord && deleteRecord(parseInt(index[1].slice(1)));
+    toggleRunning && toggleRunning();
+    setDescription('');
+    setProject(null);
+    setCompany(null);
+    setTicket(null);
+
+    setReadOnly(false);
+    setColSpan(22);
+    setShow(false);
   };
 
   const handleOnHide = (): void => {
@@ -240,7 +254,9 @@ const Timer: React.FC = (): JSX.Element => {
                         data={tickets}
                         labelKey={'ticket'}
                         valueKey={'ticket'}
-                        onSelect={(value: any) => handleOnTagSelect(value)}
+                        onSelect={(value: any): void =>
+                          handleOnTagSelect(value)
+                        }
                       />
                     </FormGroup>
                   </Form>
@@ -250,14 +266,14 @@ const Timer: React.FC = (): JSX.Element => {
                     <Button block onClick={handleOnHide} appearance='primary'>
                       Ok
                     </Button>
-                    <Button block onClick={handleOnHide} appearance='default'>
+                    <Button block appearance='default' onClick={handleStop}>
                       Cancel
                     </Button>
                   </ButtonToolbar>
                   <Divider />
                   <Button
                     block
-                    onClick={handleOnHide}
+                    onClick={handleDelete}
                     appearance='ghost'
                     color='red'
                   >
@@ -278,7 +294,7 @@ const Timer: React.FC = (): JSX.Element => {
                     icon={<Icon icon='play' />}
                     color='green'
                     circle
-                    onClick={handleOnPlay}
+                    onClick={handlePlay}
                     data-testid='play-button'
                   />
                 </FlexboxGrid.Item>
@@ -306,13 +322,13 @@ const Timer: React.FC = (): JSX.Element => {
                       icon={<Icon icon='edit2' />}
                       color='blue'
                       circle
-                      onClick={handleOnClick}
+                      onClick={handleEdit}
                     />
                     <IconButton
                       icon={<Icon icon='stop' />}
                       color='red'
                       circle
-                      onClick={handleOnStop}
+                      onClick={handleStop}
                     />
                   </ButtonToolbar>
                 </FlexboxGrid.Item>

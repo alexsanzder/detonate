@@ -78,7 +78,7 @@ const Summary = (): JSX.Element => {
       //Load spredsheet data
       loadTable && loadTable();
     }
-  }, [reload]);
+  }, [reload, toggleReload, loadTable]);
 
   const data = records?.reduce((r: any, a: Record) => {
     r[a.date] = r[a.date] || [];

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import AppContext from './../contexts/useApp';
 import GoogleAuthContext from './../contexts/useGoogleAuth';
+import { Record } from './../hooks/useGoogle';
 
 import {
   FlexboxGrid,
@@ -19,6 +20,7 @@ import {
   SelectPicker,
   Divider,
 } from 'rsuite';
+import { ItemDataType } from 'rsuite/lib/@types/common';
 
 import { getFraction, getTimeFromSeconds } from '../utils/time';
 
@@ -34,16 +36,16 @@ const Timer: React.FC = (): JSX.Element => {
 
   const { locale, running, toggleRunning } = React.useContext(AppContext);
 
-  const [isReload, setIsReload] = React.useState(false);
-  const [seconds, setSeconds] = React.useState(0);
-  const [updatedRange, setUpdatedRange] = React.useState();
-  const [colSpan, setColSpan] = React.useState(22);
+  const [isReload, setIsReload] = React.useState<boolean>(false);
+  const [seconds, setSeconds] = React.useState<number>(0);
+  const [updatedRange, setUpdatedRange] = React.useState<string>('');
+  const [colSpan, setColSpan] = React.useState<number>(22);
   const [description, setDescription] = React.useState<string>('');
   const [company, setCompany] = React.useState<string | null>(null);
   const [project, setProject] = React.useState<string | null>(null);
   const [ticket, setTicket] = React.useState<string | null>(null);
-  const [show, setShow] = React.useState(false);
-  const [readOnly, setReadOnly] = React.useState(false);
+  const [show, setShow] = React.useState<boolean>(false);
+  const [readOnly, setReadOnly] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     let interval: number | undefined = undefined;
@@ -54,7 +56,10 @@ const Timer: React.FC = (): JSX.Element => {
     } else if (!running && seconds !== 0) {
       window.clearInterval(interval);
     }
-    return () => window.clearInterval(interval);
+    return (): void => {
+      window.clearInterval(interval);
+      setSeconds(0);
+    };
   }, [running, seconds]);
 
   React.useEffect(() => {
@@ -64,19 +69,19 @@ const Timer: React.FC = (): JSX.Element => {
       //Load spredsheet data
       loadTable && loadTable();
     }
-  }, [isReload, running]);
+  }, [isReload, running, loadTable]);
 
   const handleOnChange = React.useCallback((value: string) => {
     setDescription(value);
   }, []);
 
-  const handleOnClick = () => {
+  const handleOnClick = (): void => {
     setShow(true);
   };
 
-  const handleOnStart = async () => {
-    setIsReload(false);
+  const handleOnPlay = async (): Promise<void> => {
     toggleRunning && toggleRunning();
+    setIsReload(false);
     setReadOnly(true);
     setColSpan(16);
     setDescription(description ? description : '(no description)');
@@ -97,14 +102,13 @@ const Timer: React.FC = (): JSX.Element => {
         '0',
       ]));
 
-    const { result } = append;
-    setUpdatedRange(result.updates.updatedRange);
+    setUpdatedRange(append?.result?.updates?.updatedRange);
   };
 
-  const handleOnStop = (): void => {
+  const handleOnStop = async (): Promise<void> => {
     const fraction = getFraction(seconds);
     updateRecord &&
-      updateRecord(updatedRange, [
+      (await updateRecord(updatedRange, [
         null,
         null,
         company,
@@ -112,7 +116,7 @@ const Timer: React.FC = (): JSX.Element => {
         description,
         ticket,
         fraction,
-      ]);
+      ]));
     setIsReload(true);
     toggleRunning && toggleRunning();
     setDescription('');
@@ -124,11 +128,11 @@ const Timer: React.FC = (): JSX.Element => {
     setColSpan(22);
   };
 
-  const handleOnHide = () => {
+  const handleOnHide = (): void => {
     setShow(false);
   };
 
-  const handleOnSelect = React.useCallback((value: string, item: any) => {
+  const handleOnSelect = React.useCallback((_value: string, item: any) => {
     setProject(item.project);
     setCompany(item.company);
   }, []);
@@ -137,10 +141,10 @@ const Timer: React.FC = (): JSX.Element => {
     setTicket(value.join(', '));
   }, []);
 
-  const uniqueTickets = Array.from(
-    new Set(records?.map((a: any) => a.ticket))
+  const tickets = Array.from(
+    new Set(records?.map((record: Record) => record.ticket))
   ).map(ticket => {
-    return records.find((a: any) => a.ticket === ticket);
+    return records.find((record: Record) => record.ticket === ticket);
   });
 
   return (
@@ -216,7 +220,7 @@ const Timer: React.FC = (): JSX.Element => {
                         labelKey={'project'}
                         valueKey={'id'}
                         groupBy={'company'}
-                        onSelect={(value: any, item: any) =>
+                        onSelect={(value: string, item: ItemDataType): void =>
                           handleOnSelect(value, item)
                         }
                       />
@@ -230,7 +234,7 @@ const Timer: React.FC = (): JSX.Element => {
                         size='lg'
                         accepter={TagPicker}
                         placeholder='Ticket?'
-                        data={uniqueTickets}
+                        data={tickets}
                         labelKey={'ticket'}
                         valueKey={'ticket'}
                         onSelect={(value: any) => handleOnTagSelect(value)}
@@ -271,7 +275,8 @@ const Timer: React.FC = (): JSX.Element => {
                     icon={<Icon icon='play' />}
                     color='green'
                     circle
-                    onClick={handleOnStart}
+                    onClick={handleOnPlay}
+                    data-testid='play-button'
                   />
                 </FlexboxGrid.Item>
               </React.Fragment>
@@ -281,6 +286,7 @@ const Timer: React.FC = (): JSX.Element => {
                   <FormControl
                     name='time'
                     size='lg'
+                    placeholder='00:00:00'
                     readOnly
                     className='timer'
                     value={getTimeFromSeconds(seconds)}

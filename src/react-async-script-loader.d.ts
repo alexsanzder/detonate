@@ -1,1 +1,1 @@
-declare module "react-async-script-loader";
+declare module 'react-async-script-loader';

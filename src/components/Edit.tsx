@@ -82,7 +82,7 @@ const Edit: React.FC<EditProps> = ({
   }, []);
 
   const handleOnProjectSelect = React.useCallback(
-    (value: string, item: any) => {
+    (_value: string, item: any) => {
       setProject(item.project);
       setCompany(item.company);
     },

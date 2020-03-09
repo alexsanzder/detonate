@@ -13,7 +13,7 @@ import Spinner from './components/Spinner';
 import Timer from './components/Timer';
 
 import 'rsuite/dist/styles/rsuite-dark.css';
-import logo from './logo-detonate2.svg';
+import logo from './logo-detonate-white.svg';
 
 import Summary from './components/Summary';
 

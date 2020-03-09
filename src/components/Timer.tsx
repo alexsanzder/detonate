@@ -34,9 +34,13 @@ const Timer: React.FC = (): JSX.Element => {
     records,
   } = React.useContext(GoogleAuthContext);
 
-  const { locale, running, toggleRunning } = React.useContext(AppContext);
-
-  const [isReload, setIsReload] = React.useState<boolean>(false);
+  const {
+    locale,
+    running,
+    toggleRunning,
+    reload,
+    toggleReload,
+  } = React.useContext(AppContext);
   const [seconds, setSeconds] = React.useState<number>(0);
   const [updatedRange, setUpdatedRange] = React.useState<string>('');
   const [colSpan, setColSpan] = React.useState<number>(22);
@@ -62,13 +66,13 @@ const Timer: React.FC = (): JSX.Element => {
   }, [running, seconds]);
 
   React.useEffect(() => {
-    if (isReload && !running) {
+    if (reload && !running) {
       setSeconds(0);
-
-      //Load spredsheet data
-      loadTable && loadTable();
     }
-  }, [isReload, running, loadTable]);
+    return (): void => {
+      setSeconds(0);
+    };
+  }, [reload, running]);
 
   const handleOnChange = React.useCallback((value: string) => {
     setDescription(value);
@@ -80,7 +84,7 @@ const Timer: React.FC = (): JSX.Element => {
 
   const handleOnPlay = async (): Promise<void> => {
     toggleRunning && toggleRunning();
-    setIsReload(false);
+    //toggleReload && toggleReload();
     setReadOnly(true);
     setColSpan(16);
     setDescription(description ? description : '(no description)');
@@ -116,8 +120,8 @@ const Timer: React.FC = (): JSX.Element => {
         ticket,
         fraction,
       ]));
-    setIsReload(true);
     toggleRunning && toggleRunning();
+    toggleReload && toggleReload();
     setDescription('');
     setProject(null);
     setCompany(null);

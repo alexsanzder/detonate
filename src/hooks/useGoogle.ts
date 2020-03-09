@@ -31,6 +31,7 @@ export interface UseGoogleType {
     range: string,
     record: (string | number | null)[]
   ) => Promise<any> | undefined;
+  deleteRecord: (index: number) => Promise<string> | undefined;
   sheetProperties: any;
 }
 
@@ -52,6 +53,7 @@ export interface Project {
 }
 
 const tablName = 'aSa';
+const spreadsheetId = '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48';
 
 export const useGoogle = ({
   clientId,
@@ -70,23 +72,17 @@ export const useGoogle = ({
 
   const loadTable = async (): Promise<void> => {
     gapi.client.load('sheets', 'v4', async () => {
-      const request = {
-        // The spreadsheet to request.
-        spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48', // TODO: Update placeholder value.
-
-        resource: {
-          dataFilters: [
-            {
-              a1Range: tablName,
-            },
-          ],
-
-          includeGridData: false,
-        },
-      };
-
       const sheetProperties = await gapi.client.sheets.spreadsheets.getByDataFilter(
-        request
+        {
+          spreadsheetId: spreadsheetId,
+          resource: {
+            dataFilters: [
+              {
+                a1Range: tablName,
+              },
+            ],
+          },
+        }
       );
       const properties =
         sheetProperties.result.sheets &&
@@ -95,7 +91,7 @@ export const useGoogle = ({
 
       const rowCount = properties?.gridProperties?.rowCount;
       const response = await gapi.client.sheets.spreadsheets.values.batchGet({
-        spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+        spreadsheetId: spreadsheetId,
         valueRenderOption: 'UNFORMATTED_VALUE',
         dateTimeRenderOption: 'FORMATTED_STRING',
         majorDimension: 'ROWS',
@@ -194,7 +190,7 @@ export const useGoogle = ({
 
   const appendRecord = async (record: string[]): Promise<any> => {
     return await gapi.client.sheets.spreadsheets.values.append({
-      spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+      spreadsheetId: spreadsheetId,
       range: `${tablName}!A2:G2`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
@@ -209,11 +205,31 @@ export const useGoogle = ({
     record: (string | number | null)[]
   ): Promise<any> => {
     return await gapi.client.sheets.spreadsheets.values.update({
-      spreadsheetId: '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48',
+      spreadsheetId: spreadsheetId,
       range: range,
       valueInputOption: 'USER_ENTERED',
       resource: {
         values: [record],
+      },
+    });
+  };
+
+  const deleteRecord = async (index: number): Promise<any> => {
+    return await gapi.client.sheets.spreadsheets.batchUpdate({
+      spreadsheetId: spreadsheetId,
+      resource: {
+        requests: [
+          {
+            deleteDimension: {
+              range: {
+                sheetId: sheetProperties?.sheetId,
+                dimension: 'ROWS',
+                startIndex: index - 1,
+                endIndex: index,
+              },
+            },
+          },
+        ],
       },
     });
   };
@@ -233,6 +249,7 @@ export const useGoogle = ({
     loadTable,
     appendRecord,
     updateRecord,
+    deleteRecord,
     sheetProperties,
   };
 };

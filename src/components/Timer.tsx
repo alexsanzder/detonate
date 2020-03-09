@@ -58,7 +58,6 @@ const Timer: React.FC = (): JSX.Element => {
     }
     return (): void => {
       window.clearInterval(interval);
-      setSeconds(0);
     };
   }, [running, seconds]);
 

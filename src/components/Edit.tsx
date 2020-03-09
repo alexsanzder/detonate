@@ -31,7 +31,7 @@ const Edit: React.FC<EditProps> = ({
   onHide,
 }: EditProps): JSX.Element => {
   const { toggleReload } = React.useContext(AppContext);
-  const { projects, records, updateRecord } = React.useContext(
+  const { projects, records, updateRecord, deleteRecord } = React.useContext(
     GoogleAuthContext
   );
 
@@ -61,6 +61,13 @@ const Edit: React.FC<EditProps> = ({
         ticket?.join(', '),
         fraction,
       ]);
+    toggleReload && toggleReload();
+    onHide();
+  };
+
+  const handleDelete = (): void => {
+    const index = record.id.replace('aSa!A', '');
+    deleteRecord && deleteRecord(parseInt(index));
     toggleReload && toggleReload();
     onHide();
   };
@@ -189,7 +196,7 @@ const Edit: React.FC<EditProps> = ({
             </Button>
           </ButtonToolbar>
           <Divider />
-          <Button block appearance='ghost' color='red'>
+          <Button block appearance='ghost' color='red' onClick={handleDelete}>
             Delete
           </Button>
         </Modal.Footer>

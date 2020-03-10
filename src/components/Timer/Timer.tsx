@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import AppContext from "../../contexts/useApp";
+import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 import { Record } from "../../hooks/useGoogle";
 
@@ -128,7 +128,7 @@ const Timer: React.FC = (): JSX.Element => {
         getFraction(seconds)
       ]));
 
-    toggleReload && toggleReload();
+    toggleReload && toggleReload(true);
     toggleRunning && toggleRunning(false);
     setDescription("");
     setProject(null);

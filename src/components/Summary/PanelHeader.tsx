@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import { FlexboxGrid } from "rsuite";
 
-import AppContext from "../../contexts/useApp";
+import { AppContext } from "../../contexts/AppProvider";
 import { getTimeFormated } from "../../utils/time";
 
 type PanelHeaderProps = {

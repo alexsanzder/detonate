@@ -1,11 +1,12 @@
-import React from 'react';
+import React from "react";
 
-import { Loader } from 'rsuite';
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 export const Spinner = (): JSX.Element => (
-  <div>
-    <Loader backdrop content='loading...' size='md' vertical />
-  </div>
+  <Backdrop open={true}>
+    <CircularProgress color="inherit" />
+  </Backdrop>
 );
 
 export default Spinner;

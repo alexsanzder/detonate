@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import AppContext from "../../contexts/useApp";
+import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
 import {
@@ -30,7 +30,7 @@ const Summary = (): JSX.Element => {
 
   React.useEffect(() => {
     if (reload) {
-      toggleReload && toggleReload();
+      toggleReload && toggleReload(true);
       //Load spredsheet data
       loadTable && loadTable();
     }

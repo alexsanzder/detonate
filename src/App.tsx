@@ -1,20 +1,16 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import * as React from "react";
-import { Container, Content, Footer, FlexboxGrid, Button, Icon } from "rsuite";
+import { Container, CssBaseline, createMuiTheme } from "@material-ui/core";
 
-import AppContext from "./contexts/useApp";
+import AppProvider from "./contexts/AppProvider";
 
 import GoogleAuthContext from "./contexts/useGoogleAuth";
 import { useGoogle } from "./hooks/useGoogle";
 
-import Header from "./components/Header/Header";
+import NavBar from "./components/NavBar/NavBar";
 import Login from "./components/Login/Login";
 import Spinner from "./components/Spinner/Spinner";
 import Timer from "./components/Timer/Timer";
 import Summary from "./components/Summary/Summary";
-
-import "rsuite/dist/styles/rsuite-dark.css";
-import logo from "./logo-detonate-white.svg";
 
 const discoveryDocs = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4"
@@ -34,42 +30,16 @@ const App = () => {
     tableName: "aSa"
   });
 
-  const [running, setRunning] = React.useState(false);
-  const [reload, setReload] = React.useState(false);
-  const [range, setRange] = React.useState("");
-
-  const toggleRunning = (state: boolean) => {
-    setRunning(state);
-  };
-
-  const toggleReload = () => {
-    setReload(!reload);
-  };
-
-  const toggleRange = (range: string) => {
-    setRange(range);
-    console.log(range);
-  };
-
   return (
-    <AppContext.Provider
-      value={{
-        locale: "de-DE",
-        running: running,
-        toggleRunning: toggleRunning,
-        reload: reload,
-        toggleReload: toggleReload,
-        range: range,
-        toggleRange: toggleRange
-      }}
-    >
+    <AppProvider>
       <GoogleAuthContext.Provider value={googleAuth}>
         {googleAuth.isInitialized ? (
-          <Container>
+          <div>
+            <CssBaseline />
             {googleAuth.isSignedIn ? (
               <React.Fragment>
-                <Header logo={logo} />
-                <Content
+                <NavBar />
+                {/*  <Content
                   style={{
                     marginTop: "56px"
                   }}
@@ -92,17 +62,17 @@ const App = () => {
                       See more on Google Sheets
                     </Button>
                   </FlexboxGrid>
-                </Footer>
+                </Footer> */}
               </React.Fragment>
             ) : (
               <Login />
             )}
-          </Container>
+          </div>
         ) : (
           <Spinner />
         )}
       </GoogleAuthContext.Provider>
-    </AppContext.Provider>
+    </AppProvider>
   );
 };
 

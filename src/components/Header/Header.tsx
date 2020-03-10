@@ -12,7 +12,7 @@ import {
   Tooltip
 } from "rsuite";
 
-import AppContext from "../../contexts/useApp";
+import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
 type HeaderProps = {

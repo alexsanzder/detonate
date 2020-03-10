@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import AppContext from "../../contexts/useApp";
+import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 import { Record } from "../../hooks/useGoogle";
 
@@ -31,6 +31,7 @@ const Edit: React.FC<EditProps> = ({
   onHide
 }: EditProps): JSX.Element => {
   const { toggleReload } = React.useContext(AppContext);
+
   const { projects, records, updateRecord, deleteRecord } = React.useContext(
     GoogleAuthContext
   );
@@ -61,14 +62,14 @@ const Edit: React.FC<EditProps> = ({
         ticket?.join(", "),
         fraction
       ]);
-    toggleReload && toggleReload();
+    toggleReload && toggleReload(true);
     onHide();
   };
 
   const handleDelete = (): void => {
     const index = record.id.replace("aSa!A", "");
     deleteRecord && deleteRecord(parseInt(index));
-    toggleReload && toggleReload();
+    toggleReload && toggleReload(true);
     onHide();
   };
 

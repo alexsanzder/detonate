@@ -1,9 +1,9 @@
-import * as React from 'react';
-import styled from 'styled-components';
+import * as React from "react";
+import styled from "styled-components";
 
-import AppContext from './../contexts/useApp';
-import GoogleAuthContext from './../contexts/useGoogleAuth';
-import { Record } from './../hooks/useGoogle';
+import AppContext from "../../contexts/useApp";
+import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { Record } from "../../hooks/useGoogle";
 
 import {
   FlexboxGrid,
@@ -18,11 +18,11 @@ import {
   ButtonToolbar,
   TagPicker,
   SelectPicker,
-  Divider,
-} from 'rsuite';
-import { ItemDataType } from 'rsuite/lib/@types/common';
+  Divider
+} from "rsuite";
+import { ItemDataType } from "rsuite/lib/@types/common";
 
-import { getFraction, getTimeFromSeconds } from '../utils/time';
+import { getFraction, getTimeFromSeconds } from "../../utils/time";
 
 const Timer: React.FC = (): JSX.Element => {
   const {
@@ -31,7 +31,7 @@ const Timer: React.FC = (): JSX.Element => {
     currentUser,
     deleteRecord,
     projects,
-    records,
+    records
   } = React.useContext(GoogleAuthContext);
 
   const {
@@ -40,16 +40,19 @@ const Timer: React.FC = (): JSX.Element => {
     toggleRunning,
     reload,
     toggleReload,
+    range,
+    toggleRange
   } = React.useContext(AppContext);
-  const [seconds, setSeconds] = React.useState<number>(0);
-  const [updatedRange, setUpdatedRange] = React.useState<string>('');
+
   const [colSpan, setColSpan] = React.useState<number>(22);
-  const [description, setDescription] = React.useState<string>('');
+  const [show, setShow] = React.useState<boolean>(false);
+  const [readOnly, setReadOnly] = React.useState<boolean>(false);
+
+  const [seconds, setSeconds] = React.useState<number>(0);
+  const [description, setDescription] = React.useState<string>("");
   const [company, setCompany] = React.useState<string | null>(null);
   const [project, setProject] = React.useState<string | null>(null);
   const [ticket, setTicket] = React.useState<string | null>(null);
-  const [show, setShow] = React.useState<boolean>(false);
-  const [readOnly, setReadOnly] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     let interval: number | undefined = undefined;
@@ -83,46 +86,51 @@ const Timer: React.FC = (): JSX.Element => {
   };
 
   const handlePlay = async (): Promise<void> => {
-    toggleRunning && toggleRunning();
-    //toggleReload && toggleReload();
+    toggleRunning && toggleRunning(true);
     setReadOnly(true);
     setColSpan(16);
-    setDescription(description ? description : '(no description)');
+    setDescription(description ? description : "(no description)");
 
     const append =
       appendRecord &&
       (await appendRecord([
         currentUser.getName(),
         new Date().toLocaleDateString(locale, {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
         }),
-        '(no company)',
-        '(no project)',
-        description ? description : '(no description)',
-        '(no ticket)',
-        '0',
+        "(no company)",
+        "(no project)",
+        description ? description : "(no description)",
+        "(no ticket)",
+        "0"
       ]));
 
-    setUpdatedRange(append?.result?.updates?.updatedRange);
+    const {
+      result: {
+        updates: { updatedRange }
+      }
+    } = append;
+    toggleRange && toggleRange(updatedRange);
   };
 
   const handleStop = async (): Promise<void> => {
-    const fraction = getFraction(seconds);
-    updateRecord &&
-      (await updateRecord(updatedRange, [
+    const update =
+      updateRecord &&
+      (await updateRecord(range ? range : "", [
         null,
         null,
         company,
         project,
         description,
         ticket,
-        fraction,
+        getFraction(seconds)
       ]));
+
     toggleReload && toggleReload();
-    toggleRunning && toggleRunning();
-    setDescription('');
+    toggleRunning && toggleRunning(false);
+    setDescription("");
     setProject(null);
     setCompany(null);
     setTicket(null);
@@ -132,10 +140,10 @@ const Timer: React.FC = (): JSX.Element => {
   };
 
   const handleDelete = (): void => {
-    const index = updatedRange.split(':');
+    const index = range ? range.split(":") : "";
     deleteRecord && deleteRecord(parseInt(index[1].slice(1)));
-    toggleRunning && toggleRunning();
-    setDescription('');
+    toggleRunning && toggleRunning(false);
+    setDescription("");
     setProject(null);
     setCompany(null);
     setTicket(null);
@@ -155,7 +163,7 @@ const Timer: React.FC = (): JSX.Element => {
   }, []);
 
   const handleOnTagSelect = React.useCallback((value: string[]) => {
-    setTicket(value.join(', '));
+    setTicket(value.join(", "));
   }, []);
 
   const tickets = Array.from(
@@ -169,30 +177,30 @@ const Timer: React.FC = (): JSX.Element => {
       <Panel
         shaded
         style={{
-          position: 'fixed',
-          width: '100%',
+          position: "fixed",
+          width: "100%",
           zIndex: 10,
-          height: '82px',
+          height: "82px",
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
-          backgroundColor: '#1a1d24',
+          backgroundColor: "#1a1d24"
         }}
       >
         <Form>
-          <FlexboxGrid align='middle'>
+          <FlexboxGrid align="middle" justify="space-between">
             <FlexboxGrid.Item colspan={colSpan}>
               <FormControl
-                name='description'
-                size='lg'
-                placeholder='What are you working on?'
-                width='100%'
+                name="description"
+                size="lg"
+                placeholder="What are you working on?"
+                width="100%"
                 readOnly={readOnly}
                 value={description}
                 onChange={handleOnChange}
               />
               <Modal
                 full
-                size={'lg'}
+                size={"lg"}
                 show={show}
                 backdrop={true}
                 onHide={handleOnHide}
@@ -206,22 +214,22 @@ const Timer: React.FC = (): JSX.Element => {
                       <FormControl
                         style={{
                           padding: 4,
-                          color: '#999',
-                          textAlign: 'center',
-                          fontSize: 'x-large',
+                          color: "#999",
+                          textAlign: "center",
+                          fontSize: "x-large"
                         }}
-                        name='timer'
-                        size='lg'
+                        name="timer"
+                        size="lg"
                         readOnly={true}
                         value={getTimeFromSeconds(seconds)}
                       />
                     </FormGroup>
                     <FormGroup>
                       <FormControl
-                        name='title'
-                        size='lg'
-                        placeholder='What are you working on?'
-                        width='100%'
+                        name="title"
+                        size="lg"
+                        placeholder="What are you working on?"
+                        width="100%"
                         value={description}
                         onChange={handleOnChange}
                       />
@@ -229,14 +237,14 @@ const Timer: React.FC = (): JSX.Element => {
                     <FormGroup>
                       <FormControl
                         block
-                        name='project'
-                        size='lg'
+                        name="project"
+                        size="lg"
                         accepter={SelectPicker}
-                        placeholder='Project?'
+                        placeholder="Project?"
                         data={projects}
-                        labelKey={'project'}
-                        valueKey={'id'}
-                        groupBy={'company'}
+                        labelKey={"project"}
+                        valueKey={"id"}
+                        groupBy={"company"}
                         onSelect={(value: string, item: ItemDataType): void =>
                           handleOnSelect(value, item)
                         }
@@ -247,13 +255,13 @@ const Timer: React.FC = (): JSX.Element => {
                       <FormControl
                         block
                         creatable
-                        name='ticket'
-                        size='lg'
+                        name="ticket"
+                        size="lg"
                         accepter={TagPicker}
-                        placeholder='Ticket?'
+                        placeholder="Ticket?"
                         data={tickets}
-                        labelKey={'ticket'}
-                        valueKey={'ticket'}
+                        labelKey={"ticket"}
+                        valueKey={"ticket"}
                         onSelect={(value: any): void =>
                           handleOnTagSelect(value)
                         }
@@ -263,10 +271,10 @@ const Timer: React.FC = (): JSX.Element => {
                 </Modal.Body>
                 <Modal.Footer>
                   <ButtonToolbar>
-                    <Button block onClick={handleOnHide} appearance='primary'>
+                    <Button block onClick={handleOnHide} appearance="primary">
                       Ok
                     </Button>
-                    <Button block appearance='default' onClick={handleStop}>
+                    <Button block appearance="default" onClick={handleStop}>
                       Cancel
                     </Button>
                   </ButtonToolbar>
@@ -274,8 +282,8 @@ const Timer: React.FC = (): JSX.Element => {
                   <Button
                     block
                     onClick={handleDelete}
-                    appearance='ghost'
-                    color='red'
+                    appearance="ghost"
+                    color="red"
                   >
                     Delete
                   </Button>
@@ -287,15 +295,15 @@ const Timer: React.FC = (): JSX.Element => {
                 <FlexboxGrid.Item
                   colspan={2}
                   style={{
-                    textAlign: 'right',
+                    textAlign: "right"
                   }}
                 >
                   <IconButton
-                    icon={<Icon icon='play' />}
-                    color='green'
+                    icon={<Icon icon="play" />}
+                    color="green"
                     circle
                     onClick={handlePlay}
-                    data-testid='play-button'
+                    data-testid="play-button"
                   />
                 </FlexboxGrid.Item>
               </React.Fragment>
@@ -303,30 +311,30 @@ const Timer: React.FC = (): JSX.Element => {
               <React.Fragment>
                 <FlexboxGrid.Item colspan={4}>
                   <FormControl
-                    name='time'
-                    size='lg'
-                    placeholder='00:00:00'
+                    name="time"
+                    size="lg"
+                    placeholder="00:00:00"
                     readOnly
-                    className='timer'
+                    className="timer"
                     value={getTimeFromSeconds(seconds)}
                   />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item
                   colspan={4}
                   style={{
-                    textAlign: 'right',
+                    textAlign: "right"
                   }}
                 >
                   <ButtonToolbar>
                     <IconButton
-                      icon={<Icon icon='edit2' />}
-                      color='blue'
+                      icon={<Icon icon="edit2" />}
+                      color="blue"
                       circle
                       onClick={handleEdit}
                     />
                     <IconButton
-                      icon={<Icon icon='stop' />}
-                      color='red'
+                      icon={<Icon icon="stop" />}
+                      color="red"
                       circle
                       onClick={handleStop}
                     />

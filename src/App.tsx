@@ -1,29 +1,28 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import * as React from 'react';
-import { Container, Content, Footer, FlexboxGrid, Button, Icon } from 'rsuite';
+import * as React from "react";
+import { Container, Content, Footer, FlexboxGrid, Button, Icon } from "rsuite";
 
-import AppContext from './contexts/useApp';
+import AppContext from "./contexts/useApp";
 
-import GoogleAuthContext from './contexts/useGoogleAuth';
-import { useGoogle } from './hooks/useGoogle';
+import GoogleAuthContext from "./contexts/useGoogleAuth";
+import { useGoogle } from "./hooks/useGoogle";
 
-import Header from './components/Header';
-import Login from './components/Login';
-import Spinner from './components/Spinner';
-import Timer from './components/Timer';
+import Header from "./components/Header/Header";
+import Login from "./components/Login/Login";
+import Spinner from "./components/Spinner/Spinner";
+import Timer from "./components/Timer/Timer";
+import Summary from "./components/Summary/Summary";
 
-import 'rsuite/dist/styles/rsuite-dark.css';
-import logo from './logo-detonate-white.svg';
-
-import Summary from './components/Summary';
+import "rsuite/dist/styles/rsuite-dark.css";
+import logo from "./logo-detonate-white.svg";
 
 const discoveryDocs = [
-  'https://sheets.googleapis.com/$discovery/rest?version=v4',
+  "https://sheets.googleapis.com/$discovery/rest?version=v4"
 ];
 const scope = [
-  'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/drive.metadata',
-].join(' ');
+  "https://www.googleapis.com/auth/spreadsheets",
+  "https://www.googleapis.com/auth/drive.metadata"
+].join(" ");
 
 const App = () => {
   const googleAuth = useGoogle({
@@ -31,28 +30,37 @@ const App = () => {
     clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
     discoveryDocs,
     scope,
-    spreadsheetId: process.env.REACT_APP_GOOGLE_SHEET_ID,
+    spreadsheetId: "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
+    tableName: "aSa"
   });
 
   const [running, setRunning] = React.useState(false);
   const [reload, setReload] = React.useState(false);
+  const [range, setRange] = React.useState("");
 
-  const toggleRunning = () => {
-    setRunning(!running);
+  const toggleRunning = (state: boolean) => {
+    setRunning(state);
   };
 
   const toggleReload = () => {
     setReload(!reload);
   };
 
+  const toggleRange = (range: string) => {
+    setRange(range);
+    console.log(range);
+  };
+
   return (
     <AppContext.Provider
       value={{
-        locale: 'de-DE',
+        locale: "de-DE",
         running: running,
         toggleRunning: toggleRunning,
         reload: reload,
         toggleReload: toggleReload,
+        range: range,
+        toggleRange: toggleRange
       }}
     >
       <GoogleAuthContext.Provider value={googleAuth}>
@@ -61,10 +69,9 @@ const App = () => {
             {googleAuth.isSignedIn ? (
               <React.Fragment>
                 <Header logo={logo} />
-
                 <Content
                   style={{
-                    marginTop: '56px',
+                    marginTop: "56px"
                   }}
                 >
                   <Timer />
@@ -72,16 +79,16 @@ const App = () => {
                 </Content>
                 <Footer
                   style={{
-                    padding: '0px 0px 20px',
+                    padding: "0px 0px 20px"
                   }}
                 >
-                  <FlexboxGrid justify='center'>
+                  <FlexboxGrid justify="center">
                     <Button
-                      target='_blank'
+                      target="_blank"
                       href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${googleAuth.sheetProperties?.sheetId}`}
-                      appearance='ghost'
+                      appearance="ghost"
                     >
-                      <Icon icon='google' />
+                      <Icon icon="google" />
                       See more on Google Sheets
                     </Button>
                   </FlexboxGrid>

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import styled from 'styled-components';
+import * as React from "react";
+import styled from "styled-components";
 
 import {
   Header,
@@ -9,11 +9,11 @@ import {
   Icon,
   Avatar,
   Whisper,
-  Tooltip,
-} from 'rsuite';
+  Tooltip
+} from "rsuite";
 
-import AppContext from './../contexts/useApp';
-import GoogleAuthContext from '../contexts/useGoogleAuth';
+import AppContext from "../../contexts/useApp";
+import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
 type HeaderProps = {
   logo: string;
@@ -24,7 +24,7 @@ const SyncTooltip = <Tooltip>Sync Google Sheets</Tooltip>;
 const DarkModeTooltip = <Tooltip>Toggle dark/light mode</Tooltip>;
 
 const AppHeader: React.FC<HeaderProps> = ({
-  logo,
+  logo
 }: HeaderProps): JSX.Element => {
   const { toggleReload } = React.useContext(AppContext);
   const { currentUser, handleSignOut, sheetProperties } = React.useContext(
@@ -35,62 +35,54 @@ const AppHeader: React.FC<HeaderProps> = ({
     <Style>
       <Header
         style={{
-          position: 'fixed',
-          width: '100%',
-          zIndex: 1000,
+          position: "fixed",
+          width: "100%",
+          zIndex: 1000
         }}
       >
-        <Navbar appearance='default'>
+        <Navbar appearance="default">
           <Navbar.Header>
-            <img
-              src={logo}
-              alt='Detoanate Time Tracking'
-              height={50}
-              style={{
-                padding: '10px 15px 5px 15px',
-                cursor: 'none',
-              }}
-            />
+            <img src={logo} alt="Detoanate Time Tracking" height={50} />
           </Navbar.Header>
           <Navbar.Body>
             <Nav pullRight>
-              <Whisper placement='bottom' trigger='hover' speaker={SyncTooltip}>
+              <Whisper placement="bottom" trigger="hover" speaker={SyncTooltip}>
                 <Nav.Item
-                  icon={<Icon icon='reload' size='lg' />}
+                  icon={<Icon icon="reload" size="lg" />}
                   onClick={toggleReload}
                 ></Nav.Item>
               </Whisper>
-              <Whisper placement='bottom' trigger='hover' speaker={OpenTooltip}>
+              <Whisper placement="bottom" trigger="hover" speaker={OpenTooltip}>
                 <Nav.Item
-                  target='_blank'
+                  target="_blank"
                   href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${sheetProperties?.sheetId}`}
-                  icon={<Icon icon='external-link' size='lg' />}
+                  icon={<Icon icon="external-link" size="lg" />}
                 ></Nav.Item>
               </Whisper>
               <Whisper
-                placement='bottom'
-                trigger='hover'
+                placement="bottom"
+                trigger="hover"
                 speaker={DarkModeTooltip}
               >
-                <Nav.Item icon={<Icon icon='sun-o' size='lg' />}></Nav.Item>
+                <Nav.Item icon={<Icon icon="sun-o" size="lg" />}></Nav.Item>
               </Whisper>
               <Dropdown
-                placement='bottomEnd'
+                placement="bottomEnd"
                 renderTitle={(): JSX.Element => {
                   return (
-                    <Avatar circle src={currentUser?.getImageUrl()} alt='AS'>
+                    <Avatar circle src={currentUser?.getImageUrl()} alt="AS">
                       AS
                     </Avatar>
                   );
                 }}
               >
                 <Dropdown.Item>
-                  <Icon icon='cog' />
+                  <Icon icon="cog" />
                   Settings
                 </Dropdown.Item>
                 <Dropdown.Item divider />
                 <Dropdown.Item onClick={handleSignOut}>
-                  <Icon icon='sign-out' />
+                  <Icon icon="sign-out" />
                   Logout
                 </Dropdown.Item>
               </Dropdown>
@@ -103,6 +95,10 @@ const AppHeader: React.FC<HeaderProps> = ({
 };
 
 const Style = styled.div`
+  .rs-navbar-header img {
+    padding: 7px 15px 12px;
+    cursor: none;
+  }
   .rs-avatar {
     margin: 5px 15px 5px 5px;
   }

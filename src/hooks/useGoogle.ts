@@ -1,8 +1,8 @@
 /* global gapi */
-import { useState, useEffect } from 'react';
-import { useScript } from './useScript';
+import { useState, useEffect } from "react";
+import { useScript } from "./useScript";
 
-const GOOGLE_API_SOURCE = 'https://apis.google.com/js/api.js';
+const GOOGLE_API_SOURCE = "https://apis.google.com/js/api.js";
 
 export interface GoogleUser extends gapi.auth2.GoogleUser {
   googleId?: string;
@@ -15,7 +15,8 @@ export interface UseGoogleOptions {
   apiKey?: string | undefined;
   scope?: string | undefined;
   discoveryDocs?: string[] | undefined;
-  spreadsheetId?: string | '1Lqm0iIOp5BYMtws8B5LOEy-wRC-fhOH6aPVFb5-N7Us';
+  spreadsheetId: string;
+  tableName: string;
 }
 export interface UseGoogleType {
   currentUser: any | undefined;
@@ -52,16 +53,15 @@ export interface Project {
   project: string;
 }
 
-const tablName = 'aSa';
-const spreadsheetId = '1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48';
-
 export const useGoogle = ({
   clientId,
   apiKey,
   scope,
   discoveryDocs,
+  spreadsheetId,
+  tableName
 }: UseGoogleOptions): Partial<UseGoogleType> => {
-  const [isScriptLoaded] = useScript(GOOGLE_API_SOURCE, 'gapi');
+  const [isScriptLoaded] = useScript(GOOGLE_API_SOURCE, "gapi");
   const [GoogleAuth, setGoogleAuth] = useState();
   const [isInitialized, setInitialized] = useState(false);
   const [isSignedIn, setSignedIn] = useState(false);
@@ -71,17 +71,17 @@ export const useGoogle = ({
   const [sheetProperties, setSheetProperties] = useState();
 
   const loadTable = async (): Promise<void> => {
-    gapi.client.load('sheets', 'v4', async () => {
+    gapi.client.load("sheets", "v4", async () => {
       const sheetProperties = await gapi.client.sheets.spreadsheets.getByDataFilter(
         {
           spreadsheetId: spreadsheetId,
           resource: {
             dataFilters: [
               {
-                a1Range: tablName,
-              },
-            ],
-          },
+                a1Range: tableName
+              }
+            ]
+          }
         }
       );
       const properties =
@@ -92,13 +92,13 @@ export const useGoogle = ({
       const rowCount = properties?.gridProperties?.rowCount;
       const response = await gapi.client.sheets.spreadsheets.values.batchGet({
         spreadsheetId: spreadsheetId,
-        valueRenderOption: 'UNFORMATTED_VALUE',
-        dateTimeRenderOption: 'FORMATTED_STRING',
-        majorDimension: 'ROWS',
+        valueRenderOption: "UNFORMATTED_VALUE",
+        dateTimeRenderOption: "FORMATTED_STRING",
+        majorDimension: "ROWS",
         ranges: [
-          'projects!A2:B',
-          `${tablName}!A${rowCount && rowCount - 21}:G`,
-        ],
+          "projects!A2:B",
+          `${tableName}!A${rowCount && rowCount - 21}:G`
+        ]
       });
 
       const valueRanges = response.result.valueRanges;
@@ -109,9 +109,9 @@ export const useGoogle = ({
           .map(
             (value: any[], index: number): Project => {
               return {
-                id: `${tablName}!A${index + 2}`,
+                id: `${tableName}!A${index + 2}`,
                 company: value[0],
-                project: value[1],
+                project: value[1]
               };
             }
           )
@@ -125,14 +125,14 @@ export const useGoogle = ({
           .map(
             (value: any[], index: number): Record => {
               return {
-                id: `${tablName}!A${rowCount && rowCount - 21 + index}`,
+                id: `${tableName}!A${rowCount && rowCount - 21 + index}`,
                 name: value[0],
                 date: value[1],
                 company: value[2],
                 project: value[3],
                 description: value[4],
                 ticket: value[5],
-                time: value[6],
+                time: value[6]
               };
             }
           )
@@ -158,7 +158,7 @@ export const useGoogle = ({
     };
 
     if (isScriptLoaded) {
-      gapi.load('client:auth2', initClient);
+      gapi.load("client:auth2", initClient);
     }
   }, [clientId, apiKey, discoveryDocs, scope, isScriptLoaded]);
 
@@ -191,12 +191,12 @@ export const useGoogle = ({
   const appendRecord = async (record: string[]): Promise<any> => {
     return await gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: spreadsheetId,
-      range: `${tablName}!A2:G2`,
-      valueInputOption: 'USER_ENTERED',
-      insertDataOption: 'INSERT_ROWS',
+      range: `${tableName}!A2:G2`,
+      valueInputOption: "USER_ENTERED",
+      insertDataOption: "INSERT_ROWS",
       resource: {
-        values: [record],
-      },
+        values: [record]
+      }
     });
   };
 
@@ -207,10 +207,10 @@ export const useGoogle = ({
     return await gapi.client.sheets.spreadsheets.values.update({
       spreadsheetId: spreadsheetId,
       range: range,
-      valueInputOption: 'USER_ENTERED',
+      valueInputOption: "USER_ENTERED",
       resource: {
-        values: [record],
-      },
+        values: [record]
+      }
     });
   };
 
@@ -223,14 +223,14 @@ export const useGoogle = ({
             deleteDimension: {
               range: {
                 sheetId: sheetProperties?.sheetId,
-                dimension: 'ROWS',
+                dimension: "ROWS",
                 startIndex: index - 1,
-                endIndex: index,
-              },
-            },
-          },
-        ],
-      },
+                endIndex: index
+              }
+            }
+          }
+        ]
+      }
     });
   };
 
@@ -250,6 +250,6 @@ export const useGoogle = ({
     appendRecord,
     updateRecord,
     deleteRecord,
-    sheetProperties,
+    sheetProperties
   };
 };

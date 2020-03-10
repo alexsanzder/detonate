@@ -1,11 +1,13 @@
-import * as React from 'react';
+import * as React from "react";
 
 type ContextProps = {
   locale: string;
   running: boolean;
-  toggleRunning: () => void;
+  toggleRunning: (state: boolean) => void;
   reload: boolean;
   toggleReload: () => void;
+  range: string;
+  toggleRange: (range: string) => void;
 };
 
 const AppContext = React.createContext<Partial<ContextProps>>({});

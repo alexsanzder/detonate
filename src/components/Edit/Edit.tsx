@@ -1,9 +1,9 @@
-import * as React from 'react';
-import styled from 'styled-components';
+import * as React from "react";
+import styled from "styled-components";
 
-import AppContext from './../contexts/useApp';
-import GoogleAuthContext from './../contexts/useGoogleAuth';
-import { Record } from './../hooks/useGoogle';
+import AppContext from "../../contexts/useApp";
+import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { Record } from "../../hooks/useGoogle";
 
 import {
   Form,
@@ -14,10 +14,10 @@ import {
   ButtonToolbar,
   TagPicker,
   SelectPicker,
-  Divider,
-} from 'rsuite';
-import { ItemDataType } from 'rsuite/lib/@types/common';
-import { getSeconds, getFraction, getTimeFormated } from '../utils/time';
+  Divider
+} from "rsuite";
+import { ItemDataType } from "rsuite/lib/@types/common";
+import { getSeconds, getFraction, getTimeFormated } from "../../utils/time";
 
 type EditProps = {
   show: boolean;
@@ -28,7 +28,7 @@ type EditProps = {
 const Edit: React.FC<EditProps> = ({
   show,
   record,
-  onHide,
+  onHide
 }: EditProps): JSX.Element => {
   const { toggleReload } = React.useContext(AppContext);
   const { projects, records, updateRecord, deleteRecord } = React.useContext(
@@ -57,16 +57,16 @@ const Edit: React.FC<EditProps> = ({
         null,
         company,
         project,
-        description ? description : '(no description)',
-        ticket?.join(', '),
-        fraction,
+        description ? description : "(no description)",
+        ticket?.join(", "),
+        fraction
       ]);
     toggleReload && toggleReload();
     onHide();
   };
 
   const handleDelete = (): void => {
-    const index = record.id.replace('aSa!A', '');
+    const index = record.id.replace("aSa!A", "");
     deleteRecord && deleteRecord(parseInt(index));
     toggleReload && toggleReload();
     onHide();
@@ -104,14 +104,14 @@ const Edit: React.FC<EditProps> = ({
     setTime(getTimeFormated(record.time));
     setDescription(record.description);
     setProject(record.project);
-    setTicket(record.ticket.split(', '));
+    setTicket(record.ticket.split(", "));
   };
 
   return (
     <Style>
       <Modal
         full
-        size={'lg'}
+        size={"lg"}
         show={show}
         backdrop={true}
         onHide={onHide}
@@ -126,12 +126,12 @@ const Edit: React.FC<EditProps> = ({
               <FormControl
                 style={{
                   padding: 4,
-                  color: '#999',
-                  textAlign: 'center',
-                  fontSize: 'x-large',
+                  color: "#999",
+                  textAlign: "center",
+                  fontSize: "x-large"
                 }}
-                name='timer'
-                size='lg'
+                name="timer"
+                size="lg"
                 readOnly={false}
                 value={time}
                 onChange={handleOnTimeChange}
@@ -139,11 +139,11 @@ const Edit: React.FC<EditProps> = ({
             </FormGroup>
             <FormGroup>
               <FormControl
-                name='description'
-                size='lg'
-                placeholder='What are you working on?'
-                width='100%'
-                defaultValue='(no description)'
+                name="description"
+                size="lg"
+                placeholder="What are you working on?"
+                width="100%"
+                defaultValue="(no description)"
                 value={description}
                 onChange={handleOnDescriptionChange}
               />
@@ -151,14 +151,14 @@ const Edit: React.FC<EditProps> = ({
             <FormGroup>
               <FormControl
                 block
-                name='project'
-                size='lg'
+                name="project"
+                size="lg"
                 accepter={SelectPicker}
-                placeholder='Select a project'
+                placeholder="Select a project"
                 data={projects}
-                labelKey='project'
-                valueKey='project'
-                groupBy='company'
+                labelKey="project"
+                valueKey="project"
+                groupBy="company"
                 value={project}
                 onChange={handleProjectChange}
                 onSelect={(value: string, item: ItemDataType): void =>
@@ -170,13 +170,13 @@ const Edit: React.FC<EditProps> = ({
               <FormControl
                 block
                 creatable
-                name='ticket'
-                size='lg'
+                name="ticket"
+                size="lg"
                 accepter={TagPicker}
-                placeholder='Add tickets'
+                placeholder="Add tickets"
                 data={tickets}
-                labelKey='ticket'
-                valueKey='ticket'
+                labelKey="ticket"
+                valueKey="ticket"
                 value={ticket}
                 onChange={handleTicketChange}
                 onSelect={(value: string[]): void =>
@@ -188,15 +188,15 @@ const Edit: React.FC<EditProps> = ({
         </Modal.Body>
         <Modal.Footer>
           <ButtonToolbar>
-            <Button block appearance='default' onClick={onHide}>
+            <Button block appearance="default" onClick={onHide}>
               Cancel
             </Button>
-            <Button block appearance='primary' onClick={handleUpdate}>
+            <Button block appearance="primary" onClick={handleUpdate}>
               Ok
             </Button>
           </ButtonToolbar>
           <Divider />
-          <Button block appearance='ghost' color='red' onClick={handleDelete}>
+          <Button block appearance="ghost" color="red" onClick={handleDelete}>
             Delete
           </Button>
         </Modal.Footer>

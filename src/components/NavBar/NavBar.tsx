@@ -64,7 +64,7 @@ const NavBar = () => {
 
   return (
     <div>
-      <AppBar position="static">
+      <AppBar color="primary" position="static">
         <Toolbar>
           <img src={logo} alt="detonate" className={classes.logo} />
           <section className={classes.rightToolbar}>

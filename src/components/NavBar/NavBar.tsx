@@ -24,6 +24,10 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       flexGrow: 1
     },
+    small: {
+      width: theme.spacing(3),
+      height: theme.spacing(3)
+    },
     logo: {
       height: 30,
       marginBottom: theme.spacing(1),
@@ -66,7 +70,7 @@ const NavBar = () => {
           <section className={classes.rightToolbar}>
             <IconButton color="inherit" aria-label="Sync Google Sheets">
               <Tooltip title="Sync Google Sheets" arrow>
-                <SyncIcon />
+                <SyncIcon fontSize="small" />
               </Tooltip>
             </IconButton>
             <IconButton
@@ -76,7 +80,7 @@ const NavBar = () => {
               href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${sheetProperties?.sheetId}`}
             >
               <Tooltip title="Open Google Sheets" arrow>
-                <OpenInNewIcon />
+                <OpenInNewIcon fontSize="small" />
               </Tooltip>
             </IconButton>
             <IconButton
@@ -86,9 +90,9 @@ const NavBar = () => {
             >
               <Tooltip title="Toggle Dark/Light mode" arrow>
                 {themeName === "lightTheme" ? (
-                  <Brightness4Icon />
+                  <Brightness4Icon fontSize="small" />
                 ) : (
-                  <Brightness7Icon />
+                  <Brightness7Icon fontSize="small" />
                 )}
               </Tooltip>
             </IconButton>
@@ -100,6 +104,7 @@ const NavBar = () => {
               color="inherit"
             >
               <Avatar
+                className={classes.small}
                 alt={currentUser?.getName()}
                 src={currentUser?.getImageUrl()}
               />

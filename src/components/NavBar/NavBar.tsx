@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import AppBar from "@material-ui/core/AppBar";
@@ -12,6 +12,7 @@ import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import SyncIcon from "@material-ui/icons/Sync";
 import Tooltip from "@material-ui/core/Tooltip";
+import Divider from "@material-ui/core/Divider";
 
 import { ThemeContext } from "../../contexts/ThemeProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
@@ -119,8 +120,9 @@ const NavBar = () => {
               onClose={handleClose}
             >
               <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>My account</MenuItem>
               <MenuItem onClick={handleClose}>Settings</MenuItem>
+              <Divider />
+              <MenuItem onClick={handleSignOut}>Log out</MenuItem>
             </Menu>
           </section>
         </Toolbar>

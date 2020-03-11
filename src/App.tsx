@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Container, CssBaseline, createMuiTheme } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 
 import AppProvider from "./contexts/AppProvider";
 
@@ -39,6 +39,8 @@ const App = () => {
             {googleAuth.isSignedIn ? (
               <React.Fragment>
                 <NavBar />
+                <Timer />
+
                 {/*  <Content
                   style={{
                     marginTop: "56px"

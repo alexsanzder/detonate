@@ -7,8 +7,6 @@ export interface AppContextType {
   toggleRunning(value: boolean): void;
   reload: boolean;
   toggleReload(value: boolean): void;
-  range: string;
-  toggleRange(value: string): void;
 }
 
 export const AppContext = React.createContext<AppContextType>({
@@ -16,15 +14,12 @@ export const AppContext = React.createContext<AppContextType>({
   running: false,
   toggleRunning: () => {},
   reload: false,
-  toggleReload: () => {},
-  range: "A1:G1",
-  toggleRange: () => {}
+  toggleReload: () => {}
 });
 
 export const AppProvider: React.FC = (props: React.PropsWithChildren<{}>) => {
   const [running, setRunning] = React.useState(false);
   const [reload, setReload] = React.useState(false);
-  const [range, setRange] = React.useState("");
 
   return (
     <AppContext.Provider
@@ -33,9 +28,7 @@ export const AppProvider: React.FC = (props: React.PropsWithChildren<{}>) => {
         running: running,
         toggleRunning: setRunning,
         reload: reload,
-        toggleReload: setReload,
-        range: range,
-        toggleRange: setRange
+        toggleReload: setReload
       }}
     >
       <ThemeProvider>{props.children}</ThemeProvider>

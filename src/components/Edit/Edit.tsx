@@ -1,211 +1,195 @@
-import * as React from "react";
-import styled from "styled-components";
+import React from "react";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import TextField from "@material-ui/core/TextField";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Container from "@material-ui/core/Container";
+import Slide from "@material-ui/core/Slide";
+import { TransitionProps } from "@material-ui/core/transitions";
+import Divider from "@material-ui/core/Divider";
+import Grid from "@material-ui/core/Grid";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
-import { Record } from "../../hooks/useGoogle";
-
-import {
-  Form,
-  FormGroup,
-  FormControl,
-  Modal,
-  Button,
-  ButtonToolbar,
-  TagPicker,
-  SelectPicker,
-  Divider
-} from "rsuite";
-import { ItemDataType } from "rsuite/lib/@types/common";
 import { getSeconds, getFraction, getTimeFormated } from "../../utils/time";
 
-type EditProps = {
-  show: boolean;
-  record: Record;
-  onHide: () => void;
-};
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    paper: {
+      marginTop: theme.spacing(8),
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center"
+    },
+    form: {
+      width: "100%", // Fix IE 11 issue.
+      marginTop: theme.spacing(1)
+    },
+    timer: {
+      textAlign: "center",
+      fontSize: 30
+    },
+    divider: { margin: theme.spacing(2, 0, 3) }
+  })
+);
+
+const Transition = React.forwardRef<unknown, TransitionProps>(
+  function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  }
+);
+
+export interface EditProps {
+  open: boolean;
+  handleClose: () => void;
+  timer: string;
+  record: any;
+  setRecord: (value: any) => void;
+}
 
 const Edit: React.FC<EditProps> = ({
-  show,
+  open,
+  handleClose,
+  timer,
   record,
-  onHide
-}: EditProps): JSX.Element => {
-  const { toggleReload } = React.useContext(AppContext);
-
+  setRecord
+}) => {
+  const classes = useStyles();
+  const { toggleReload, toggleRunning } = React.useContext(AppContext);
   const { projects, records, updateRecord, deleteRecord } = React.useContext(
     GoogleAuthContext
   );
 
-  const [time, setTime] = React.useState<string | null>(null);
-  const [description, setDescription] = React.useState<string | null>(null);
-  const [company, setCompany] = React.useState<string | null>(null);
-  const [project, setProject] = React.useState<string | null>(null);
-  const [ticket, setTicket] = React.useState<string[]>([]);
-
-  const tickets = Array.from(
-    new Set(records?.map((record: Record) => record.ticket))
-  ).map(ticket => {
-    return records.find((record: Record) => record.ticket === ticket);
-  });
-
-  const handleUpdate = (): void => {
-    const seconds = time ? getSeconds(time) : 0;
+  const handleUpdate = async (): Promise<void> => {
+    const seconds = timer ? getSeconds(timer) : 0;
     const fraction = getFraction(seconds);
-
-    updateRecord &&
-      updateRecord(record.id, [
+    const response =
+      updateRecord &&
+      (await updateRecord(record.range, [
         null,
         null,
-        company,
-        project,
-        description ? description : "(no description)",
-        ticket?.join(", "),
+        record.company,
+        record.project,
+        record.description,
+        record.ticket,
         fraction
-      ]);
-    toggleReload && toggleReload(true);
-    onHide();
+      ]));
+    toggleReload(true);
+    handleClose();
   };
 
-  const handleDelete = (): void => {
-    const index = record.id.replace("aSa!A", "");
-    deleteRecord && deleteRecord(parseInt(index));
-    toggleReload && toggleReload(true);
-    onHide();
+  const handleDelete = async (): Promise<void> => {
+    const index = record.range.replace(/(^.+\D)(\d+)(\D.+$)/i, "$2");
+    const response = deleteRecord && (await deleteRecord(parseInt(index)));
+    toggleReload(true);
+    toggleRunning(false);
+    handleClose();
   };
 
-  const handleOnTimeChange = React.useCallback((value: string) => {
-    setTime(value);
-  }, []);
-
-  const handleOnDescriptionChange = React.useCallback((value: string) => {
-    setDescription(value);
-  }, []);
-
-  const handleProjectChange = React.useCallback((value: string) => {
-    setProject(value);
-  }, []);
-
-  const handleTicketChange = React.useCallback((value: string[]) => {
-    setTicket(value);
-  }, []);
-
-  const handleOnProjectSelect = React.useCallback(
-    (_value: string, item: any) => {
-      setProject(item.project);
-      setCompany(item.company);
-    },
-    []
-  );
-
-  const handleOnTicketSelect = React.useCallback((value: string[]) => {
-    setTicket(value);
-  }, []);
-
-  const handleOnShow = (): void => {
-    setTime(getTimeFormated(record.time));
-    setDescription(record.description);
-    setProject(record.project);
-    setTicket(record.ticket.split(", "));
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    setRecord({ ...record, [event.target.name]: event.target.value });
   };
 
   return (
-    <Style>
-      <Modal
-        full
-        size={"lg"}
-        show={show}
-        backdrop={true}
-        onHide={onHide}
-        onShow={handleOnShow}
-      >
-        <Modal.Header>
-          <Modal.Title>Edit Timer</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form fluid>
-            <FormGroup>
-              <FormControl
-                style={{
-                  padding: 4,
-                  color: "#999",
-                  textAlign: "center",
-                  fontSize: "x-large"
-                }}
-                name="timer"
-                size="lg"
-                readOnly={false}
-                value={time}
-                onChange={handleOnTimeChange}
-              />
-            </FormGroup>
-            <FormGroup>
-              <FormControl
-                name="description"
-                size="lg"
-                placeholder="What are you working on?"
-                width="100%"
-                defaultValue="(no description)"
-                value={description}
-                onChange={handleOnDescriptionChange}
-              />
-            </FormGroup>
-            <FormGroup>
-              <FormControl
-                block
-                name="project"
-                size="lg"
-                accepter={SelectPicker}
-                placeholder="Select a project"
-                data={projects}
-                labelKey="project"
-                valueKey="project"
-                groupBy="company"
-                value={project}
-                onChange={handleProjectChange}
-                onSelect={(value: string, item: ItemDataType): void =>
-                  handleOnProjectSelect(value, item)
-                }
-              />
-            </FormGroup>
-            <FormGroup>
-              <FormControl
-                block
-                creatable
-                name="ticket"
-                size="lg"
-                accepter={TagPicker}
-                placeholder="Add tickets"
-                data={tickets}
-                labelKey="ticket"
-                valueKey="ticket"
-                value={ticket}
-                onChange={handleTicketChange}
-                onSelect={(value: string[]): void =>
-                  handleOnTicketSelect(value)
-                }
-              />
-            </FormGroup>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <ButtonToolbar>
-            <Button block appearance="default" onClick={onHide}>
-              Cancel
-            </Button>
-            <Button block appearance="primary" onClick={handleUpdate}>
-              Ok
-            </Button>
-          </ButtonToolbar>
-          <Divider />
-          <Button block appearance="ghost" color="red" onClick={handleDelete}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Style>
+    <Dialog
+      fullScreen
+      open={open}
+      onClose={handleClose}
+      TransitionComponent={Transition}
+    >
+      <Container component="main" maxWidth="xs">
+        <div className={classes.paper}>
+          <CssBaseline />
+          <form className={classes.form} noValidate>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              id="timer"
+              name="timer"
+              inputProps={{ className: classes.timer }}
+              InputProps={{
+                readOnly: true
+              }}
+              value={timer}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              name="description"
+              placeholder="What are you working on?"
+              id="description"
+              autoComplete="description"
+              value={record.description}
+              onChange={handleChangeInput}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              name="project"
+              placeholder="In what project?"
+              id="project"
+              autoComplete="project"
+              value={record.project}
+              onChange={handleChangeInput}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              name="ticket"
+              placeholder="Which ticket?"
+              id="ticket"
+              autoComplete="ticket"
+              value={record.ticket}
+              onChange={handleChangeInput}
+            />
+            <Divider className={classes.divider} />
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  color="primary"
+                  onClick={handleUpdate}
+                >
+                  Done
+                </Button>
+              </Grid>
+              <Grid item xs>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  size="large"
+                  color="default"
+                  onClick={handleUpdate}
+                >
+                  Cancel
+                </Button>
+              </Grid>
+              <Grid item xs>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  color="secondary"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
+      </Container>
+    </Dialog>
   );
 };
-
-const Style = styled.div``;
 
 export default Edit;

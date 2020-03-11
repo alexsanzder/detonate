@@ -16,13 +16,13 @@ import {
   IconButton
 } from "rsuite";
 import { Record } from "../../hooks/useGoogle";
-import Edit from "../Edit/Edit";
+import Edit from "../Edit/Edit copy";
 import PanelHeader from "./PanelHeader";
 
 import { getTimeFormated } from "../../utils/time";
 
 const Summary = (): JSX.Element => {
-  const { reload, toggleReload, toggleRange } = React.useContext(AppContext);
+  const { reload, toggleReload } = React.useContext(AppContext);
   const { records, loadTable } = React.useContext(GoogleAuthContext);
 
   const [show, setShow] = React.useState(false);

@@ -6,11 +6,11 @@ import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import Divider from "@material-ui/core/Divider";
 
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
@@ -43,9 +43,8 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%", // Fix IE 11 issue.
       marginTop: theme.spacing(1)
     },
-    submit: {
-      margin: theme.spacing(3, 0, 2)
-    }
+    divider: { margin: theme.spacing(2, 0, 3) },
+    submit: {}
   })
 );
 
@@ -71,7 +70,7 @@ const Login = () => {
             required
             fullWidth
             id="sheedId"
-            label="Google Sheet ID"
+            placeholder="Google Sheet ID"
             name="sheedId"
             autoComplete="sheedId"
             autoFocus
@@ -82,13 +81,15 @@ const Login = () => {
             required
             fullWidth
             name="sheedName"
-            label="Google Sheet Name"
+            placeholder="Google Sheet Name"
             id="sheedName"
             autoComplete="sheedName"
           />
+          <Divider className={classes.divider} />
+
           <Button
             fullWidth
-            variant="outlined"
+            variant="contained"
             size="large"
             color="primary"
             className={classes.submit}
@@ -96,7 +97,6 @@ const Login = () => {
           >
             Sign in with Google
           </Button>
-          <Grid container></Grid>
         </form>
       </div>
       <Box mt={8}>

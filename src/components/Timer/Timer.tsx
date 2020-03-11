@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -10,8 +11,11 @@ import StopRoundedIcon from "@material-ui/icons/StopRounded";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 
+import Edit from "../Edit/Edit";
+
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { Record } from "../../hooks/useGoogle";
 
 import { getFraction, getTimeFromSeconds } from "../../utils/time";
 
@@ -55,7 +59,6 @@ const Timer = () => {
     appendRecord,
     updateRecord,
     currentUser,
-    deleteRecord,
     projects,
     records
   } = React.useContext(GoogleAuthContext);
@@ -65,19 +68,22 @@ const Timer = () => {
     running,
     toggleRunning,
     reload,
-    toggleReload,
-    range,
-    toggleRange
+    toggleReload
   } = React.useContext(AppContext);
 
-  const [seconds, setSeconds] = React.useState<number>(0);
-  const [description, setDescription] = React.useState<string>("");
-  const [company, setCompany] = React.useState<string | null>(null);
-  const [project, setProject] = React.useState<string | null>(null);
-  const [ticket, setTicket] = React.useState<string | null>(null);
+  const [record, setRecord] = React.useState<any | null>({
+    range: "",
+    seconds: "",
+    description: "",
+    company: "",
+    project: "",
+    ticket: ""
+  });
 
-  const [message, setMessage] = React.useState<string>("");
-  const [open, setOpen] = React.useState(false);
+  const [seconds, setSeconds] = React.useState<number>(0);
+
+  const [openEdit, setOpenEdit] = React.useState(false);
+  const [openAlert, setOpenAlert] = React.useState(false);
 
   React.useEffect(() => {
     let interval: number | undefined = undefined;
@@ -93,24 +99,35 @@ const Timer = () => {
     };
   }, [running, seconds]);
 
-  const handlePlay = async (): Promise<void> => {
-    toggleRunning && toggleRunning(!running);
-    setDescription(description ? description : "(no description)");
+  React.useEffect(() => {
+    if (reload && !running) {
+      setSeconds(0);
+      setRecord({
+        range: "",
+        seconds: "",
+        description: "",
+        company: "",
+        project: "",
+        ticket: ""
+      });
+    }
+  }, [reload, running]);
 
+  const handlePlay = async (): Promise<void> => {
     const today = new Date().toLocaleDateString(locale, {
       year: "numeric",
       month: "2-digit",
       day: "2-digit"
     });
-    const append =
+    const response =
       appendRecord &&
       (await appendRecord([
         currentUser.getName(),
         today,
-        "(no company)",
-        "(no project)",
-        description,
-        "(no ticket)",
+        record.company ? record.company : "(no company)",
+        record.project ? record.project : "(no project)",
+        record.description ? record.description : "(no description)",
+        record.ticket ? record.ticket : "(no ticket)",
         "0"
       ]));
 
@@ -118,61 +135,65 @@ const Timer = () => {
       result: {
         updates: { updatedRange }
       }
-    } = append;
+    } = response;
 
-    toggleRange && toggleRange(updatedRange);
+    setRecord({
+      ...record,
+      range: updatedRange,
+      company: record.company ? record.company : "(no company)",
+      project: record.project ? record.project : "(no project)",
+      description: record.description ? record.description : "(no description)",
+      ticket: record.ticket ? record.ticket : "(no ticket)"
+    });
+
+    toggleRunning(!running);
   };
+
   const handleStop = async (): Promise<void> => {
-    toggleRunning && toggleRunning(!running);
-    const update =
+    toggleRunning(!running);
+    const response =
       updateRecord &&
-      (await updateRecord(range ? range : "", [
+      (await updateRecord(record.range, [
         null,
         null,
-        company,
-        project,
-        description,
-        ticket,
+        record.company,
+        record.project,
+        record.description,
+        record.ticket,
         getFraction(seconds)
       ]));
-    setDescription("");
 
     const {
       result: { updatedRange }
-    } = update;
-    setMessage(updatedRange);
-    setOpen(true);
+    } = response;
+    toggleReload(true);
+    setOpenAlert(true);
+  };
+
+  const handleOpenEdit = (): void => {
+    setOpenEdit(!openEdit);
+  };
+
+  const handleCloseEdit = (): void => {
+    setOpenEdit(false);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setDescription(event.target.value);
+    setRecord({ ...record, [event.target.name]: event.target.value });
   };
 
-  const handleClose = (
+  const handleCloseAlert = (
     _event: React.SyntheticEvent | React.MouseEvent,
     reason?: string
   ): void => {
     if (reason === "clickaway") {
       return;
     }
-    setOpen(false);
+    setOpenAlert(false);
   };
 
   return (
     <div className={classes.root}>
-      <Snackbar
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center"
-        }}
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-      >
-        <Alert onClose={handleClose} severity="success">
-          {`Time tracking added successfully - ${message}!`}
-        </Alert>
-      </Snackbar>
       <Paper className={classes.paper} elevation={0}>
         <Grid
           container
@@ -183,10 +204,11 @@ const Timer = () => {
           <Grid item xs={running ? 8 : 10}>
             <InputBase
               fullWidth
+              name="description"
               className={classes.input}
               placeholder="What are you working on?"
               inputProps={{ "aria-label": "What are you working on?" }}
-              value={description}
+              value={record.description}
               onChange={handleChange}
             />
           </Grid>
@@ -205,7 +227,12 @@ const Timer = () => {
                   />
                 </Grid>
                 <Grid item xs>
-                  <Fab color="primary" size="small" aria-label="edit">
+                  <Fab
+                    color="primary"
+                    size="small"
+                    aria-label="edit"
+                    onClick={handleOpenEdit}
+                  >
                     <EditRoundedIcon />
                   </Fab>
                   <Fab
@@ -233,6 +260,26 @@ const Timer = () => {
           </Grid>
         </Grid>
       </Paper>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center"
+        }}
+        open={openAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+      >
+        <Alert onClose={handleCloseAlert} severity="success">
+          {`Time tracked successfully - ${record.range}!`}
+        </Alert>
+      </Snackbar>
+      <Edit
+        open={openEdit}
+        handleClose={handleCloseEdit}
+        timer={getTimeFromSeconds(seconds)}
+        record={record}
+        setRecord={setRecord}
+      />
     </div>
   );
 };

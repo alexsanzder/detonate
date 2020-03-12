@@ -6,7 +6,7 @@
 
 - Google Sheet as a backend
   - Privacy and access control
-- Materil UI
+- Material UI
   - Dark/Light theme
 
 ## Getting started (WIP)

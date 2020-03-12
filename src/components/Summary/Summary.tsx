@@ -1,182 +1,110 @@
-import * as React from "react";
-import styled from "styled-components";
+import React from "react";
+import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
+import GridList from "@material-ui/core/GridList";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import FavoriteIcon from "@material-ui/icons/Favorite";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Tooltip from "@material-ui/core/Tooltip";
+import Icon from "@material-ui/core/Icon";
+import Fab from "@material-ui/core/Fab";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
-import {
-  Icon,
-  FlexboxGrid,
-  Panel,
-  Placeholder,
-  List,
-  TagGroup,
-  Tag,
-  ButtonToolbar,
-  IconButton
-} from "rsuite";
-import { Record } from "../../hooks/useGoogle";
-import Edit from "../Edit/Edit copy";
-import PanelHeader from "./PanelHeader";
-
 import { getTimeFormated } from "../../utils/time";
 
+import { RecordType } from "../../hooks/useGoogle";
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      width: "100%",
+      padding: theme.spacing(2)
+    },
+    card: {
+      marginBottom: 20
+    },
+    media: {
+      height: 140
+    },
+    actions: {
+      display: "flex"
+    },
+    coin: {
+      marginLeft: "auto"
+    },
+    favorite: {
+      marginLeft: 300,
+      marginTop: -250
+    }
+  })
+);
+
 const Summary = (): JSX.Element => {
-  const { reload, toggleReload } = React.useContext(AppContext);
+  const classes = useStyles();
+
+  const { reload, toggleReload, locale } = React.useContext(AppContext);
   const { records, loadTable } = React.useContext(GoogleAuthContext);
 
-  const [show, setShow] = React.useState(false);
-  const [record, setRecord] = React.useState();
+  const groupBy = (array: any[], key: string) => {
+    return records?.reduce((result: any, currentValue: any) => {
+      (result[currentValue[key]] = result[currentValue[key]] || []).push(
+        currentValue
+      );
+      return result;
+    }, {});
+  };
+  const data = groupBy(records, "date");
 
-  React.useEffect(() => {
-    if (reload) {
-      toggleReload && toggleReload(true);
-      //Load spredsheet data
-      loadTable && loadTable();
-    }
-  }, [reload, toggleReload, loadTable]);
-
-  const data = records?.reduce((r: any, a: Record) => {
-    r[a.date] = r[a.date] || [];
-    r[a.date].push(a);
-    return r;
-  }, Object.create(null));
-
-  const handleToogleEdit = (record: Record): void => {
-    setShow(!show);
-    setRecord(record);
+  const formatedDate = (date: string) => {
+    const splits = date.split(".");
+    return new Date(splits.reverse().join("-")).toLocaleDateString(locale, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
   };
 
-  const handleHide = (): void => {
-    setShow(false);
-  };
   return (
-    <Style>
-      <Edit show={show} record={record} onHide={handleHide} />
-      <List bordered={false} className="list-summary" size="lg">
-        {data ? (
-          Object.keys(data).map(
-            (date: string) =>
-              data[date][0].time !== undefined && (
-                <List.Item key={date}>
-                  <Panel
-                    header={<PanelHeader date={date} data={data[date]} />}
-                    bordered
-                    shaded
-                  >
-                    <List bordered={false}>
-                      {data[date].map((record: Record) => {
-                        return (
-                          <List.Item key={record.id}>
-                            <FlexboxGrid justify="space-between" align="middle">
-                              <FlexboxGrid.Item colspan={20}>
-                                <p
-                                  style={{
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis"
-                                  }}
-                                >
-                                  {record.description}
-                                </p>
-                              </FlexboxGrid.Item>
-                              <FlexboxGrid.Item
-                                colspan={4}
-                                style={{
-                                  textAlign: "right"
-                                }}
-                              >
-                                {getTimeFormated(record.time)}
-                              </FlexboxGrid.Item>
-                            </FlexboxGrid>
-                            <FlexboxGrid
-                              justify="space-between"
-                              align="middle"
-                              style={{
-                                marginTop: "1rem"
-                              }}
-                            >
-                              <FlexboxGrid.Item colspan={20}>
-                                <TagGroup>
-                                  {record.company && (
-                                    <Tag>{record.company}</Tag>
-                                  )}
-                                  {record.project && (
-                                    <Tag>
-                                      {record.project && record.project}
-                                    </Tag>
-                                  )}
-                                  {record.ticket && <Tag>{record.ticket}</Tag>}
-                                </TagGroup>
-                              </FlexboxGrid.Item>
-                              <FlexboxGrid.Item
-                                colspan={4}
-                                style={{
-                                  textAlign: "right"
-                                }}
-                              >
-                                <ButtonToolbar>
-                                  <IconButton
-                                    circle
-                                    appearance="subtle"
-                                    color="blue"
-                                    icon={<Icon icon="edit2" size="lg" />}
-                                    onClick={(): void =>
-                                      handleToogleEdit(record)
-                                    }
-                                  />
-                                  <IconButton
-                                    circle
-                                    appearance="subtle"
-                                    color="green"
-                                    icon={<Icon icon="play" size="lg" />}
-                                  />
-                                </ButtonToolbar>
-                              </FlexboxGrid.Item>
-                            </FlexboxGrid>
-                          </List.Item>
-                        );
-                      })}
-                    </List>
-                  </Panel>
-                </List.Item>
-              )
-          )
-        ) : (
-          <List.Item>
-            <Panel
-              header={<Placeholder.Grid rows={1} columns={2} active />}
-              bordered
-              shaded
-            >
-              <List bordered={false}>
-                <List.Item>
-                  <Placeholder.Grid rows={2} columns={2} active />
-                </List.Item>
-                <List.Item>
-                  <Placeholder.Grid rows={2} columns={2} active />
-                </List.Item>
-              </List>
-            </Panel>
-          </List.Item>
-        )}
-      </List>
-    </Style>
+    <GridList cols={1} className={classes.root}>
+      {data ? (
+        Object.keys(data).map((date: string) => (
+          <Card className={classes.card} key={date}>
+            <CardActionArea>
+              <Typography variant="caption">90 m</Typography>
+
+              <CardContent>
+                <Typography component="p">
+                  Lizards are a widespread group of squamate reptiles, with over
+                  6,000 species, ranging across all continents except Antarctica
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+            <CardActions className={classes.actions}>
+              <Icon>room</Icon>
+              <Typography variant="caption">90 m</Typography>
+              <IconButton
+                aria-label="Add to favorites"
+                className={classes.coin}
+              >
+                <Icon>attach_money</Icon>
+                <Typography variant="caption">10 mozzarella coin</Typography>
+              </IconButton>
+            </CardActions>
+          </Card>
+        ))
+      ) : (
+        <>Loading...</>
+      )}
+    </GridList>
   );
 };
-
-const Style = styled.div`
-  padding: 10px 20px;
-  margin-top: 82px;
-  .list-summary {
-    box-shadow: none;
-    .rs-list-item-lg {
-      box-shadow: none;
-    }
-    .rs-panel-body {
-      padding-bottom: 0;
-    }
-  }
-`;
-
 export default Summary;

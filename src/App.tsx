@@ -40,7 +40,7 @@ const App = () => {
               <React.Fragment>
                 <NavBar />
                 <Timer />
-
+                <Summary />
                 {/*  <Content
                   style={{
                     marginTop: "56px"

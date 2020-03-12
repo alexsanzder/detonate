@@ -15,7 +15,7 @@ import Edit from "../Edit/Edit";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
-import { Record } from "../../hooks/useGoogle";
+import { RecordType } from "../../hooks/useGoogle";
 
 import { getFraction, getTimeFromSeconds } from "../../utils/time";
 

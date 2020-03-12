@@ -37,7 +37,7 @@ export interface UseGoogleType {
   sheetProperties: any;
 }
 
-export interface Record {
+export interface RecordType {
   id: string;
   name: string;
   date: string;
@@ -128,7 +128,7 @@ export const useGoogle = ({
         valueRanges[1].values &&
         valueRanges[1].values
           .map(
-            (value: any[], index: number): Record => {
+            (value: any[], index: number): RecordType => {
               return {
                 id: `${tableName}!A${rowCount && rowCount - 21 + index}`,
                 name: value[0],

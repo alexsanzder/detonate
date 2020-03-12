@@ -26,6 +26,7 @@ export interface UseGoogleType {
   handleSignOut: () => Promise<void> | undefined;
   projects: any;
   records: any;
+  tickets: any;
   loadTable: () => Promise<void> | undefined;
   appendRecord: (record: string[]) => Promise<any> | undefined;
   updateRecord: (
@@ -68,6 +69,7 @@ export const useGoogle = ({
   const [currentUser, setCurrentUser] = useState();
   const [records, setRecords] = useState();
   const [projects, setProjects] = useState();
+  const [tickets, setTickets] = useState();
   const [sheetProperties, setSheetProperties] = useState();
 
   const loadTable = async (): Promise<void> => {
@@ -94,15 +96,18 @@ export const useGoogle = ({
         spreadsheetId: spreadsheetId,
         valueRenderOption: "UNFORMATTED_VALUE",
         dateTimeRenderOption: "FORMATTED_STRING",
-        majorDimension: "ROWS",
+        majorDimension: "DIMENSION_UNSPECIFIED",
         ranges: [
           "projects!A2:B",
-          `${tableName}!A${rowCount && rowCount - 21}:G`
+          `${tableName}!A${rowCount && rowCount - 21}:G`,
+          `${tableName}!F2:F`
         ]
       });
 
-      const valueRanges = response.result.valueRanges;
-      const projects =
+      const {
+        result: { valueRanges }
+      } = response;
+      const valueProjects =
         valueRanges &&
         valueRanges[0].values &&
         valueRanges[0].values
@@ -116,9 +121,9 @@ export const useGoogle = ({
             }
           )
           .reverse();
-      setProjects(projects);
+      setProjects(valueProjects);
 
-      const records =
+      const valueRecords =
         valueRanges &&
         valueRanges[1].values &&
         valueRanges[1].values
@@ -138,7 +143,25 @@ export const useGoogle = ({
           )
           .reverse()
           .filter(record => record.time !== undefined);
-      setRecords(records);
+      setRecords(valueRecords);
+
+      const valueTickets =
+        valueRanges &&
+        valueRanges[2].values &&
+        valueRanges[2].values
+          .reduce((prev: any, curr: any): any => prev.concat(curr))
+          .filter(
+            (value: any, index: number, array: string[]): any =>
+              array.indexOf(value) === index
+          )
+          .map((value: string, index: number): any => {
+            return {
+              id: index,
+              ticket: value
+            };
+          })
+          .reverse();
+      setTickets(valueTickets);
     });
   };
 
@@ -246,6 +269,7 @@ export const useGoogle = ({
     isSignedIn,
     projects,
     records,
+    tickets,
     loadTable,
     appendRecord,
     updateRecord,

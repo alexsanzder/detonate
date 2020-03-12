@@ -46,9 +46,12 @@ const NavBar = () => {
   const open = Boolean(anchorEl);
 
   const { themeName, setThemeName } = React.useContext(ThemeContext);
-  const { currentUser, handleSignOut, sheetProperties } = React.useContext(
-    GoogleAuthContext
-  );
+  const {
+    currentUser,
+    handleSignOut,
+    sheetProperties,
+    loadTable
+  } = React.useContext(GoogleAuthContext);
 
   const handleTheme = (): void => {
     setThemeName(themeName === "darkTheme" ? "lightTheme" : "darkTheme");
@@ -68,7 +71,11 @@ const NavBar = () => {
         <Toolbar>
           <img src={logo} alt="detonate" className={classes.logo} />
           <section className={classes.rightToolbar}>
-            <IconButton color="inherit" aria-label="Sync Google Sheets">
+            <IconButton
+              color="inherit"
+              aria-label="Sync Google Sheets"
+              onClick={loadTable}
+            >
               <Tooltip title="Sync Google Sheets" arrow>
                 <SyncIcon fontSize="small" />
               </Tooltip>

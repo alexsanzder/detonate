@@ -9,10 +9,22 @@ import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
+import Checkbox from "@material-ui/core/Checkbox";
+import Autocomplete, {
+  createFilterOptions
+} from "@material-ui/lab/Autocomplete";
+
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import TicketsAutocomplete from "./TicketsAutocomplete";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 import { getSeconds, getFraction, getTimeFormated } from "../../utils/time";
+
+const filter = createFilterOptions();
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,9 +69,20 @@ const Edit: React.FC<EditProps> = ({
 }) => {
   const classes = useStyles();
   const { toggleReload, toggleRunning } = React.useContext(AppContext);
-  const { projects, records, updateRecord, deleteRecord } = React.useContext(
+  const { projects, updateRecord, deleteRecord } = React.useContext(
     GoogleAuthContext
   );
+  const [project, setProject] = React.useState<string>("");
+
+  React.useEffect(() => {
+    if (record.project) {
+      setProject(
+        projects?.find((obj: any) => {
+          return obj.project === record.project;
+        })
+      );
+    }
+  });
 
   const handleUpdate = async (): Promise<void> => {
     const seconds = timer ? getSeconds(timer) : 0;
@@ -91,6 +114,28 @@ const Edit: React.FC<EditProps> = ({
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     setRecord({ ...record, [event.target.name]: event.target.value });
+  };
+
+  const handleChangeProject = (
+    _event: React.ChangeEvent<{}>,
+    newValue: any | null
+  ): void => {
+    setRecord({
+      ...record,
+      company: newValue?.company,
+      project: newValue?.project
+    });
+  };
+
+  const handleChangeTicket = (
+    _event: React.ChangeEvent<{}>,
+    newValue: any | null
+  ): void => {
+    console.log(newValue);
+    setRecord({
+      ...record,
+      ticket: newValue
+    });
   };
 
   return (
@@ -127,28 +172,60 @@ const Edit: React.FC<EditProps> = ({
               value={record.description}
               onChange={handleChangeInput}
             />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              name="project"
-              placeholder="In what project?"
-              id="project"
-              autoComplete="project"
-              value={record.project}
-              onChange={handleChangeInput}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              name="ticket"
-              placeholder="Which ticket?"
-              id="ticket"
-              autoComplete="ticket"
+            {/* <Autocomplete
+              options={projects}
+              groupBy={(object: any) => object.company}
+              getOptionLabel={(object: any) => object.project}
+              style={{ width: "100%" }}
+              value={project}
+              onChange={handleChangeProject}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  name="project"
+                  placeholder="In what project?"
+                  id="project"
+                />
+              )}
+            /> */}
+            <TicketsAutocomplete record={record} setRecord={setRecord} />
+            {/* <Autocomplete
+              multiple
+              disableCloseOnSelect
+              options={Autocomplete?.filter(
+                (ticket: string, index: number) =>
+                  ticket !== "" && tickets.indexOf(ticket) === index
+              )}
+              getOptionLabel={(object: any) => object}
+              style={{ width: "100%" }}
               value={record.ticket}
-              onChange={handleChangeInput}
-            />
+              onChange={handleChangeTicket}
+              renderOption={(option, { selected }) => (
+                <React.Fragment>
+                  <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option}
+                </React.Fragment>
+              )}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  name="ticket"
+                  placeholder="Which ticket?"
+                  id="ticket"
+                />
+              )}
+            /> */}
             <Divider className={classes.divider} />
             <Grid container spacing={1}>
               <Grid item xs={12}>
@@ -168,7 +245,7 @@ const Edit: React.FC<EditProps> = ({
                   variant="outlined"
                   size="large"
                   color="default"
-                  onClick={handleUpdate}
+                  onClick={handleClose}
                 >
                   Cancel
                 </Button>

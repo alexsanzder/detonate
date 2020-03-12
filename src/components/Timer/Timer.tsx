@@ -59,8 +59,7 @@ const Timer = () => {
     appendRecord,
     updateRecord,
     currentUser,
-    projects,
-    records
+    loadTable
   } = React.useContext(GoogleAuthContext);
 
   const {
@@ -102,14 +101,6 @@ const Timer = () => {
   React.useEffect(() => {
     if (reload && !running) {
       setSeconds(0);
-      setRecord({
-        range: "",
-        seconds: "",
-        description: "",
-        company: "",
-        project: "",
-        ticket: ""
-      });
     }
   }, [reload, running]);
 
@@ -176,6 +167,7 @@ const Timer = () => {
 
   const handleCloseEdit = (): void => {
     setOpenEdit(false);
+    loadTable && loadTable();
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {

@@ -36,7 +36,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     paper: {
       padding: theme.spacing(2),
-      textAlign: "center"
+      textAlign: "center",
+      borderRadius: 0
     },
     item: {
       flexGrow: 0,
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Timer = () => {
+const Timer = (): JSX.Element => {
   const classes = useStyles();
   const {
     appendRecord,
@@ -71,7 +72,7 @@ const Timer = () => {
   } = React.useContext(AppContext);
 
   const [record, setRecord] = React.useState<any | null>({
-    range: "",
+    id: "",
     seconds: "",
     description: "",
     company: "",
@@ -130,7 +131,7 @@ const Timer = () => {
 
     setRecord({
       ...record,
-      range: updatedRange,
+      id: updatedRange,
       company: record.company ? record.company : "(no company)",
       project: record.project ? record.project : "(no project)",
       description: record.description ? record.description : "(no description)",
@@ -144,7 +145,7 @@ const Timer = () => {
     toggleRunning(!running);
     const response =
       updateRecord &&
-      (await updateRecord(record.range, [
+      (await updateRecord(record.id, [
         null,
         null,
         record.company,
@@ -240,7 +241,7 @@ const Timer = () => {
               </Grid>
             ) : (
               <Fab
-                color="primary"
+                color="default"
                 size="small"
                 className={classes.fab}
                 aria-label="add"
@@ -262,7 +263,7 @@ const Timer = () => {
         onClose={handleCloseAlert}
       >
         <Alert onClose={handleCloseAlert} severity="success">
-          {`Time tracked successfully - ${record.range}!`}
+          {`Time tracked successfully - ${record.id}!`}
         </Alert>
       </Snackbar>
       <Edit

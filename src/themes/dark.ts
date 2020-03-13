@@ -1,8 +1,26 @@
 import { createMuiTheme } from "@material-ui/core";
 import grey from "@material-ui/core/colors/grey";
-import color from "@material-ui/core/colors/amber";
+import green from "@material-ui/core/colors/green";
 
 export const darkTheme = createMuiTheme({
+  palette: {
+    type: "dark",
+    primary: {
+      main: "#2196f3"
+    },
+    secondary: {
+      main: "#F50057"
+    },
+    background: {
+      default: grey[800],
+      paper: grey[700]
+    }
+  },
+  typography: {
+    button: {
+      textTransform: "none"
+    }
+  },
   props: {
     MuiAppBar: {
       position: "sticky"
@@ -11,16 +29,7 @@ export const darkTheme = createMuiTheme({
       elevation: 0
     }
   },
-  palette: {
-    type: "dark",
-    primary: {
-      main: "#2196f3"
-    },
-    background: {
-      default: grey[800],
-      paper: grey[700]
-    }
-  },
+
   overrides: {
     MuiAppBar: {
       colorPrimary: {
@@ -34,7 +43,16 @@ export const darkTheme = createMuiTheme({
     },
     MuiTypography: {
       root: {
-        color: grey[400]
+        color: grey[300]
+      }
+    },
+    MuiFab: {
+      root: {
+        backgroundColor: green[500],
+        color: "#fff",
+        "&:hover": {
+          backgroundColor: green[700]
+        }
       }
     }
   }

@@ -11,6 +11,8 @@ import Login from "./components/Login/Login";
 import Spinner from "./components/Spinner/Spinner";
 import Timer from "./components/Timer/Timer";
 import Summary from "./components/Summary/Summary";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 
 const discoveryDocs = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4"
@@ -41,30 +43,20 @@ const App = () => {
                 <NavBar />
                 <Timer />
                 <Summary />
-                {/*  <Content
-                  style={{
-                    marginTop: "56px"
-                  }}
-                >
-                  <Timer />
-                  <Summary />
-                </Content>
-                <Footer
-                  style={{
-                    padding: "0px 0px 20px"
-                  }}
-                >
-                  <FlexboxGrid justify="center">
-                    <Button
-                      target="_blank"
-                      href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${googleAuth.sheetProperties?.sheetId}`}
-                      appearance="ghost"
-                    >
-                      <Icon icon="google" />
-                      See more on Google Sheets
-                    </Button>
-                  </FlexboxGrid>
-                </Footer> */}
+                <Grid container justify="center">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="large"
+                    target="_blank"
+                    style={{
+                      margin: "0px 0px 32px"
+                    }}
+                    href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${googleAuth.sheetProperties?.sheetId}`}
+                  >
+                    See more on Google Sheets
+                  </Button>
+                </Grid>
               </React.Fragment>
             ) : (
               <Login />

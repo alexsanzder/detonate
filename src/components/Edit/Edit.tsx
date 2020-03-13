@@ -9,10 +9,6 @@ import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
-import Checkbox from "@material-ui/core/Checkbox";
-import Autocomplete, {
-  createFilterOptions
-} from "@material-ui/lab/Autocomplete";
 
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
@@ -22,10 +18,6 @@ import ProjectsAutocomplete from "./ProjectsAutocomplete";
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 import { getSeconds, getFraction, getTimeFormated } from "../../utils/time";
-
-const filter = createFilterOptions();
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,7 +48,7 @@ const Transition = React.forwardRef<unknown, TransitionProps>(
 export interface EditProps {
   open: boolean;
   handleClose: () => void;
-  timer: string;
+  timer?: string;
   record: any;
   setRecord: (value: any) => void;
 }
@@ -73,25 +65,29 @@ const Edit: React.FC<EditProps> = ({
   const { updateRecord, deleteRecord } = React.useContext(GoogleAuthContext);
 
   const handleUpdate = async (): Promise<void> => {
-    const seconds = timer ? getSeconds(timer) : 0;
-    const fraction = getFraction(seconds);
+    const time = timer ? getFraction(getSeconds(timer)) : record.time;
+    console.log(record);
     const response =
       updateRecord &&
-      (await updateRecord(record.range, [
+      (await updateRecord(record.id, [
         null,
         null,
         record.company,
         record.project,
         record.description,
         record.ticket,
-        fraction
+        time
       ]));
     toggleReload(true);
     handleClose();
   };
 
   const handleDelete = async (): Promise<void> => {
-    const index = record.range.replace(/(^.+\D)(\d+)(\D.+$)/i, "$2");
+    console.log(record.id);
+    const index = timer
+      ? record.id.replace(/(^.+\D)(\d+)(\D.+$)/i, "$2")
+      : record.id.replace("aSa!A", "");
+    console.log(index);
     const response = deleteRecord && (await deleteRecord(parseInt(index)));
     toggleReload(true);
     toggleRunning(false);
@@ -125,7 +121,7 @@ const Edit: React.FC<EditProps> = ({
               InputProps={{
                 readOnly: true
               }}
-              value={timer}
+              value={timer ? timer : getTimeFormated(record?.time)}
             />
             <TextField
               variant="outlined"
@@ -135,7 +131,7 @@ const Edit: React.FC<EditProps> = ({
               placeholder="What are you working on?"
               id="description"
               autoComplete="description"
-              value={record.description}
+              value={record?.description}
               onChange={handleChangeInput}
             />
             <ProjectsAutocomplete record={record} setRecord={setRecord} />

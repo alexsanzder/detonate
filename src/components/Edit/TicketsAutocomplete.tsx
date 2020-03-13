@@ -45,16 +45,15 @@ const TicketsAutocomplete: React.FC<TicketsAutocompleteProps> = ({
         _event: React.ChangeEvent<{}>,
         newValue: TicketOptionType[]
       ): void => {
-        const options = newValue.map((option: TicketOptionType) => {
-          if (option && option.inputValue) {
-            return option.inputValue;
-          }
-          return option?.ticket;
-        });
+        const options = newValue
+          .filter(Boolean)
+          .map((option: TicketOptionType) =>
+            option?.inputValue ? option?.inputValue : option?.ticket
+          );
         setRecord &&
           setRecord({
             ...record,
-            ticket: options.length > 0 ? options.join(", ") : options
+            ticket: options.length ? options.join(", ") : options.toString()
           });
       }}
       getOptionLabel={(option: TicketOptionType): string => {

@@ -75,7 +75,10 @@ const Edit: React.FC<EditProps> = ({
         record.ticket,
         time
       ]));
-    handleClose();
+    const {
+      result: { updatedRange }
+    } = response;
+    updatedRange && handleClose();
   };
 
   const handleDelete = async (): Promise<void> => {
@@ -85,7 +88,7 @@ const Edit: React.FC<EditProps> = ({
     const response = deleteRecord && (await deleteRecord(parseInt(index)));
     toggleReload(true);
     toggleRunning(false);
-    handleClose();
+    response && handleClose();
   };
 
   const handleChangeInput = (

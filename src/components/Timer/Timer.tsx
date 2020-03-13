@@ -1,8 +1,12 @@
 import * as React from "react";
 
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardHeader from "@material-ui/core/CardHeader";
+
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
+import Chip from "@material-ui/core/Chip";
+import Badge from "@material-ui/core/Badge";
 import InputBase from "@material-ui/core/InputBase";
 import Fab from "@material-ui/core/Fab";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
@@ -34,22 +38,18 @@ const useStyles = makeStyles((theme: Theme) =>
         height: theme.spacing(9)
       }
     },
-    paper: {
-      padding: theme.spacing(2),
-      textAlign: "center",
+    card: {
       borderRadius: 0
     },
-    item: {
-      flexGrow: 0,
-      maxWidth: "87%",
-      flexBasis: "87%"
-    },
-    input: {},
-    text: {
-      width: "87%"
-    },
     fab: {
-      float: "right"
+      marginLeft: theme.spacing(1)
+    },
+    chips: {
+      display: "flex",
+      flexWrap: "wrap",
+      "& > *": {
+        margin: theme.spacing(0.25)
+      }
     }
   })
 );
@@ -194,73 +194,74 @@ const Timer = (): JSX.Element => {
   };
 
   return (
-    <div className={classes.root}>
-      <Paper className={classes.paper} elevation={0}>
-        <Grid
-          container
-          justify={running ? "space-between" : "flex-end"}
-          alignItems="center"
-          spacing={running ? 1 : 0}
-        >
-          <Grid item xs={running ? 8 : 10}>
-            <InputBase
-              fullWidth
-              name="description"
-              className={classes.input}
-              placeholder="What are you working on?"
-              inputProps={{ "aria-label": "What are you working on?" }}
-              value={record.description}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs>
-            {running ? (
-              <Grid container justify="space-between" alignItems="center">
-                <Grid item xs={5}>
+    <div>
+      <Card className={classes.card}>
+        <CardHeader
+          disableTypography
+          title={
+            <Grid container>
+              <Grid item xs={9}>
+                <InputBase
+                  fullWidth
+                  name="description"
+                  placeholder="What are you working on?"
+                  inputProps={{ "aria-label": "What are you working on?" }}
+                  value={record.description}
+                  onChange={handleChange}
+                />
+              </Grid>
+              {running && (
+                <Grid item xs={3}>
                   <InputBase
-                    className={classes.input}
+                    fullWidth
                     placeholder="00:00:00"
                     value={getTimeFromSeconds(seconds)}
                     inputProps={{
-                      "aria-label": "What are you working on?",
-                      readOnly: true
+                      readOnly: true,
+                      style: {
+                        textAlign: "right"
+                      }
                     }}
                   />
                 </Grid>
-                <Grid item xs>
-                  <Fab
-                    color="primary"
-                    size="small"
-                    aria-label="edit"
-                    onClick={handleOpenEdit}
-                  >
-                    <EditRoundedIcon />
-                  </Fab>
-                  <Fab
-                    color="secondary"
-                    size="small"
-                    className={classes.fab}
-                    aria-label="stop"
-                    onClick={handleStop}
-                  >
-                    <StopRoundedIcon />
-                  </Fab>
-                </Grid>
-              </Grid>
-            ) : (
+              )}
+            </Grid>
+          }
+          action={
+            !running ? (
               <Fab
                 color="default"
                 size="small"
-                className={classes.fab}
                 aria-label="add"
                 onClick={handlePlay}
               >
                 <PlayArrowRoundedIcon />
               </Fab>
-            )}
-          </Grid>
-        </Grid>
-      </Paper>
+            ) : (
+              <React.Fragment>
+                <Fab
+                  className={classes.fab}
+                  color="primary"
+                  size="small"
+                  aria-label="edit"
+                  onClick={handleOpenEdit}
+                >
+                  <EditRoundedIcon />
+                </Fab>
+                <Fab
+                  className={classes.fab}
+                  color="secondary"
+                  size="small"
+                  aria-label="stop"
+                  onClick={handleStop}
+                >
+                  <StopRoundedIcon />
+                </Fab>
+              </React.Fragment>
+            )
+          }
+        />
+      </Card>
       <Snackbar
         anchorOrigin={{
           vertical: "top",

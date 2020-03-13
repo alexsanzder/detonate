@@ -35,11 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(2.5)
     },
     cardContent: {
-      padding: theme.spacing(2, 2, 0)
-    },
-    action: {
-      marginTop: theme.spacing(1),
-      marginRight: theme.spacing(1)
+      padding: theme.spacing(2, 2, 1)
     },
     right: {
       marginLeft: "auto"
@@ -89,7 +85,7 @@ const Summary = (): JSX.Element => {
   const [openEdit, setOpenEdit] = React.useState(false);
   const [record, setRecord] = React.useState();
 
-  const groupBy = (array: any[], key: string) => {
+  const groupBy = (array: any[], key: string): any => {
     return records?.reduce((result: any, currentValue: any) => {
       (result[currentValue[key]] = result[currentValue[key]] || []).push(
         currentValue
@@ -99,7 +95,7 @@ const Summary = (): JSX.Element => {
   };
   const data = groupBy(records, "date");
 
-  const formatedDate = (date: string) => {
+  const formatedDate = (date: string): string => {
     const splits = date.split(".");
     return new Date(splits.reverse().join("-")).toLocaleDateString(locale, {
       weekday: "long",
@@ -125,8 +121,8 @@ const Summary = (): JSX.Element => {
   };
 
   const handleCloseEdit = (): void => {
-    setOpenEdit(false);
     loadTable && loadTable();
+    setOpenEdit(false);
   };
 
   return (
@@ -142,18 +138,15 @@ const Summary = (): JSX.Element => {
                 </Typography>
               }
               action={
-                <Typography
-                  color="textPrimary"
-                  variant="body1"
-                  className={classes.action}
-                >
+                <Typography color="textPrimary" variant="body1">
                   {totalTime(data[date])}
                 </Typography>
               }
             />
+            <Divider className={classes.divider} />
             {data[date].map((record: RecordType) => (
               <React.Fragment key={record.id}>
-                <Divider className={classes.divider} />
+                <Divider className={classes.divider} light />
                 <CardActionArea
                   key={record.id}
                   onClick={e => handleOpenEdit(e, record)}

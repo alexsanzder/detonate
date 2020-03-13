@@ -54,6 +54,15 @@ export const darkTheme = createMuiTheme({
           backgroundColor: green[700]
         }
       }
+    },
+    MuiCardHeader: {
+      content: {
+        marginRight: "8px"
+      },
+      action: {
+        marginTop: "0",
+        marginRight: "0"
+      }
     }
   }
 });

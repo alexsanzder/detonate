@@ -38,9 +38,9 @@ export interface UseGoogleType {
 }
 
 export interface RecordType {
-  id: string;
-  name: string;
-  date: string;
+  id?: string;
+  name?: string;
+  date?: string;
   company: string;
   project: string;
   description: string;

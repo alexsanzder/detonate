@@ -14,7 +14,7 @@ const filter = createFilterOptions();
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-export interface TicketsAutocompleteProps {
+export interface TicketsSelectProps {
   record: any;
   setRecord?: (value: any) => void;
 }
@@ -24,10 +24,7 @@ export interface TicketOptionType {
   ticket: string;
   id?: number;
 }
-const TicketsAutocomplete: React.FC<TicketsAutocompleteProps> = ({
-  record,
-  setRecord
-}) => {
+const TicketsSelect: React.FC<TicketsSelectProps> = ({ record, setRecord }) => {
   const { tickets } = React.useContext(GoogleAuthContext);
 
   return (
@@ -113,4 +110,4 @@ const TicketsAutocomplete: React.FC<TicketsAutocompleteProps> = ({
   );
 };
 
-export default TicketsAutocomplete;
+export default TicketsSelect;

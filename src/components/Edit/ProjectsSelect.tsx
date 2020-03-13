@@ -4,7 +4,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
-export interface ProjectsAutocompleteProps {
+export interface ProjectsSelectProps {
   record: any;
   setRecord?: (value: any) => void;
 }
@@ -14,7 +14,7 @@ export interface ProjectOptionType {
   company: string;
   id?: string;
 }
-const ProjectsAutocomplete: React.FC<ProjectsAutocompleteProps> = ({
+const ProjectsSelect: React.FC<ProjectsSelectProps> = ({
   record,
   setRecord
 }) => {
@@ -53,4 +53,4 @@ const ProjectsAutocomplete: React.FC<ProjectsAutocompleteProps> = ({
   );
 };
 
-export default ProjectsAutocomplete;
+export default ProjectsSelect;

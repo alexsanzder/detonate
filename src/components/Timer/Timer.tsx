@@ -70,15 +70,17 @@ const Timer = (): JSX.Element => {
     reload,
     toggleReload
   } = React.useContext(AppContext);
-
-  const [record, setRecord] = React.useState<any | null>({
+  const defaultRecord = {
     id: "",
-    seconds: "",
+    name: "",
+    date: "",
     description: "",
     company: "",
     project: "",
-    ticket: ""
-  });
+    ticket: "",
+    time: 0
+  };
+  const [record, setRecord] = React.useState<RecordType>(defaultRecord);
 
   const [seconds, setSeconds] = React.useState<number>(0);
 
@@ -102,6 +104,8 @@ const Timer = (): JSX.Element => {
   React.useEffect(() => {
     if (reload && !running) {
       setSeconds(0);
+      setRecord(defaultRecord);
+      loadTable && loadTable();
     }
   }, [reload, running]);
 
@@ -116,10 +120,10 @@ const Timer = (): JSX.Element => {
       (await appendRecord([
         currentUser.getName(),
         today,
-        record.company ? record.company : "(no company)",
-        record.project ? record.project : "(no project)",
-        record.description ? record.description : "(no description)",
-        record.ticket ? record.ticket : "(no ticket)",
+        record?.company ? record?.company : "(no company)",
+        record?.project ? record?.project : "(no project)",
+        record?.description ? record?.description : "(no description)",
+        record?.ticket ? record?.ticket : "(no ticket)",
         "0"
       ]));
 
@@ -132,20 +136,24 @@ const Timer = (): JSX.Element => {
     setRecord({
       ...record,
       id: updatedRange,
-      company: record.company ? record.company : "(no company)",
-      project: record.project ? record.project : "(no project)",
-      description: record.description ? record.description : "(no description)",
-      ticket: record.ticket ? record.ticket : "(no ticket)"
+      company: record?.company ? record?.company : "(no company)",
+      project: record?.project ? record?.project : "(no project)",
+      description: record?.description
+        ? record?.description
+        : "(no description)",
+      ticket: record?.ticket ? record?.ticket : "(no ticket)",
+      time: record?.time ? record?.time : seconds
     });
 
     toggleRunning(!running);
   };
 
   const handleStop = async (): Promise<void> => {
-    toggleRunning(!running);
+    setRecord({ ...record, description: "Loading..." });
+
     const response =
       updateRecord &&
-      (await updateRecord(record.id, [
+      (await updateRecord(record?.id ? record?.id : "", [
         null,
         null,
         record.company,
@@ -159,6 +167,7 @@ const Timer = (): JSX.Element => {
       result: { updatedRange }
     } = response;
     toggleReload(true);
+    toggleRunning(false);
     setOpenAlert(true);
   };
 
@@ -168,7 +177,6 @@ const Timer = (): JSX.Element => {
 
   const handleCloseEdit = (): void => {
     setOpenEdit(false);
-    loadTable && loadTable();
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {

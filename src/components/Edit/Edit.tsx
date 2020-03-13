@@ -10,10 +10,8 @@ import { TransitionProps } from "@material-ui/core/transitions";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import TicketsAutocomplete from "./TicketsAutocomplete";
-import ProjectsAutocomplete from "./ProjectsAutocomplete";
+import TicketsAutocomplete from "./TicketsSelect";
+import ProjectsAutocomplete from "./ProjectsSelect";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
@@ -61,12 +59,11 @@ const Edit: React.FC<EditProps> = ({
   setRecord
 }) => {
   const classes = useStyles();
-  const { toggleReload, toggleRunning } = React.useContext(AppContext);
+  const { toggleReload, toggleRunning, running } = React.useContext(AppContext);
   const { updateRecord, deleteRecord } = React.useContext(GoogleAuthContext);
 
   const handleUpdate = async (): Promise<void> => {
     const time = timer ? getFraction(getSeconds(timer)) : record.time;
-    console.log(record);
     const response =
       updateRecord &&
       (await updateRecord(record.id, [
@@ -78,16 +75,13 @@ const Edit: React.FC<EditProps> = ({
         record.ticket,
         time
       ]));
-    toggleReload(true);
     handleClose();
   };
 
   const handleDelete = async (): Promise<void> => {
-    console.log(record.id);
     const index = timer
       ? record.id.replace(/(^.+\D)(\d+)(\D.+$)/i, "$2")
       : record.id.replace("aSa!A", "");
-    console.log(index);
     const response = deleteRecord && (await deleteRecord(parseInt(index)));
     toggleReload(true);
     toggleRunning(false);

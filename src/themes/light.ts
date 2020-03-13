@@ -17,7 +17,10 @@ export const lightTheme = createMuiTheme({
     MuiFab: {
       root: {
         backgroundColor: green[500],
-        color: "#fff"
+        color: "#fff",
+        "&:hover": {
+          backgroundColor: green[700]
+        }
       }
     }
   }

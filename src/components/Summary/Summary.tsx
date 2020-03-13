@@ -11,7 +11,6 @@ import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
-import Portal from "@material-ui/core/Portal";
 
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
@@ -84,17 +83,11 @@ const useStyles = makeStyles((theme: Theme) =>
 const Summary = (): JSX.Element => {
   const classes = useStyles();
 
-  const { reload, toggleReload, locale } = React.useContext(AppContext);
+  const { locale } = React.useContext(AppContext);
   const { records, loadTable } = React.useContext(GoogleAuthContext);
 
   const [openEdit, setOpenEdit] = React.useState(false);
   const [record, setRecord] = React.useState();
-
-  React.useEffect(() => {
-    if (reload) {
-      //loadTable && loadTable();
-    }
-  }, [reload, loadTable]);
 
   const groupBy = (array: any[], key: string) => {
     return records?.reduce((result: any, currentValue: any) => {
@@ -212,6 +205,7 @@ const Summary = (): JSX.Element => {
                   <div className={classes.buttons}>
                     <IconButton
                       className={classes.button}
+                      size="medium"
                       onClick={(e): void => handleOpenEdit(e, record)}
                     >
                       <EditRoundedIcon
@@ -219,7 +213,7 @@ const Summary = (): JSX.Element => {
                         className={classes.iconEdit}
                       />
                     </IconButton>
-                    <IconButton className={classes.button}>
+                    <IconButton className={classes.button} size="medium">
                       <PlayArrowRoundedIcon
                         fontSize="small"
                         className={classes.iconPlay}

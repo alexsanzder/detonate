@@ -3,10 +3,7 @@ import * as React from "react";
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
-
 import Grid from "@material-ui/core/Grid";
-import Chip from "@material-ui/core/Chip";
-import Badge from "@material-ui/core/Badge";
 import InputBase from "@material-ui/core/InputBase";
 import Fab from "@material-ui/core/Fab";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
@@ -19,6 +16,7 @@ import Edit from "../Edit/Edit";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { useInterval } from "../../hooks/useInterval";
 import { RecordType } from "../../hooks/useGoogle";
 
 import { getFraction, getTimeFromSeconds } from "../../utils/time";
@@ -80,12 +78,13 @@ const Timer = (): JSX.Element => {
     ticket: "",
     time: 0
   };
-  const [record, setRecord] = React.useState<RecordType>(defaultRecord);
-
-  const [seconds, setSeconds] = React.useState<number>(0);
 
   const [openEdit, setOpenEdit] = React.useState(false);
   const [openAlert, setOpenAlert] = React.useState(false);
+  const [record, setRecord] = React.useState<RecordType>(defaultRecord);
+  const [seconds, setSeconds] = React.useState<number>(0);
+
+  useInterval(() => setSeconds(seconds => seconds + 1), running ? 1000 : null);
 
   React.useEffect(() => {
     let interval: number | undefined = undefined;

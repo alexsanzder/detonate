@@ -1,5 +1,8 @@
 import * as React from "react";
+
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
+import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 
@@ -12,6 +15,7 @@ import Login from "./components/Login";
 import Spinner from "./components/Spinner";
 import Timer from "./components/Timer";
 import Summary from "./components/Summary";
+import Footer from "./components/Footer";
 
 const discoveryDocs = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4"
@@ -21,7 +25,13 @@ const scope = [
   "https://www.googleapis.com/auth/drive.metadata"
 ].join(" ");
 
-const App = () => {
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({ offset: theme.mixins.toolbar })
+);
+
+const App = (): JSX.Element => {
+  const classes = useStyles();
+
   const googleAuth = useGoogle({
     apiKey: process.env.REACT_APP_GOOGLE_APP_ID,
     clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
@@ -35,32 +45,21 @@ const App = () => {
     <AppProvider>
       <GoogleAuthContext.Provider value={googleAuth}>
         {googleAuth.isInitialized ? (
-          <div>
+          <React.Fragment>
             <CssBaseline />
             {googleAuth.isSignedIn ? (
               <React.Fragment>
                 <NavBar />
                 <Timer />
-                <Summary />
-                <Grid container justify="center">
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="large"
-                    target="_blank"
-                    style={{
-                      margin: "0px 0px 32px"
-                    }}
-                    href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${googleAuth.sheetProperties?.sheetId}`}
-                  >
-                    See more on Google Sheets
-                  </Button>
-                </Grid>
+                <Container fixed>
+                  <Summary />
+                </Container>
+                <Footer />
               </React.Fragment>
             ) : (
               <Login />
             )}
-          </div>
+          </React.Fragment>
         ) : (
           <Spinner />
         )}

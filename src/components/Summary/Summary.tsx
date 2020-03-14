@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-      padding: theme.spacing(2.5, 2)
+      paddingTop: theme.spacing(2.5)
     },
     card: {
       width: "100%",
@@ -72,6 +72,10 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": {
         color: theme.palette.primary.main
       }
+    },
+    time: {
+      marginLeft: "auto",
+      marginRight: theme.spacing(-1)
     }
   })
 );
@@ -134,12 +138,12 @@ const Summary = (): JSX.Element => {
               disableTypography
               title={
                 <Typography color="textPrimary" variant="body1">
-                  {formatedDate(date)}
+                  <b>{formatedDate(date)}</b>
                 </Typography>
               }
               action={
                 <Typography color="textPrimary" variant="body1">
-                  {totalTime(data[date])}
+                  <b>{totalTime(data[date])}</b>
                 </Typography>
               }
             />
@@ -149,7 +153,7 @@ const Summary = (): JSX.Element => {
                 <Divider className={classes.divider} light />
                 <CardActionArea
                   key={record.id}
-                  onClick={e => handleOpenEdit(e, record)}
+                  onClick={(e): void => handleOpenEdit(e, record)}
                 >
                   <CardContent className={classes.cardContent}>
                     <Grid container>
@@ -159,7 +163,10 @@ const Summary = (): JSX.Element => {
                         </Typography>
                       </Grid>
                       <Grid item className={classes.right}>
-                        <Typography variant="subtitle2">
+                        <Typography
+                          variant="subtitle2"
+                          color={record.time < 0.5 ? "error" : "inherit"}
+                        >
                           {getTimeFormated(record.time)}
                         </Typography>
                       </Grid>
@@ -232,7 +239,7 @@ const Summary = (): JSX.Element => {
                     width={"70%"}
                   />
                   <Skeleton
-                    className={classes.right}
+                    className={classes.time}
                     variant="text"
                     animation="wave"
                     height={18}
@@ -328,7 +335,7 @@ const Summary = (): JSX.Element => {
                     width={"75%"}
                   />
                   <Skeleton
-                    className={classes.right}
+                    className={classes.time}
                     variant="text"
                     animation="wave"
                     height={18}

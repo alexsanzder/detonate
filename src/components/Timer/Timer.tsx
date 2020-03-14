@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
+
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import Grid from "@material-ui/core/Grid";
@@ -28,16 +29,13 @@ const Alert = (props: AlertProps) => {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: "flex",
-      flexWrap: "wrap",
-      flexGrow: 1,
-      "& > *": {
-        width: "100%",
-        height: theme.spacing(9)
-      }
+      position: "sticky",
+      top: "48px",
+      zIndex: 100
     },
     card: {
-      borderRadius: 0
+      borderRadius: 0,
+      backgroundColor: theme.palette.background.paper
     },
     fab: {
       marginLeft: theme.spacing(1)
@@ -85,20 +83,6 @@ const Timer = (): JSX.Element => {
   const [seconds, setSeconds] = React.useState<number>(0);
 
   useInterval(() => setSeconds(seconds => seconds + 1), running ? 1000 : null);
-
-  React.useEffect(() => {
-    let interval: number | undefined = undefined;
-    if (running) {
-      interval = window.setInterval(() => {
-        setSeconds(seconds => seconds + 1);
-      }, 1000);
-    } else if (!running && seconds !== 0) {
-      window.clearInterval(interval);
-    }
-    return (): void => {
-      window.clearInterval(interval);
-    };
-  }, [running, seconds]);
 
   React.useEffect(() => {
     if (reload && !running) {
@@ -193,7 +177,7 @@ const Timer = (): JSX.Element => {
   };
 
   return (
-    <div>
+    <div className={classes.root}>
       <Card className={classes.card}>
         <CardHeader
           disableTypography

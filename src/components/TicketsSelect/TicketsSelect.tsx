@@ -24,7 +24,10 @@ export interface TicketOptionType {
   ticket: string;
   id?: number;
 }
-const TicketsSelect: React.FC<TicketsSelectProps> = ({ record, setRecord }) => {
+const TicketsSelect: React.FC<TicketsSelectProps> = ({
+  record,
+  setRecord
+}): JSX.Element => {
   const { tickets } = React.useContext(GoogleAuthContext);
 
   return (

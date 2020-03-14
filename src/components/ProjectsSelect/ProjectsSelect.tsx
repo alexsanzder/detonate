@@ -17,7 +17,7 @@ export interface ProjectOptionType {
 const ProjectsSelect: React.FC<ProjectsSelectProps> = ({
   record,
   setRecord
-}) => {
+}): JSX.Element => {
   const { projects } = React.useContext(GoogleAuthContext);
 
   return (

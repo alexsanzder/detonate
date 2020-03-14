@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: theme.spacing(3)
     },
     logo: {
-      height: 30,
+      height: theme.spacing(3.5),
       marginBottom: theme.spacing(1),
       cursor: "none"
     },
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const NavBar = () => {
+const NavBar = (): JSX.Element => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -66,80 +66,78 @@ const NavBar = () => {
   };
 
   return (
-    <div>
-      <AppBar color="primary" position="static">
-        <Toolbar>
-          <img src={logo} alt="detonate" className={classes.logo} />
-          <section className={classes.rightToolbar}>
-            <IconButton
-              color="inherit"
-              aria-label="Sync Google Sheets"
-              onClick={loadTable}
-            >
-              <Tooltip title="Sync Google Sheets" arrow>
-                <SyncIcon fontSize="small" />
-              </Tooltip>
-            </IconButton>
-            <IconButton
-              color="inherit"
-              aria-label="Open Google Sheets"
-              target="_blank"
-              href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${sheetProperties?.sheetId}`}
-            >
-              <Tooltip title="Open Google Sheets" arrow>
-                <OpenInNewIcon fontSize="small" />
-              </Tooltip>
-            </IconButton>
-            <IconButton
-              color="inherit"
-              aria-label="Toggle Dark/Light mode"
-              onClick={handleTheme}
-            >
-              <Tooltip title="Toggle Dark/Light mode" arrow>
-                {themeName === "lightTheme" ? (
-                  <Brightness4Icon fontSize="small" />
-                ) : (
-                  <Brightness7Icon fontSize="small" />
-                )}
-              </Tooltip>
-            </IconButton>
-            <IconButton
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <Avatar
-                className={classes.small}
-                alt={currentUser?.getName()}
-                src={currentUser?.getImageUrl()}
-              />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right"
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right"
-              }}
-              open={open}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>Settings</MenuItem>
-              <Divider />
-              <MenuItem onClick={handleSignOut}>Log out</MenuItem>
-            </Menu>
-          </section>
-        </Toolbar>
-      </AppBar>
-    </div>
+    <AppBar color="primary" position="sticky" elevation={3}>
+      <Toolbar variant="dense">
+        <img src={logo} alt="detonate" className={classes.logo} />
+        <section className={classes.rightToolbar}>
+          <IconButton
+            color="inherit"
+            aria-label="Sync Google Sheets"
+            onClick={loadTable}
+          >
+            <Tooltip title="Sync Google Sheets" arrow>
+              <SyncIcon fontSize="small" />
+            </Tooltip>
+          </IconButton>
+          <IconButton
+            color="inherit"
+            aria-label="Open Google Sheets"
+            target="_blank"
+            href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${sheetProperties?.sheetId}`}
+          >
+            <Tooltip title="Open Google Sheets" arrow>
+              <OpenInNewIcon fontSize="small" />
+            </Tooltip>
+          </IconButton>
+          <IconButton
+            color="inherit"
+            aria-label="Toggle Dark/Light mode"
+            onClick={handleTheme}
+          >
+            <Tooltip title="Toggle Dark/Light mode" arrow>
+              {themeName === "lightTheme" ? (
+                <Brightness4Icon fontSize="small" />
+              ) : (
+                <Brightness7Icon fontSize="small" />
+              )}
+            </Tooltip>
+          </IconButton>
+          <IconButton
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            color="inherit"
+          >
+            <Avatar
+              className={classes.small}
+              alt={currentUser?.getName()}
+              src={currentUser?.getImageUrl()}
+            />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right"
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right"
+            }}
+            open={open}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClose}>Profile</MenuItem>
+            <MenuItem onClick={handleClose}>Settings</MenuItem>
+            <Divider />
+            <MenuItem onClick={handleSignOut}>Log out</MenuItem>
+          </Menu>
+        </section>
+      </Toolbar>
+    </AppBar>
   );
 };
 export default NavBar;

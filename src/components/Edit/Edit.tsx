@@ -15,7 +15,12 @@ import ProjectsAutocomplete from "../ProjectsSelect";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
-import { getSeconds, getFraction, getTimeFormated } from "../../utils/time";
+import {
+  getSeconds,
+  getFraction,
+  getTimeFormated,
+  getTimeFromSeconds
+} from "../../utils/time";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,13 +62,18 @@ const Edit: React.FC<EditProps> = ({
   timer,
   record,
   setRecord
-}) => {
+}): JSX.Element => {
   const classes = useStyles();
   const { toggleReload, toggleRunning, running } = React.useContext(AppContext);
   const { updateRecord, deleteRecord } = React.useContext(GoogleAuthContext);
+  const [time, setTime] = React.useState<string>("");
+
+  React.useEffect(() => {
+    setTime(getTimeFormated(record?.time));
+  }, [record]);
 
   const handleUpdate = async (): Promise<void> => {
-    const time = timer ? getFraction(getSeconds(timer)) : record.time;
+    const fraction = getFraction(getSeconds(timer ? timer : time));
     const response =
       updateRecord &&
       (await updateRecord(record.id, [
@@ -73,7 +83,7 @@ const Edit: React.FC<EditProps> = ({
         record.project,
         record.description,
         record.ticket,
-        time
+        fraction
       ]));
     const {
       result: { updatedRange }
@@ -91,10 +101,17 @@ const Edit: React.FC<EditProps> = ({
     response && handleClose();
   };
 
-  const handleChangeInput = (
+  const handleChangeTime = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setRecord({ ...record, [event.target.name]: event.target.value });
+    //setRecord({ ...record, time: event.target.value });
+    setTime(event.target.value);
+  };
+
+  const handleChangeDecription = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    setRecord({ ...record, description: event.target.value });
   };
 
   return (
@@ -112,13 +129,13 @@ const Edit: React.FC<EditProps> = ({
               variant="outlined"
               margin="normal"
               fullWidth
-              id="timer"
-              name="timer"
+              name="time"
               inputProps={{ className: classes.timer }}
               InputProps={{
-                readOnly: true
+                readOnly: running
               }}
-              value={timer ? timer : getTimeFormated(record?.time)}
+              value={timer ? timer : time}
+              onChange={handleChangeTime}
             />
             <TextField
               variant="outlined"
@@ -126,10 +143,8 @@ const Edit: React.FC<EditProps> = ({
               fullWidth
               name="description"
               placeholder="What are you working on?"
-              id="description"
-              autoComplete="description"
               value={record?.description}
-              onChange={handleChangeInput}
+              onChange={handleChangeDecription}
             />
             <ProjectsAutocomplete record={record} setRecord={setRecord} />
             <TicketsAutocomplete record={record} setRecord={setRecord} />

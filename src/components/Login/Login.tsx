@@ -14,7 +14,7 @@ import Divider from "@material-ui/core/Divider";
 
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
-const Copyright = () => {
+const Copyright = (): JSX.Element => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Login = () => {
+const Login = (): JSX.Element => {
   const { handleSignIn } = React.useContext(GoogleAuthContext);
 
   const classes = useStyles();

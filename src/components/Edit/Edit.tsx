@@ -10,8 +10,8 @@ import { TransitionProps } from "@material-ui/core/transitions";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 
-import TicketsAutocomplete from "./TicketsSelect";
-import ProjectsAutocomplete from "./ProjectsSelect";
+import TicketsAutocomplete from "../TicketsSelect";
+import ProjectsAutocomplete from "../ProjectsSelect";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";

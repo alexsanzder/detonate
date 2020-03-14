@@ -15,7 +15,7 @@ import Divider from "@material-ui/core/Divider";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 
-import Edit from "../Edit/Edit";
+import Edit from "../Edit";
 
 import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";

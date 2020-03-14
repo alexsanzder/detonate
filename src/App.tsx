@@ -1,18 +1,17 @@
 import * as React from "react";
 import { CssBaseline } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 
 import AppProvider from "./contexts/AppProvider";
-
 import GoogleAuthContext from "./contexts/useGoogleAuth";
 import { useGoogle } from "./hooks/useGoogle";
 
-import NavBar from "./components/NavBar/NavBar";
-import Login from "./components/Login/Login";
-import Spinner from "./components/Spinner/Spinner";
-import Timer from "./components/Timer/Timer";
-import Summary from "./components/Summary/Summary";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
+import NavBar from "./components/NavBar";
+import Login from "./components/Login";
+import Spinner from "./components/Spinner";
+import Timer from "./components/Timer";
+import Summary from "./components/Summary";
 
 const discoveryDocs = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4"

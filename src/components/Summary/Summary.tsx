@@ -1,4 +1,6 @@
 import React from "react";
+import clsx from "clsx";
+
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
@@ -11,9 +13,11 @@ import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import WarningRoundedIcon from "@material-ui/icons/WarningRounded";
 
 import Edit from "../Edit";
 
@@ -76,6 +80,16 @@ const useStyles = makeStyles((theme: Theme) =>
     time: {
       marginLeft: "auto",
       marginRight: theme.spacing(-1)
+    },
+    popper: {
+      top: theme.spacing(-2)
+    },
+    hide: {
+      display: "none"
+    },
+    warning: {
+      display: "block",
+      padding: theme.spacing(0, 0.5, 0, 0)
     }
   })
 );
@@ -167,7 +181,28 @@ const Summary = (): JSX.Element => {
                           variant="subtitle2"
                           color={record.time < 0.5 ? "error" : "inherit"}
                         >
-                          {getTimeFormated(record.time)}
+                          <Tooltip
+                            title="Minimum time 0.5h"
+                            arrow
+                            classes={{
+                              tooltip:
+                                record.time < 0.5
+                                  ? classes.popper
+                                  : classes.hide
+                            }}
+                          >
+                            <Grid container>
+                              <Grid item>
+                                <WarningRoundedIcon
+                                  fontSize="small"
+                                  className={clsx(classes.hide, {
+                                    [classes.warning]: record.time < 0.5
+                                  })}
+                                />
+                              </Grid>
+                              <Grid item>{getTimeFormated(record.time)}</Grid>
+                            </Grid>
+                          </Tooltip>
                         </Typography>
                       </Grid>
                     </Grid>

@@ -2,7 +2,6 @@ import * as React from "react";
 import clsx from "clsx";
 
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
-
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import Grid from "@material-ui/core/Grid";
@@ -17,8 +16,10 @@ import { green } from "@material-ui/core/colors";
 
 import Edit from "../Edit/Edit";
 
-import { AppContext } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { AppContext } from "../../contexts/AppProvider";
+import { ThemeContext } from "../../contexts/ThemeProvider";
+
 import { useInterval } from "../../hooks/useInterval";
 import { RecordType } from "../../hooks/useGoogle";
 
@@ -30,6 +31,10 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "sticky",
       top: "48px",
       zIndex: 100
+    },
+    paper: {
+      backgroundColor: "#585858",
+      margin: 0
     },
     card: {
       borderRadius: 0,
@@ -80,9 +85,11 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Timer = (): JSX.Element => {
   const classes = useStyles();
+
   const { addRecord, updateRecord, currentUser, loadTable } = React.useContext(
     GoogleAuthContext
   );
+  const { themeName } = React.useContext(ThemeContext);
 
   const {
     locale,
@@ -215,6 +222,13 @@ const Timer = (): JSX.Element => {
     <div className={classes.root}>
       <Card className={classes.card}>
         <CardHeader
+          classes={
+            themeName === "darkTheme"
+              ? {
+                  root: classes.paper
+                }
+              : undefined
+          }
           disableTypography
           title={
             <Grid container>

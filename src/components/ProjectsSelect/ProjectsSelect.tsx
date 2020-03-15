@@ -52,12 +52,13 @@ const ProjectsSelect: React.FC<ProjectsSelectProps> = ({
   record,
   setRecord
 }): JSX.Element => {
+  const classes = useStyles();
+
+  const { themeName } = React.useContext(ThemeContext);
   const { projects, addProject, currentUser } = React.useContext(
     GoogleAuthContext
   );
-  const { themeName } = React.useContext(ThemeContext);
 
-  const classes = useStyles();
   const { locale } = React.useContext(AppContext);
   const [open, toggleOpen] = React.useState(false);
   const [dialogValue, setDialogValue] = React.useState({

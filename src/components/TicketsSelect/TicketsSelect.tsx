@@ -1,4 +1,6 @@
 import React from "react";
+
+import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import Checkbox from "@material-ui/core/Checkbox";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete, {
@@ -9,6 +11,7 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import Chip from "@material-ui/core/Chip";
 
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { ThemeContext } from "../../contexts/ThemeProvider";
 
 const filter = createFilterOptions();
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -18,20 +21,44 @@ export interface TicketsSelectProps {
   record: any;
   setRecord?: (value: any) => void;
 }
-
 export interface TicketOptionType {
   inputValue?: string;
   ticket: string;
   id?: number;
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    paper: {
+      backgroundColor: "#585858",
+      margin: 0
+    },
+    groupLabel: {
+      backgroundColor: "#484848",
+      paddingTop: 0
+    }
+  })
+);
+
 const TicketsSelect: React.FC<TicketsSelectProps> = ({
   record,
   setRecord
 }): JSX.Element => {
+  const classes = useStyles();
+
+  const { themeName } = React.useContext(ThemeContext);
   const { tickets } = React.useContext(GoogleAuthContext);
 
   return (
     <Autocomplete
+      classes={
+        themeName === "darkTheme"
+          ? {
+              paper: classes.paper,
+              groupLabel: classes.groupLabel
+            }
+          : undefined
+      }
       multiple
       freeSolo
       disableCloseOnSelect

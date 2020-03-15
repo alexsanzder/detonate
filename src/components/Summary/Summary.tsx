@@ -38,6 +38,9 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       marginBottom: theme.spacing(2.5)
     },
+    cardHeader: {
+      height: 55.63
+    },
     cardContent: {
       padding: theme.spacing(2, 2, 1)
     },
@@ -90,6 +93,9 @@ const useStyles = makeStyles((theme: Theme) =>
     warning: {
       display: "block",
       padding: theme.spacing(0, 0.5, 0, 0)
+    },
+    disabled: {
+      opacity: 0.5
     }
   })
 );
@@ -149,6 +155,7 @@ const Summary = (): JSX.Element => {
         Object.keys(data).map((date: string) => (
           <Card className={classes.card} key={date}>
             <CardHeader
+              //className={classes.cardHeader}
               disableTypography
               title={
                 <Typography color="textPrimary" variant="body1">
@@ -161,7 +168,6 @@ const Summary = (): JSX.Element => {
                 </Typography>
               }
             />
-            <Divider className={classes.divider} />
             {data[date].map((record: RecordType) => (
               <React.Fragment key={record.id}>
                 <Divider className={classes.divider} light />
@@ -172,7 +178,16 @@ const Summary = (): JSX.Element => {
                   <CardContent className={classes.cardContent}>
                     <Grid container>
                       <Grid item xs={9}>
-                        <Typography noWrap variant="subtitle2">
+                        <Typography
+                          noWrap
+                          variant="subtitle2"
+                          classes={{
+                            root:
+                              record.description === "(no description)"
+                                ? classes.disabled
+                                : undefined
+                          }}
+                        >
                           {record.description}
                         </Typography>
                       </Grid>
@@ -215,6 +230,7 @@ const Summary = (): JSX.Element => {
                           color="default"
                           variant="outlined"
                           label={record.company}
+                          disabled={record.company === "(no company)"}
                         />
                       )}
                       {record.project && (
@@ -223,6 +239,7 @@ const Summary = (): JSX.Element => {
                           color="default"
                           variant="outlined"
                           label={record.project && record.project}
+                          disabled={record.project === "(no project)"}
                         />
                       )}
                       {record.ticket && (
@@ -231,6 +248,7 @@ const Summary = (): JSX.Element => {
                           color="default"
                           variant="outlined"
                           label={record.ticket}
+                          disabled={record.ticket === "(no ticket)"}
                         />
                       )}
                     </Grid>
@@ -264,6 +282,7 @@ const Summary = (): JSX.Element => {
         <React.Fragment>
           <Card className={classes.card}>
             <CardHeader
+              className={classes.cardHeader}
               disableTypography
               title={
                 <Grid container>
@@ -360,6 +379,7 @@ const Summary = (): JSX.Element => {
           </Card>
           <Card className={classes.card}>
             <CardHeader
+              className={classes.cardHeader}
               disableTypography
               title={
                 <Grid container>

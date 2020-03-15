@@ -1,4 +1,5 @@
 import * as React from "react";
+import clsx from "clsx";
 
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 
@@ -10,8 +11,9 @@ import Fab from "@material-ui/core/Fab";
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import StopRoundedIcon from "@material-ui/icons/StopRounded";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
+import CheckRoundedIcon from "@material-ui/icons/CheckRounded";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { green } from "@material-ui/core/colors";
 
 import Edit from "../Edit/Edit";
 
@@ -21,10 +23,6 @@ import { useInterval } from "../../hooks/useInterval";
 import { RecordType } from "../../hooks/useGoogle";
 
 import { getFraction, getTimeFromSeconds } from "../../utils/time";
-
-const Alert = (props: AlertProps) => {
-  return <MuiAlert elevation={6} {...props} />;
-};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,6 +44,36 @@ const useStyles = makeStyles((theme: Theme) =>
       "& > *": {
         margin: theme.spacing(0.25)
       }
+    },
+    wrapper: {
+      position: "relative"
+    },
+    buttonSuccess: {
+      backgroundColor: green[500],
+      "&:hover": {
+        backgroundColor: green[700]
+      }
+    },
+    fabProgress: {
+      color: green[700],
+      position: "absolute",
+      top: -4,
+      left: -3,
+      zIndex: 1
+    },
+    fabProgressEdit: {
+      color: green[700],
+      position: "absolute",
+      top: -4,
+      left: 5,
+      zIndex: 1
+    },
+    fabProgressStop: {
+      color: green[700],
+      position: "absolute",
+      top: -4,
+      right: -3,
+      zIndex: 1
     }
   })
 );
@@ -77,10 +105,11 @@ const Timer = (): JSX.Element => {
     time: 0
   };
 
-  const [openEdit, setOpenEdit] = React.useState(false);
-  const [openAlert, setOpenAlert] = React.useState(false);
+  const [openEdit, setOpenEdit] = React.useState<boolean>(false);
   const [record, setRecord] = React.useState<RecordType>(defaultRecord);
   const [seconds, setSeconds] = React.useState<number>(0);
+  const [loading, setLoading] = React.useState<string>("");
+  const [success, setSuccess] = React.useState<string>("");
 
   useInterval(() => setSeconds(seconds => seconds + 1), running ? 1000 : null);
 
@@ -93,6 +122,8 @@ const Timer = (): JSX.Element => {
   }, [reload, running]);
 
   const handlePlay = async (): Promise<void> => {
+    setSuccess("");
+    setLoading("play");
     const today = new Date().toLocaleDateString(locale, {
       year: "numeric",
       month: "2-digit",
@@ -115,6 +146,8 @@ const Timer = (): JSX.Element => {
         updates: { updatedRange }
       }
     } = response;
+    setSuccess("play");
+    setLoading("");
 
     setRecord({
       ...record,
@@ -132,6 +165,8 @@ const Timer = (): JSX.Element => {
   };
 
   const handleStop = async (): Promise<void> => {
+    setLoading("stop");
+    setSuccess("");
     setRecord({ ...record, description: "Loading..." });
 
     const response =
@@ -145,35 +180,37 @@ const Timer = (): JSX.Element => {
         record.ticket,
         getFraction(seconds)
       ]));
+    toggleReload(true);
 
     const {
       result: { updatedRange }
     } = response;
-    toggleReload(true);
+    setLoading("");
+    setSuccess("stop");
     toggleRunning(false);
-    setOpenAlert(true);
   };
 
   const handleOpenEdit = (): void => {
+    setSuccess("");
+    setLoading("");
     setOpenEdit(!openEdit);
   };
 
+  const timer = React.useRef<any>();
   const handleCloseEdit = (): void => {
     setOpenEdit(false);
+    if (loading === "") {
+      setSuccess("");
+      setLoading("edit");
+      timer.current = setTimeout(() => {
+        setSuccess("edit");
+        setLoading("");
+      }, 1000);
+    }
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setRecord({ ...record, [event.target.name]: event.target.value });
-  };
-
-  const handleCloseAlert = (
-    _event: React.SyntheticEvent | React.MouseEvent,
-    reason?: string
-  ): void => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenAlert(false);
   };
 
   return (
@@ -212,52 +249,74 @@ const Timer = (): JSX.Element => {
           }
           action={
             !running ? (
-              <Fab
-                color="default"
-                size="small"
-                aria-label="add"
-                onClick={handlePlay}
-              >
-                <PlayArrowRoundedIcon />
-              </Fab>
+              <div className={classes.wrapper}>
+                <Fab
+                  color="default"
+                  size="small"
+                  onClick={handlePlay}
+                  className={clsx({
+                    [classes.buttonSuccess]: success === "play"
+                  })}
+                >
+                  {success === "play" ? (
+                    <CheckRoundedIcon />
+                  ) : (
+                    <PlayArrowRoundedIcon />
+                  )}
+                </Fab>
+                {loading === "play" && (
+                  <CircularProgress size={47} className={classes.fabProgress} />
+                )}
+              </div>
             ) : (
-              <React.Fragment>
-                <Fab
-                  className={classes.fab}
-                  color="primary"
-                  size="small"
-                  aria-label="edit"
-                  onClick={handleOpenEdit}
-                >
-                  <EditRoundedIcon />
-                </Fab>
-                <Fab
-                  className={classes.fab}
-                  color="secondary"
-                  size="small"
-                  aria-label="stop"
-                  onClick={handleStop}
-                >
-                  <StopRoundedIcon />
-                </Fab>
-              </React.Fragment>
+              <div>
+                <div className={classes.wrapper}>
+                  <Fab
+                    className={clsx(classes.fab, {
+                      [classes.buttonSuccess]: success === "edit"
+                    })}
+                    color="primary"
+                    size="small"
+                    onClick={handleOpenEdit}
+                  >
+                    {success === "edit" ? (
+                      <CheckRoundedIcon />
+                    ) : (
+                      <EditRoundedIcon />
+                    )}
+                  </Fab>
+                  {loading === "edit" && (
+                    <CircularProgress
+                      size={47}
+                      className={classes.fabProgressEdit}
+                    />
+                  )}
+                  <Fab
+                    className={clsx(classes.fab, {
+                      [classes.buttonSuccess]: success === "stop"
+                    })}
+                    color="secondary"
+                    size="small"
+                    onClick={handleStop}
+                  >
+                    {success === "stop" ? (
+                      <CheckRoundedIcon />
+                    ) : (
+                      <StopRoundedIcon />
+                    )}
+                  </Fab>
+                  {loading === "stop" && (
+                    <CircularProgress
+                      size={47}
+                      className={classes.fabProgressStop}
+                    />
+                  )}
+                </div>
+              </div>
             )
           }
         />
       </Card>
-      <Snackbar
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center"
-        }}
-        open={openAlert}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-      >
-        <Alert onClose={handleCloseAlert} severity="success">
-          {`Time tracked successfully - ${record.id}!`}
-        </Alert>
-      </Snackbar>
       <Edit
         open={openEdit}
         handleClose={handleCloseEdit}

@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(-1)
     },
     popper: {
-      top: theme.spacing(-2)
+      top: theme.spacing(-2.5)
     },
     hide: {
       display: "none"

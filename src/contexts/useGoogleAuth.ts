@@ -11,7 +11,7 @@ const GoogleAuthContext = React.createContext<Partial<UseGoogleType>>({
   records: undefined,
   tickets: undefined,
   loadTable: undefined,
-  appendRecord: undefined,
+  addRecord: undefined,
   updateRecord: undefined,
   deleteRecord: undefined
 });

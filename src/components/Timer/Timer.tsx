@@ -80,12 +80,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Timer = (): JSX.Element => {
   const classes = useStyles();
-  const {
-    appendRecord,
-    updateRecord,
-    currentUser,
-    loadTable
-  } = React.useContext(GoogleAuthContext);
+  const { addRecord, updateRecord, currentUser, loadTable } = React.useContext(
+    GoogleAuthContext
+  );
 
   const {
     locale,
@@ -94,6 +91,7 @@ const Timer = (): JSX.Element => {
     reload,
     toggleReload
   } = React.useContext(AppContext);
+
   const defaultRecord = {
     id: "",
     name: "",
@@ -130,8 +128,8 @@ const Timer = (): JSX.Element => {
       day: "2-digit"
     });
     const response =
-      appendRecord &&
-      (await appendRecord([
+      addRecord &&
+      (await addRecord([
         currentUser.getName(),
         today,
         record?.company ? record?.company : "(no company)",

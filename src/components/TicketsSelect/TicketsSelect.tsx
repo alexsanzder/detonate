@@ -36,7 +36,7 @@ const TicketsSelect: React.FC<TicketsSelectProps> = ({
       freeSolo
       disableCloseOnSelect
       defaultValue={[
-        tickets.find(
+        tickets?.find(
           (element: TicketOptionType) => element.ticket === record?.ticket
         )
       ]}

@@ -25,13 +25,7 @@ const scope = [
   "https://www.googleapis.com/auth/drive.metadata"
 ].join(" ");
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({ offset: theme.mixins.toolbar })
-);
-
 const App = (): JSX.Element => {
-  const classes = useStyles();
-
   const googleAuth = useGoogle({
     apiKey: process.env.REACT_APP_GOOGLE_APP_ID,
     clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,

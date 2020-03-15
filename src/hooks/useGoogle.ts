@@ -28,7 +28,8 @@ export interface UseGoogleType {
   records: any;
   tickets: any;
   loadTable: () => Promise<void> | undefined;
-  appendRecord: (record: string[]) => Promise<any> | undefined;
+  addProject: (project: string[]) => Promise<any> | undefined;
+  addRecord: (record: string[]) => Promise<any> | undefined;
   updateRecord: (
     range: string,
     record: (string | number | null)[]
@@ -36,7 +37,6 @@ export interface UseGoogleType {
   deleteRecord: (index: number) => Promise<string> | undefined;
   sheetProperties: any;
 }
-
 export interface RecordType {
   id?: string;
   name?: string;
@@ -47,7 +47,6 @@ export interface RecordType {
   ticket: string;
   time: number;
 }
-
 export interface Project {
   id: string;
   company: string;
@@ -211,7 +210,19 @@ export const useGoogle = ({
     //gapi.auth2.getAuthInstance().disconnect();
   };
 
-  const appendRecord = async (record: string[]): Promise<any> => {
+  const addProject = async (project: string[]): Promise<any> => {
+    return await gapi.client.sheets.spreadsheets.values.append({
+      spreadsheetId: spreadsheetId,
+      range: `projects!A2:G2`,
+      valueInputOption: "USER_ENTERED",
+      insertDataOption: "INSERT_ROWS",
+      resource: {
+        values: [project]
+      }
+    });
+  };
+
+  const addRecord = async (record: string[]): Promise<any> => {
     return await gapi.client.sheets.spreadsheets.values.append({
       spreadsheetId: spreadsheetId,
       range: `${tableName}!A2:G2`,
@@ -271,7 +282,8 @@ export const useGoogle = ({
     records,
     tickets,
     loadTable,
-    appendRecord,
+    addProject,
+    addRecord,
     updateRecord,
     deleteRecord,
     sheetProperties

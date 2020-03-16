@@ -10,23 +10,24 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
-import Skeleton from "@material-ui/lab/Skeleton";
 import Chip from "@material-ui/core/Chip";
 import Divider from "@material-ui/core/Divider";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import StopRoundedIcon from "@material-ui/icons/StopRounded";
 import WarningRoundedIcon from "@material-ui/icons/WarningRounded";
 
 import Edit from "../Edit";
 
-import { AppContext } from "../../contexts/AppProvider";
+import { AppContext, defaultRecord } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
 import { getTimeFormated } from "../../utils/time";
 
 import { RecordType } from "../../hooks/useGoogle";
+import PlaceHolder from "../PlaceHolder";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -80,12 +81,22 @@ const useStyles = makeStyles((theme: Theme) =>
         color: theme.palette.primary.main
       }
     },
+    iconStop: {
+      "&:hover": {
+        color: theme.palette.secondary.main
+      }
+    },
     time: {
       marginLeft: "auto",
       marginRight: theme.spacing(-1)
     },
     popper: {
-      top: theme.spacing(-2.5)
+      top: theme.spacing(-2.5),
+      backgroundColor: theme.palette.grey[600],
+      border: "none"
+    },
+    popperArrow: {
+      color: theme.palette.grey[600]
     },
     hide: {
       display: "none"
@@ -103,14 +114,20 @@ const useStyles = makeStyles((theme: Theme) =>
 const Summary = (): JSX.Element => {
   const classes = useStyles();
 
-  const { locale } = React.useContext(AppContext);
+  const {
+    locale,
+    running,
+    toggleRunning,
+    record,
+    setRecord
+  } = React.useContext(AppContext);
   const { records, loadTable } = React.useContext(GoogleAuthContext);
 
   const [openEdit, setOpenEdit] = React.useState(false);
-  const [record, setRecord] = React.useState();
+  const [continueId, setContinueId] = React.useState();
 
   const groupBy = (array: any[], key: string): any => {
-    return records?.reduce((result: any, currentValue: any) => {
+    return array?.reduce((result: any, currentValue: any) => {
       (result[currentValue[key]] = result[currentValue[key]] || []).push(
         currentValue
       );
@@ -136,7 +153,16 @@ const Summary = (): JSX.Element => {
     return getTimeFormated(total);
   };
 
-  const handleOpenEdit = (
+  const handleContinue = (
+    _event: React.ChangeEvent<{}>,
+    record: RecordType
+  ): void => {
+    setContinueId(record.id);
+    setRecord(record);
+    toggleRunning(!running);
+  };
+
+  const handleEdit = (
     _event: React.ChangeEvent<{}>,
     record: RecordType
   ): void => {
@@ -147,6 +173,7 @@ const Summary = (): JSX.Element => {
   const handleCloseEdit = (): void => {
     loadTable && loadTable();
     setOpenEdit(false);
+    setRecord(defaultRecord);
   };
 
   return (
@@ -155,7 +182,6 @@ const Summary = (): JSX.Element => {
         Object.keys(data).map((date: string) => (
           <Card className={classes.card} key={date}>
             <CardHeader
-              //className={classes.cardHeader}
               disableTypography
               title={
                 <Typography color="textPrimary" variant="body1">
@@ -173,10 +199,10 @@ const Summary = (): JSX.Element => {
                 <Divider className={classes.divider} light />
                 <CardActionArea
                   key={record.id}
-                  onClick={(e): void => handleOpenEdit(e, record)}
+                  onClick={(e): void => handleEdit(e, record)}
                 >
                   <CardContent className={classes.cardContent}>
-                    <Grid container>
+                    <Grid container wrap="nowrap">
                       <Grid item xs={9}>
                         <Typography
                           noWrap
@@ -203,7 +229,8 @@ const Summary = (): JSX.Element => {
                               tooltip:
                                 record.time < 0.5
                                   ? classes.popper
-                                  : classes.hide
+                                  : classes.hide,
+                              arrow: classes.popperArrow
                             }}
                           >
                             <Grid container>
@@ -223,7 +250,7 @@ const Summary = (): JSX.Element => {
                     </Grid>
                   </CardContent>
                   <CardActions disableSpacing>
-                    <Grid item className={classes.chips}>
+                    <Grid item className={classes.chips} xs={10}>
                       {record.company && (
                         <Chip
                           size="small"
@@ -259,18 +286,47 @@ const Summary = (): JSX.Element => {
                     <IconButton
                       className={classes.button}
                       size="medium"
-                      onClick={(e): void => handleOpenEdit(e, record)}
+                      onClick={(e): void => handleEdit(e, record)}
                     >
-                      <EditRoundedIcon
-                        fontSize="small"
-                        className={classes.iconEdit}
-                      />
+                      <Tooltip
+                        title="Edit this record"
+                        arrow
+                        classes={{
+                          tooltip: classes.popper,
+                          arrow: classes.popperArrow
+                        }}
+                      >
+                        <EditRoundedIcon
+                          fontSize="small"
+                          className={classes.iconEdit}
+                        />
+                      </Tooltip>
                     </IconButton>
-                    <IconButton className={classes.button} size="medium">
-                      <PlayArrowRoundedIcon
-                        fontSize="small"
-                        className={classes.iconPlay}
-                      />
+                    <IconButton
+                      className={classes.button}
+                      size="medium"
+                      onClick={(e): void => handleContinue(e, record)}
+                    >
+                      <Tooltip
+                        title="Continue whit this record"
+                        arrow
+                        classes={{
+                          tooltip: classes.popper,
+                          arrow: classes.popperArrow
+                        }}
+                      >
+                        {record.id === continueId && running ? (
+                          <StopRoundedIcon
+                            fontSize="small"
+                            className={classes.iconStop}
+                          />
+                        ) : (
+                          <PlayArrowRoundedIcon
+                            fontSize="small"
+                            className={classes.iconPlay}
+                          />
+                        )}
+                      </Tooltip>
                     </IconButton>
                   </div>
                 </div>
@@ -279,165 +335,7 @@ const Summary = (): JSX.Element => {
           </Card>
         ))
       ) : (
-        <React.Fragment>
-          <Card className={classes.card}>
-            <CardHeader
-              className={classes.cardHeader}
-              disableTypography
-              title={
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={18}
-                    width={"70%"}
-                  />
-                  <Skeleton
-                    className={classes.time}
-                    variant="text"
-                    animation="wave"
-                    height={18}
-                    width={"20%"}
-                  />
-                </Grid>
-              }
-            />
-            <Divider className={classes.divider} />
-            <CardActionArea>
-              <CardContent className={classes.cardContent}>
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"75%"}
-                  />
-                  <Skeleton
-                    className={classes.right}
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"15%"}
-                  />
-                </Grid>
-              </CardContent>
-              <CardContent>
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"60%"}
-                  />
-                  <Skeleton
-                    className={classes.right}
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"20%"}
-                  />
-                </Grid>
-              </CardContent>
-            </CardActionArea>
-            <Divider className={classes.divider} />
-            <CardActionArea>
-              <CardContent className={classes.cardContent}>
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"60%"}
-                  />
-                  <Skeleton
-                    className={classes.right}
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"30%"}
-                  />
-                </Grid>
-              </CardContent>
-              <CardContent>
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"70%"}
-                  />
-                  <Skeleton
-                    className={classes.right}
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"20%"}
-                  />
-                </Grid>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-          <Card className={classes.card}>
-            <CardHeader
-              className={classes.cardHeader}
-              disableTypography
-              title={
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={18}
-                    width={"75%"}
-                  />
-                  <Skeleton
-                    className={classes.time}
-                    variant="text"
-                    animation="wave"
-                    height={18}
-                    width={"20%"}
-                  />
-                </Grid>
-              }
-            />
-            <Divider className={classes.divider} />
-            <CardActionArea>
-              <CardContent className={classes.cardContent}>
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"55%"}
-                  />
-                  <Skeleton
-                    className={classes.right}
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"15%"}
-                  />
-                </Grid>
-              </CardContent>
-              <CardContent>
-                <Grid container>
-                  <Skeleton
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"70%"}
-                  />
-                  <Skeleton
-                    className={classes.right}
-                    variant="text"
-                    animation="wave"
-                    height={16}
-                    width={"20%"}
-                  />
-                </Grid>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </React.Fragment>
+        <PlaceHolder />
       )}
       <Edit
         open={openEdit}

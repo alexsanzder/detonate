@@ -18,11 +18,10 @@ import {} from "@material-ui/core/colors";
 import Edit from "../Edit/Edit";
 
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
-import { AppContext } from "../../contexts/AppProvider";
+import { AppContext, defaultRecord } from "../../contexts/AppProvider";
 import { ThemeContext } from "../../contexts/ThemeProvider";
 
 import { useInterval } from "../../hooks/useInterval";
-import { RecordType } from "../../hooks/useGoogle";
 
 import { getFraction, getTimeFromSeconds } from "../../utils/time";
 
@@ -100,22 +99,12 @@ const Timer = (): JSX.Element => {
     running,
     toggleRunning,
     reload,
-    toggleReload
+    toggleReload,
+    record,
+    setRecord
   } = React.useContext(AppContext);
 
-  const defaultRecord = {
-    id: "",
-    name: "",
-    date: "",
-    description: "",
-    company: "",
-    project: "",
-    ticket: "",
-    time: 0
-  };
-
   const [openEdit, setOpenEdit] = React.useState<boolean>(false);
-  const [record, setRecord] = React.useState<RecordType>(defaultRecord);
   const [seconds, setSeconds] = React.useState<number>(0);
   const [loading, setLoading] = React.useState<string>("");
   const [success, setSuccess] = React.useState<string>("");
@@ -123,12 +112,13 @@ const Timer = (): JSX.Element => {
   useInterval(() => setSeconds(seconds => seconds + 1), running ? 1000 : null);
 
   React.useEffect(() => {
-    if (reload && !running) {
+    if (loading && reload && !running) {
       setSeconds(0);
       setRecord(defaultRecord);
       loadTable && loadTable();
+      setSuccess("");
     }
-  }, [reload, running]);
+  }, [loading, reload, running]);
 
   const handlePlay = async (): Promise<void> => {
     setSuccess("");
@@ -155,12 +145,11 @@ const Timer = (): JSX.Element => {
         updates: { updatedRange }
       }
     } = response;
-    setSuccess("play");
-    setLoading("");
 
     setRecord({
-      ...record,
       id: updatedRange,
+      name: currentUser.getName(),
+      date: today,
       company: record?.company ? record?.company : "(no company)",
       project: record?.project ? record?.project : "(no project)",
       description: record?.description
@@ -170,33 +159,50 @@ const Timer = (): JSX.Element => {
       time: record?.time ? record?.time : seconds
     });
 
+    setSuccess("play");
+    setLoading("");
     toggleRunning(!running);
   };
 
   const handleStop = async (): Promise<void> => {
+    toggleRunning(false);
     setLoading("stop");
     setSuccess("");
     setRecord({ ...record, description: "Loading..." });
 
-    const response =
+    const today = new Date().toLocaleDateString(locale, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    });
+    if (record.date === today) {
       updateRecord &&
-      (await updateRecord(record?.id ? record?.id : "", [
-        null,
-        null,
-        record.company,
-        record.project,
-        record.description,
-        record.ticket,
-        getFraction(seconds)
-      ]));
-    toggleReload(true);
+        (await updateRecord(record.id ? record?.id : "", [
+          null,
+          today,
+          record.company,
+          record.project,
+          record.description,
+          record.ticket,
+          record.time + getFraction(seconds)
+        ]));
+    } else {
+      addRecord &&
+        (await addRecord([
+          currentUser.getName(),
+          today,
+          record.company,
+          record.project,
+          record.description,
+          record.ticket,
+          getFraction(seconds)
+        ]));
+    }
 
-    const {
-      result: { updatedRange }
-    } = response;
+    toggleReload(true);
+    toggleRunning(false);
     setLoading("");
     setSuccess("stop");
-    toggleRunning(false);
   };
 
   const handleOpenEdit = (): void => {

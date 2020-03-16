@@ -14,7 +14,7 @@ const Footer = (): JSX.Element => {
     <Grid container justify="center">
       <Button
         variant="outlined"
-        color="primary"
+        color="secondary"
         size="large"
         target="_blank"
         style={{

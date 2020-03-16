@@ -13,6 +13,7 @@ import StopRoundedIcon from "@material-ui/icons/StopRounded";
 import CheckRoundedIcon from "@material-ui/icons/CheckRounded";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { green } from "@material-ui/core/colors";
+import {} from "@material-ui/core/colors";
 
 import Edit from "../Edit/Edit";
 
@@ -39,6 +40,9 @@ const useStyles = makeStyles((theme: Theme) =>
     card: {
       borderRadius: 0,
       backgroundColor: theme.palette.background.paper
+    },
+    input: {
+      cursor: "pointer"
     },
     fab: {
       marginLeft: theme.spacing(1)
@@ -67,14 +71,14 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 1
     },
     fabProgressEdit: {
-      color: green[700],
+      color: theme.palette.primary.dark,
       position: "absolute",
       top: -4,
       left: 5,
       zIndex: 1
     },
     fabProgressStop: {
-      color: green[700],
+      color: theme.palette.secondary.dark,
       position: "absolute",
       top: -4,
       right: -3,
@@ -196,9 +200,11 @@ const Timer = (): JSX.Element => {
   };
 
   const handleOpenEdit = (): void => {
-    setSuccess("");
-    setLoading("");
-    setOpenEdit(!openEdit);
+    if (running) {
+      setSuccess("");
+      setLoading("");
+      setOpenEdit(!openEdit);
+    }
   };
 
   const timer = React.useRef<any>();
@@ -231,13 +237,15 @@ const Timer = (): JSX.Element => {
           }
           disableTypography
           title={
-            <Grid container>
+            <Grid container onClick={handleOpenEdit}>
               <Grid item xs={9}>
                 <InputBase
                   fullWidth
                   name="description"
                   placeholder="What are you working on?"
-                  inputProps={{ "aria-label": "What are you working on?" }}
+                  inputProps={{
+                    className: running ? classes.input : undefined
+                  }}
                   value={record.description}
                   onChange={handleChange}
                 />
@@ -252,7 +260,8 @@ const Timer = (): JSX.Element => {
                       readOnly: true,
                       style: {
                         textAlign: "right"
-                      }
+                      },
+                      className: running ? classes.input : undefined
                     }}
                   />
                 </Grid>

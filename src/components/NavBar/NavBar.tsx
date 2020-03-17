@@ -17,7 +17,7 @@ import Divider from "@material-ui/core/Divider";
 import { ThemeContext } from "../../contexts/ThemeProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
-import logo from "../../logo-detonate-white.svg";
+import logo from "../../detonate-white.svg";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,8 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: theme.spacing(3)
     },
     logo: {
-      height: theme.spacing(3.5),
-      marginBottom: theme.spacing(1),
+      height: theme.spacing(3),
       cursor: "none"
     },
     rightToolbar: {
@@ -66,7 +65,7 @@ const NavBar = (): JSX.Element => {
   };
 
   return (
-    <AppBar color="primary" position="sticky" elevation={3}>
+    <AppBar color="secondary" position="sticky" elevation={3}>
       <Toolbar variant="dense">
         <img src={logo} alt="detonate" className={classes.logo} />
         <section className={classes.rightToolbar}>

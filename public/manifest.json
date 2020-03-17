@@ -1,25 +1,52 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
+  "manifest_version": 2,
+  "name": "Detonate time tracker Google extension using Google Sheets",
+  "short_name": "Detonate time tracker",
+  "version": "1.0.0",
+  "description": "Detonate time tracker Google extension using Google Sheets as data storage written in React",
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_title": "Detonate time tracker"
+  },
+  "icons": {
+    "36": "./logo@36.png",
+    "54": "./logo@54.png",
+    "72": "./logo@72.png"
+  },
+
+  "permissions": [
+    "identity",
+    "identity.email",
+    "tabs",
+    "activeTab",
+    "storage",
+    "cookies",
+    "notifications",
+    "https://apis.google.com/js/client.js",
+    "https://accounts.google.com/o/oauth2/token",
+    "https://content-sheets.googleapis.com/v4/spreadsheets/*",
+    "idle"
   ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+
+  "oauth2": {
+    "client_id": "274057418646-6elclgm75krpir8c446kvc2is1e2e4le.apps.googleusercontent.com",
+    "spreadsheetId": "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
+    "key": "AIzaSyCaQbBvEqSs_o4ZuRkJ8CzGZ5XFLSpolqk",
+    "scopes": [
+      "https://www.googleapis.com/auth/spreadsheets.readonly",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "profile"
+    ]
+  },
+
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://apis.google.com/; object-src 'self'",
+  "web_accessible_resources": ["*.*"],
+
+  "background": {
+    "scripts": [
+    
+      "background.js"
+    ]
+  }
+
 }

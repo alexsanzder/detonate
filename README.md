@@ -1,4 +1,4 @@
-![Detoante](src/logo-detonate.svg)
+![Detoante](src/detonate.svg)
 
 ## ⏱️ Time Tracker Google extension using 📈 Google Sheets as data storage written in ⚛️ React
 

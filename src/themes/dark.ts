@@ -9,7 +9,7 @@ export const darkTheme = createMuiTheme({
       main: "#2196f3"
     },
     secondary: {
-      main: "#F50057"
+      main: "#E535AB"
     },
     background: {
       default: grey[800],
@@ -32,7 +32,7 @@ export const darkTheme = createMuiTheme({
 
   overrides: {
     MuiAppBar: {
-      colorPrimary: {
+      colorSecondary: {
         backgroundColor: grey[800]
       }
     },

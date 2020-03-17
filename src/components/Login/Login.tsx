@@ -2,23 +2,23 @@ import * as React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
 import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
+import Link from "@material-ui/core/Link";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
 
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { ReactComponent as Logo } from "../../logo.svg";
 
 const Copyright = (): JSX.Element => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
+      <Link color="inherit" href="https://github.com/alexsanzder/detonate/">
         Detonate - Time Tracker
       </Link>{" "}
       {new Date().getFullYear()}
@@ -36,29 +36,43 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center"
     },
     avatar: {
-      margin: theme.spacing(1),
+      margin: theme.spacing(2),
+      width: theme.spacing(7),
+      height: theme.spacing(7),
       backgroundColor: theme.palette.secondary.main
     },
     form: {
-      width: "100%", // Fix IE 11 issue.
+      width: "100%",
       marginTop: theme.spacing(1)
     },
     divider: { margin: theme.spacing(2, 0, 3) },
-    submit: {}
+    icon: {
+      "& path": {
+        fill: "white"
+      }
+    }
   })
 );
 
-const Login = (): JSX.Element => {
-  const { handleSignIn } = React.useContext(GoogleAuthContext);
+const DetonateIcon = (props: SvgIconProps): JSX.Element => (
+  <SvgIcon {...props} component={Logo} />
+);
 
+const Login = (): JSX.Element => {
   const classes = useStyles();
+
+  const { handleSignIn } = React.useContext(GoogleAuthContext);
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          <DetonateIcon
+            viewBox="0 0 512 512"
+            style={{ fontSize: 40 }}
+            className={classes.icon}
+          />
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign in
@@ -86,20 +100,18 @@ const Login = (): JSX.Element => {
             autoComplete="sheedName"
           />
           <Divider className={classes.divider} />
-
           <Button
             fullWidth
             variant="contained"
             size="large"
             color="primary"
-            className={classes.submit}
             onClick={handleSignIn}
           >
             Sign in with Google
           </Button>
         </form>
       </div>
-      <Box mt={8}>
+      <Box mt={10}>
         <Copyright />
       </Box>
     </Container>

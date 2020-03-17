@@ -2,11 +2,6 @@ import { useState, useEffect } from "react";
 
 export const cachedScripts: Map<string, string> = new Map();
 
-/**
- *
- * @param src - script URL
- * @param name - name for cache pourposes
- */
 export const useScript = (src: string, name: string): boolean[] => {
   // Keeping track of script loaded and error state
   const [state, setState] = useState({
@@ -55,10 +50,8 @@ export const useScript = (src: string, name: string): boolean[] => {
       script.addEventListener("load", onScriptLoad);
       script.addEventListener("error", onScriptError);
 
-      // Add script to document body
       document.body.appendChild(script);
 
-      // Remove event listeners on cleanup
       return (): void => {
         script.removeEventListener("load", onScriptLoad);
         script.removeEventListener("error", onScriptError);

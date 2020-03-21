@@ -123,8 +123,8 @@ const Summary = (): JSX.Element => {
   } = React.useContext(AppContext);
   const { records, loadTable } = React.useContext(GoogleAuthContext);
 
-  const [openEdit, setOpenEdit] = React.useState(false);
-  const [continueId, setContinueId] = React.useState();
+  const [openEdit, setOpenEdit] = React.useState<boolean>(false);
+  const [continueId, setContinueId] = React.useState<string | undefined>();
 
   const groupBy = (array: any[], key: string): any => {
     return array?.reduce((result: any, currentValue: any) => {
@@ -219,7 +219,7 @@ const Summary = (): JSX.Element => {
                       </Grid>
                       <Grid item className={classes.right}>
                         <Typography
-                          variant="subtitle2"
+                          variant={"subtitle2"}
                           color={record.time < 0.5 ? "error" : "inherit"}
                         >
                           <Tooltip

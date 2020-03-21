@@ -13,7 +13,7 @@ export const lightTheme = createMuiTheme({
       main: "#0091ea"
     },
     secondary: {
-      main: "#E535AB"
+      main: "#F50057"
     }
   },
   overrides: {

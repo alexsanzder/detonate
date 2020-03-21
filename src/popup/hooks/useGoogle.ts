@@ -1,5 +1,5 @@
 /* global gapi */
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useScript } from "./useScript";
 
 const GOOGLE_API_SOURCE = "https://apis.google.com/js/api.js";
@@ -62,16 +62,16 @@ export const useGoogle = ({
   tableName
 }: UseGoogleOptions): Partial<UseGoogleType> => {
   const [isScriptLoaded] = useScript(GOOGLE_API_SOURCE, "gapi");
-  const [GoogleAuth, setGoogleAuth] = useState();
-  const [isInitialized, setInitialized] = useState(false);
-  const [isSignedIn, setSignedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState();
-  const [records, setRecords] = useState();
-  const [projects, setProjects] = useState();
-  const [tickets, setTickets] = useState();
-  const [sheetProperties, setSheetProperties] = useState();
+  const [GoogleAuth, setGoogleAuth] = useState<any | undefined>();
+  const [isInitialized, setInitialized] = useState<boolean>(false);
+  const [isSignedIn, setSignedIn] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<any | undefined>();
+  const [records, setRecords] = useState<any | undefined>();
+  const [projects, setProjects] = useState<any | undefined>();
+  const [tickets, setTickets] = useState<any | undefined>();
+  const [sheetProperties, setSheetProperties] = useState<any | undefined>();
 
-  const loadTable = async (): Promise<void> => {
+  const loadTable = useCallback(async (): Promise<void> => {
     gapi.client.load("sheets", "v4", async () => {
       const sheetProperties = await gapi.client.sheets.spreadsheets.getByDataFilter(
         {
@@ -162,7 +162,7 @@ export const useGoogle = ({
           .reverse();
       setTickets(valueTickets);
     });
-  };
+  }, [spreadsheetId, tableName]);
 
   useEffect(() => {
     const initClient = async (): Promise<void> => {
@@ -182,7 +182,7 @@ export const useGoogle = ({
     if (isScriptLoaded) {
       gapi.load("client:auth2", initClient);
     }
-  }, [clientId, apiKey, discoveryDocs, scope, isScriptLoaded]);
+  }, [clientId, apiKey, discoveryDocs, scope, isScriptLoaded, loadTable]);
 
   useEffect(() => {
     if (GoogleAuth) {
@@ -199,7 +199,7 @@ export const useGoogle = ({
 
       setSignedIn(GoogleAuth.isSignedIn.get());
     }
-  }, [GoogleAuth]);
+  }, [GoogleAuth, loadTable]);
 
   const handleSignIn = async (): Promise<void> => {
     await gapi.auth2.getAuthInstance().signIn();

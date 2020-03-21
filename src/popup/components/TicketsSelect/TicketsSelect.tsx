@@ -13,7 +13,6 @@ import Chip from "@material-ui/core/Chip";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 import { ThemeContext } from "../../contexts/ThemeProvider";
 
-const filter = createFilterOptions();
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -40,6 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const filter = createFilterOptions<TicketOptionType>();
 const TicketsSelect: React.FC<TicketsSelectProps> = ({
   record,
   setRecord

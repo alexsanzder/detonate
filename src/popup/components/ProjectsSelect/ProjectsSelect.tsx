@@ -18,7 +18,6 @@ import { ThemeContext } from "../../contexts/ThemeProvider";
 
 import { RecordType } from "../../hooks/useGoogle";
 
-const filter = createFilterOptions();
 export interface ProjectsSelectProps {
   record: RecordType;
   setRecord?: (value: RecordType) => void;
@@ -48,6 +47,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const filter = createFilterOptions<ProjectOptionType>();
 const ProjectsSelect: React.FC<ProjectsSelectProps> = ({
   record,
   setRecord

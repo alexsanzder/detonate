@@ -1,4 +1,4 @@
-[<img align="right" src="src/logo.svg?sanitize=true" width="30%">](https://www.npmjs.com/package/webextension-toolbox)
+[<img align="right" src="src/logo.svg?sanitize=true" width="30%">]()
 
 # Detonate time tracker
 

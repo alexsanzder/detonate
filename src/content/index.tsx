@@ -14,7 +14,8 @@ const description = `${
     ? ticket.innerText
     : ticket.getElementsByTagName("a")[0].innerText
 } ${heading.innerText}`;
-ticket.parentNode.insertBefore(newNode, ticket.nextSibling);
+
+ticket?.parentNode.insertBefore(newNode, ticket.nextSibling);
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);

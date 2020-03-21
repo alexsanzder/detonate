@@ -17,7 +17,7 @@ import Divider from "@material-ui/core/Divider";
 import { ThemeContext } from "../../contexts/ThemeProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
-import logo from "../../detonate-white.svg";
+import logo from "../../../detonate-white.svg";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

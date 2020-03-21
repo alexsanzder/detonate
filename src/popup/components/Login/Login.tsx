@@ -13,7 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
 
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
-import { ReactComponent as Logo } from "../../logo.svg";
+import { ReactComponent as Logo } from "../../../logo.svg";
 
 const Copyright = (): JSX.Element => {
   return (

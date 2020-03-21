@@ -102,7 +102,8 @@ const App = ({
     chrome.storage.onChanged.addListener(changes => {
       setIsRunning(changes.isRunning.newValue);
     });
-  }, [description, record, ticket]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const today = new Date().toLocaleDateString("de-DE", {
     year: "numeric",
@@ -114,10 +115,10 @@ const App = ({
     if (!isRunning) {
       handleStart();
       setAnchor(event.currentTarget);
-      if (inputEl && inputEl.current) {
-        inputEl.current.focus();
-        inputEl.current.setSelectionRange(0, 0);
-      }
+      // if (inputEl && inputEl.current) {
+      //   inputEl.current.focus();
+      //   inputEl.current.setSelectionRange(0, 0);
+      // }
     } else {
       handleStop();
     }

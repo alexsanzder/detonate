@@ -55,7 +55,7 @@ chrome.identity.getAuthToken({ interactive: true }, token => {
 });
 
 const main = async (): Promise<any> => {
-  // console.log("Getting list of Sheets from Google Drive");
+  console.log("Getting list of Sheets from Google Drive");
   // const sheetProperties = await gapi.client.sheets.spreadsheets.getByDataFilter(
   //   {
   //     spreadsheetId: SPREADSHEET_ID,

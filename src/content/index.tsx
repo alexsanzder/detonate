@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   ReactDOM.render(
     <App
       description={description}
-      ticket={ticket.innerText}
+      ticket={ticket?.innerText}
       project={project}
       projects={request.projects}
     />,

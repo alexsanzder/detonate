@@ -1,10 +1,16 @@
 {
     "manifest_version": 2,
-    "name": "Chrome Extension (built with TypeScript + React)",
-    "description": "A boilerplate project to quickly build a Chrome extension using TypeScript and React (built using webpack).",
+    "name": "Detonate time tracker google extension using Google Sheets",
+    "short_name": "Detonate time tracker",
+    "description": "Track time on projects and tasks with using Google Sheets.",
     "version": "1.0.0",
+    "icons": {
+        "36": "./logo256.png",
+        "54": "./logo384.png",
+        "72": "./logo512.png"
+    },
     "browser_action": {
-        "default_icon": "icon16.png",
+        "default_icon": "logo256.png",
         "default_popup": "popup.html"
     },
     "content_scripts": [
@@ -14,22 +20,17 @@
                 "http://*.atlassian.net/*"
             ],
             "js": [
-                "/js/content.js"
+                "/static/js/content.js"
             ],
             "run_at": "document_end"
         }
     ],
     "background": {
         "scripts": [
-            "js/background.js"
+            "/static/js/background.js"
         ],
         "run_at": "document_start",
         "persistent": false
-    },
-    "icons": {
-        "16": "icon16.png",
-        "48": "icon48.png",
-        "128": "icon128.png"
     },
     "permissions": [
         "identity",
@@ -39,7 +40,7 @@
         "https://*.google.com/"
     ],
     "oauth2": {
-        "client_id": "274057418646-grkrs21eebl97cfrcf885ioj72eb3g0m.apps.googleusercontent.com",
+        "client_id": "87622167375-sqh7cj732qtf2p9hn4ghq53ct9u1r4ko.apps.googleusercontent.com",
         "spreadsheetId": "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
         "scopes": [
             "https://www.googleapis.com/auth/spreadsheets",

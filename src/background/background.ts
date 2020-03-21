@@ -1,7 +1,9 @@
-/* global gapi */
-const CLIENT_ID =
-  "274057418646-grkrs21eebl97cfrcf885ioj72eb3g0m.apps.googleusercontent.com";
-const API_KEY = "AIzaSyCaQbBvEqSs_o4ZuRkJ8CzGZ5XFLSpolqk";
+/* global chrome gapi */
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const API_KEY = process.env.REACT_APP_API_KEY;
+const SPREADSHEET_ID = process.env.REACT_APP_SPREADSHEET_ID;
+const TABLE_NAME = process.env.REACT_APP_TABLE_NAME;
+
 const DISCOVERY_DOCS = [
   "https://sheets.googleapis.com/$discovery/rest?version=v4"
 ];
@@ -10,8 +12,6 @@ const SCOPE = [
   "https://www.googleapis.com/auth/spreadsheets",
   "https://www.googleapis.com/auth/drive.metadata"
 ].join(" ");
-const SPREADSHEET_ID = "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48";
-const TABLE_NAME = "aSa";
 
 interface ProjectType {
   id: string;
@@ -68,7 +68,7 @@ const main = async (): Promise<any> => {
   //     }
   //   }
   // );
-  //console.log(sheetProperties);
+  // console.log(sheetProperties);
 
   const response = await gapi.client.sheets.spreadsheets.values.batchGet({
     spreadsheetId: SPREADSHEET_ID,
@@ -81,37 +81,41 @@ const main = async (): Promise<any> => {
     result: { valueRanges }
   } = response;
 
-  const projects = valueRanges[0].values.reverse().map(
-    (value: any[], index: number): ProjectType => {
-      return {
-        id: `!A${index + 2}`,
-        company: value[0],
-        project: value[1],
-        details: value[0]
-      };
-    }
-  );
-
-  const lastRecord = valueRanges[1].values
-    .map(
-      (value: any[], index: number): RecordType => {
+  const projects =
+    valueRanges &&
+    valueRanges[0].values?.reverse().map(
+      (value: any[], index: number): ProjectType => {
         return {
-          id: `${TABLE_NAME}!A${index + 2}:G${index + 2}`,
-          name: value[0],
-          date: value[1],
-          company: value[2],
-          project: value[3],
-          description: value[4],
-          ticket: value[5],
-          time: value[6]
+          id: `!A${index + 2}`,
+          company: value[0],
+          project: value[1],
+          details: value[0]
         };
       }
-    )
-    .pop();
+    );
+
+  const lastRecord =
+    valueRanges &&
+    valueRanges[1].values
+      ?.map(
+        (value: any[], index: number): RecordType => {
+          return {
+            id: `${TABLE_NAME}!A${index + 2}:G${index + 2}`,
+            name: value[0],
+            date: value[1],
+            company: value[2],
+            project: value[3],
+            description: value[4],
+            ticket: value[5],
+            time: value[6]
+          };
+        }
+      )
+      .pop();
 
   chrome.storage.sync.set({
-    range: lastRecord.id,
-    isRunning: lastRecord.time === 0
+    range: lastRecord?.id,
+    isRunning: lastRecord?.time === 0
   });
 
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {

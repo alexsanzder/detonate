@@ -1,10 +1,7 @@
 import * as React from "react";
 
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
 import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
 
 import AppProvider from "./contexts/AppProvider";
 import GoogleAuthContext from "./contexts/useGoogleAuth";
@@ -27,12 +24,12 @@ const scope = [
 
 const App = (): JSX.Element => {
   const googleAuth = useGoogle({
-    apiKey: process.env.REACT_APP_GOOGLE_APP_ID,
-    clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+    apiKey: process.env.REACT_APP_API_KEY,
+    clientId: process.env.REACT_APP_CLIENT_ID,
+    spreadsheetId: process.env.REACT_APP_SPREADSHEET_ID,
+    tableName: process.env.REACT_APP_TABLE_NAME,
     discoveryDocs,
-    scope,
-    spreadsheetId: "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
-    tableName: "aSa"
+    scope
   });
 
   return (

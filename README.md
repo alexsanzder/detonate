@@ -1,6 +1,8 @@
-![Detoante](src/detonate.svg)
+[<img align="right" src="src/logo.svg?sanitize=true" width="30%">](https://www.npmjs.com/package/webextension-toolbox)
 
-## ⏱️ Time Tracker Google extension using 📈 Google Sheets as data storage written in ⚛️ React
+# Detonate time tracker
+
+Google extension using Google Sheets as data storage written in React
 
 ## Features
 

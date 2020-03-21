@@ -100,10 +100,9 @@ const App = ({
     setRecord({ ...record, description: description, ticket });
     chrome.storage.sync.get("isRunning", item => setIsRunning(item.isRunning));
     chrome.storage.onChanged.addListener(changes => {
-      console.log(changes);
       setIsRunning(changes.isRunning.newValue);
     });
-  }, []);
+  }, [description, record, ticket]);
 
   const today = new Date().toLocaleDateString("de-DE", {
     year: "numeric",
@@ -193,7 +192,7 @@ const App = ({
           range: items.range,
           record: updateRecord
         },
-        function(response) {
+        (response: any) => {
           console.log("Stop updateRecord response ", response);
         }
       );

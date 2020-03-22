@@ -1,2 +1,2 @@
-export { default } from "./PlaceHolder";
-export * from "./PlaceHolder";
+export { default } from "./Placeholder";
+export * from "./Placeholder";

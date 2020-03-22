@@ -1,17 +1,24 @@
 {
     "manifest_version": 2,
-    "name": "Detonate time tracker google extension using Google Sheets",
+    "name": "Detonate time trackig using Google Sheets",
     "short_name": "Detonate time tracker",
-    "description": "Track time on projects and tasks with using Google Sheets.",
+    "description": "Track time on projects and tasks using Google Sheets.",
     "version": "1.0.0",
     "icons": {
-        "36": "./logo256.png",
-        "54": "./logo384.png",
-        "72": "./logo512.png"
+        "16": "logo16.png",
+        "32": "logo32.png",
+        "48": "logo48.png",
+        "128": "logo128.png"
     },
     "browser_action": {
-        "default_icon": "logo256.png",
-        "default_popup": "popup.html"
+        "default_icon": {
+            "16": "logo16.png",
+            "32": "logo32.png",
+            "48": "logo48.png",
+            "128": "logo128.png"
+        },
+        "default_popup": "popup.html",
+        "run_at": "document_end"
     },
     "content_scripts": [
         {

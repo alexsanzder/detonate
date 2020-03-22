@@ -38,7 +38,7 @@ const App = (): JSX.Element => {
         {googleAuth.isInitialized ? (
           <React.Fragment>
             <CssBaseline />
-            {googleAuth.isSignedIn ? (
+            {true ? (
               <React.Fragment>
                 <NavBar />
                 <Timer />

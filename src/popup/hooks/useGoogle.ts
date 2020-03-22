@@ -166,21 +166,40 @@ export const useGoogle = ({
 
   useEffect(() => {
     const initClient = async (): Promise<void> => {
+      await gapi.auth.authorize(
+        {
+          client_id: clientId,
+          scope: scope,
+          immediate: true
+        },
+        () => {
+          setInitialized(true);
+          chrome.identity.getAuthToken({ interactive: true }, token => {
+            gapi.client.setToken({ access_token: token });
+            setSignedIn(true);
+          });
+        }
+      );
+    };
+
+    const initClientAuth2 = async (): Promise<void> => {
       await gapi.client.init({ apiKey, clientId, discoveryDocs, scope });
       setInitialized(true);
-
       const gAuth = gapi.auth2.getAuthInstance();
       setGoogleAuth(gAuth);
 
       const currentUser = gAuth.currentUser.get().getBasicProfile();
       setCurrentUser(currentUser);
-
       //Load spredsheet data
       loadTable();
     };
 
-    if (isScriptLoaded) {
-      gapi.load("client:auth2", initClient);
+    if (isScriptLoaded && !chrome.identity) {
+      // ? gapi.load("client", initClient)
+      gapi.load("client:auth2", initClientAuth2);
+    } else {
+      setInitialized(true);
+      setSignedIn(true);
     }
   }, [clientId, apiKey, discoveryDocs, scope, isScriptLoaded, loadTable]);
 

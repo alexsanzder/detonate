@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const PlaceHolder = (): JSX.Element => {
+export const Placeholder = (): JSX.Element => {
   const classes = useStyles();
 
   return (
@@ -200,4 +200,4 @@ export const PlaceHolder = (): JSX.Element => {
   );
 };
 
-export default PlaceHolder;
+export default Placeholder;

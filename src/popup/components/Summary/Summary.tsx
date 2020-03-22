@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import clsx from "clsx";
 
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
@@ -20,6 +20,7 @@ import StopRoundedIcon from "@material-ui/icons/StopRounded";
 import WarningRoundedIcon from "@material-ui/icons/WarningRounded";
 
 import Edit from "../Edit";
+import Placeholder from "../Placeholder";
 
 import { AppContext, defaultRecord } from "../../contexts/AppProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
@@ -27,7 +28,6 @@ import GoogleAuthContext from "../../contexts/useGoogleAuth";
 import { getTimeFormated } from "../../utils/time";
 
 import { RecordType } from "../../hooks/useGoogle";
-import PlaceHolder from "../PlaceHolder";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -121,10 +121,11 @@ const Summary = (): JSX.Element => {
     record,
     setRecord
   } = React.useContext(AppContext);
-  const { records, loadTable } = React.useContext(GoogleAuthContext);
+  //const { records, loadTable } = React.useContext(GoogleAuthContext);
 
   const [openEdit, setOpenEdit] = React.useState<boolean>(false);
   const [continueId, setContinueId] = React.useState<string | undefined>();
+  const [records, setRecords] = React.useState<any[] | undefined>();
 
   const groupBy = (array: any[], key: string): any => {
     return array?.reduce((result: any, currentValue: any) => {
@@ -134,6 +135,12 @@ const Summary = (): JSX.Element => {
       return result;
     }, {});
   };
+  React.useEffect(() => {
+    //Load spredsheet data
+    chrome.storage.sync.get("records", (item: any) => {
+      setRecords(item.records);
+    });
+  }, [records]);
   const data = groupBy(records, "date");
 
   const formatedDate = (date: string): string => {

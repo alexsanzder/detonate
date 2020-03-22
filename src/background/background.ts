@@ -94,32 +94,32 @@ const main = async (): Promise<any> => {
       }
     );
 
-  const lastRecord =
+  const records =
     valueRanges &&
-    valueRanges[1].values
-      ?.map(
-        (value: any[], index: number): RecordType => {
-          return {
-            id: `${TABLE_NAME}!A${index + 2}:G${index + 2}`,
-            name: value[0],
-            date: value[1],
-            company: value[2],
-            project: value[3],
-            description: value[4],
-            ticket: value[5],
-            time: value[6]
-          };
-        }
-      )
-      .pop();
+    valueRanges[1].values?.map(
+      (value: any[], index: number): RecordType => {
+        return {
+          id: `${TABLE_NAME}!A${index + 2}:G${index + 2}`,
+          name: value[0],
+          date: value[1],
+          company: value[2],
+          project: value[3],
+          description: value[4],
+          ticket: value[5],
+          time: value[6]
+        };
+      }
+    );
 
+  const lastRecord = records.pop();
   chrome.storage.sync.set({
     range: lastRecord?.id,
+    records: records.slice(Math.max(records.length - 15, 0)),
     isRunning: lastRecord?.time === 0
   });
 
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status == "complete") {
+    if (changeInfo.status === "complete") {
       chrome.tabs.query({ active: true }, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, {
           projects

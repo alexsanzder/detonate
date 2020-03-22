@@ -342,7 +342,7 @@ const Summary = (): JSX.Element => {
           </Card>
         ))
       ) : (
-        <PlaceHolder />
+        <Placeholder />
       )}
       <Edit
         open={openEdit}

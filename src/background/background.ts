@@ -34,24 +34,26 @@ chrome.identity.getProfileUserInfo(userInfo => {
   // console.log(userInfo);
 });
 
-chrome.identity.getAuthToken({ interactive: true }, token => {
-  //load Google's javascript client libraries
-  (<any>window).gapi_onload = () => {
-    gapi.auth.authorize(
-      {
-        client_id: CLIENT_ID,
-        scope: SCOPE,
-        immediate: true
-      },
-      () => {
-        gapi.client.load("sheets", "v4", () => {
-          gapi.client.setToken({ access_token: token });
-          main();
-        });
-      }
-    );
-  };
-  loadScript("https://apis.google.com/js/client.js");
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.identity.getAuthToken({ interactive: true }, token => {
+    //load Google's javascript client libraries
+    (window as any).gapi_onload = () => {
+      gapi.auth.authorize(
+        {
+          client_id: CLIENT_ID,
+          scope: SCOPE,
+          immediate: true
+        },
+        () => {
+          gapi.client.load("sheets", "v4", () => {
+            gapi.client.setToken({ access_token: token });
+            main();
+          });
+        }
+      );
+    };
+    loadScript("https://apis.google.com/js/client.js");
+  });
 });
 
 const main = async (): Promise<any> => {

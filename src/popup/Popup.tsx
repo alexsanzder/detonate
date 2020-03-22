@@ -22,7 +22,7 @@ const scope = [
   "https://www.googleapis.com/auth/drive.metadata"
 ].join(" ");
 
-const App = (): JSX.Element => {
+const Popup = (): JSX.Element => {
   const googleAuth = useGoogle({
     apiKey: process.env.REACT_APP_API_KEY,
     clientId: process.env.REACT_APP_CLIENT_ID,
@@ -59,4 +59,4 @@ const App = (): JSX.Element => {
   );
 };
 
-export default App;
+export default Popup;

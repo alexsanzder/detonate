@@ -4,44 +4,20 @@ import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import Autocomplete, { RenderInputParams } from "@material-ui/lab/Autocomplete";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
-import ButtonBase from "@material-ui/core/ButtonBase";
 import Divider from "@material-ui/core/Divider";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
 
 import PopoverTitle from "./PopoverTitle";
-import DetonateIcon from "./DetonateIcon";
+import ButtonDetonate from "./ButtonDetonate";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
-      height: "328px"
-    },
-    form: {
-      width: "100%",
-      marginTop: theme.spacing(1)
+      height: "303px"
     },
     divider: {
-      margin: theme.spacing(2, 0, 3)
-    },
-    startButton: {
-      padding: theme.spacing(0, 0.5)
-    },
-    icon: {
-      fontSize: 24,
-      margin: theme.spacing(0, 0.25, 0.5),
-      "&:hover": {
-        fill: theme.palette.secondary.dark
-      }
-    },
-    underline: {
-      color: theme.palette.grey[700],
-      "&:hover": {
-        borderBottom: "1.5px solid currentColor",
-        display: "inline-block",
-        lineHeight: 1.2
-      }
+      margin: theme.spacing(2, 0, 2.5)
     },
     autoComplete: {
       width: "396px"
@@ -74,7 +50,7 @@ export interface ContentProps {
   projects?: ProjectType[];
 }
 
-const App = ({
+const Content = ({
   description,
   ticket,
   project,
@@ -92,7 +68,7 @@ const App = ({
     ticket: "",
     time: 0
   });
-  const inputEl = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const open = Boolean(anchor);
 
   React.useEffect(() => {
@@ -101,7 +77,9 @@ const App = ({
       setIsRunning(item.isRunning)
     );
     chrome.storage.onChanged.addListener((changes: any) => {
-      setIsRunning(changes.isRunning.newValue);
+      if (changes.isRunning) {
+        setIsRunning(changes.isRunning.newValue);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -116,10 +94,6 @@ const App = ({
     if (!isRunning) {
       handleStart();
       setAnchor(event.currentTarget);
-      // if (inputEl && inputEl.current) {
-      //   inputEl.current.focus();
-      //   inputEl.current.setSelectionRange(0, 0);
-      // }
     } else {
       handleStop();
     }
@@ -204,16 +178,10 @@ const App = ({
 
   return (
     <React.Fragment>
-      <ButtonBase onClick={handleClick} className={classes.startButton}>
-        <DetonateIcon className={classes.icon} />
-        <Typography
-          component="span"
-          variant="subtitle2"
-          className={classes.underline}
-        >
-          {isRunning ? "Stop timer" : "Start timer"}
-        </Typography>
-      </ButtonBase>
+      <ButtonDetonate
+        onClick={handleClick}
+        title={isRunning ? "Stop timer" : "Start timer"}
+      />
       <Popover
         keepMounted
         open={open}
@@ -232,69 +200,67 @@ const App = ({
           <PopoverTitle onClose={handleClose} onStop={handleStop}>
             Stop timer
           </PopoverTitle>
-          <form className={classes.form} noValidate={true}>
-            <TextField
-              variant="outlined"
-              margin="dense"
-              fullWidth
-              id="description"
-              placeholder="What are you doing?"
-              name="description"
-              value={description}
-              inputRef={inputEl}
-              autoFocus
-            />
-            <Autocomplete
-              className={classes.autoComplete}
-              value={project}
-              options={projects ? projects : []}
-              onChange={(
-                _event: React.ChangeEvent<{}>,
-                newValue: ProjectType | null
-              ): void => {
-                setRecord({
-                  ...record,
-                  project: newValue?.project,
-                  company: newValue?.company
-                });
-              }}
-              groupBy={(object: ProjectType): string => object.company}
-              getOptionLabel={(object: ProjectType): string => object.project}
-              renderInput={(params: RenderInputParams): React.ReactNode => (
-                <TextField
-                  {...params}
-                  fullWidth
-                  variant="outlined"
-                  margin="dense"
-                  name="project"
-                  placeholder="Add project"
-                />
-              )}
-            />
-            <TextField
-              variant="outlined"
-              margin="dense"
-              fullWidth
-              name="ticket"
-              placeholder="Add ticket"
-              id="ticket"
-              value={ticket}
-            />
-            <Divider className={classes.divider} />
-            <Button
-              fullWidth
-              variant="contained"
-              size="medium"
-              color="secondary"
-              onClick={handleDone}
-            >
-              Done
-            </Button>
-          </form>
+          <TextField
+            variant="outlined"
+            margin="dense"
+            fullWidth
+            id="description"
+            placeholder="What are you doing?"
+            name="description"
+            defaultValue={description}
+            inputRef={inputRef}
+          />
+          <Autocomplete
+            className={classes.autoComplete}
+            defaultValue={project}
+            options={projects ? projects : []}
+            onChange={(
+              _event: React.ChangeEvent<{}>,
+              newValue: ProjectType | null
+            ): void => {
+              setRecord({
+                ...record,
+                project: newValue?.project,
+                company: newValue?.company
+              });
+            }}
+            groupBy={(object: ProjectType): string => object.company}
+            getOptionLabel={(object: ProjectType): string => object.project}
+            renderInput={(params: RenderInputParams): React.ReactNode => (
+              <TextField
+                {...params}
+                fullWidth
+                variant="outlined"
+                margin="dense"
+                name="project"
+                placeholder="Add project"
+              />
+            )}
+          />
+          <TextField
+            variant="outlined"
+            margin="dense"
+            fullWidth
+            name="ticket"
+            placeholder="Add ticket"
+            id="ticket"
+            defaultValue={ticket}
+          />
+          <Divider className={classes.divider} />
+          <Button
+            fullWidth
+            variant="contained"
+            size="medium"
+            color="secondary"
+            onClick={handleDone}
+            style={{ textTransform: "none" }}
+          >
+            Done
+          </Button>
         </Container>
       </Popover>
     </React.Fragment>
   );
 };
 
-export default App;
+export default Content;

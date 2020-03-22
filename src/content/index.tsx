@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import App, { ProjectType } from "./App";
+import Content, { ProjectType } from "./Content";
 
 const newNode = document.createElement("span");
 const ticket = document.getElementById("key-val")
@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener(
     });
 
     ReactDOM.render(
-      <App
+      <Content
         description={description}
         ticket={ticket?.innerText}
         project={project}

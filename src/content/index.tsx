@@ -10,29 +10,31 @@ const ticket = document.getElementById("key-val")
 
 const heading = document.getElementById("summary-val");
 const description = `${
-  ticket.innerText
+  ticket?.innerText
     ? ticket.innerText
-    : ticket.getElementsByTagName("a")[0].innerText
-} ${heading.innerText}`;
+    : ticket?.getElementsByTagName("a")[0].innerText
+} ${heading?.innerText}`;
 
-ticket?.parentNode.insertBefore(newNode, ticket.nextSibling);
+ticket?.parentNode?.insertBefore(newNode, ticket.nextSibling);
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const projectKey = urlParams.get("projectKey");
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const project = request.projects.find((obj: ProjectType) => {
-    return obj.project === projectKey;
-  });
+chrome.runtime.onMessage.addListener(
+  (request: any, sender: any, sendResponse: any) => {
+    const project = request.projects.find((obj: ProjectType) => {
+      return obj.project === projectKey;
+    });
 
-  ReactDOM.render(
-    <App
-      description={description}
-      ticket={ticket?.innerText}
-      project={project}
-      projects={request.projects}
-    />,
-    newNode
-  );
-});
+    ReactDOM.render(
+      <App
+        description={description}
+        ticket={ticket?.innerText}
+        project={project}
+        projects={request.projects}
+      />,
+      newNode
+    );
+  }
+);

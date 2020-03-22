@@ -2,11 +2,14 @@ const path = require("path");
 const fs = require("fs");
 const url = require("url");
 
-// Make sure any symlinks in the project folder are resolved:
-// https://github.com/facebook/create-react-app/issues/637
+const getPublicUrlOrPath = require("react-dev-utils/getPublicUrlOrPath");
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
-
+const publicUrlOrPath = getPublicUrlOrPath(
+  process.env.NODE_ENV === "development",
+  require(resolveApp("package.json")).homepage,
+  process.env.PUBLIC_URL
+);
 const envPublicUrl = process.env.PUBLIC_URL;
 
 function ensureSlash(inputPath, needsSlash) {
@@ -50,7 +53,6 @@ const moduleFileExtensions = [
   "jsx"
 ];
 
-// Resolve file paths in the same order as webpack
 const resolveModule = (resolveFn, filePath) => {
   const extension = moduleFileExtensions.find(extension =>
     fs.existsSync(resolveFn(`${filePath}.${extension}`))
@@ -63,7 +65,6 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.js`);
 };
 
-// config after eject: we're in ./config/
 module.exports = {
   dotenv: resolveApp(".env"),
   appPath: resolveApp("."),
@@ -98,7 +99,7 @@ module.exports = {
   proxySetup: resolveApp("src/setupProxy.js"),
   appNodeModules: resolveApp("node_modules"),
   publicUrl: getPublicUrl(resolveApp("package.json")),
-  servedPath: getServedPath(resolveApp("package.json"))
+  servedPath: getServedPath(resolveApp("package.json")),
+  publicUrlOrPath
 };
-
 module.exports.moduleFileExtensions = moduleFileExtensions;

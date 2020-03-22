@@ -10,8 +10,8 @@ import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 
-import DetonateIcon from "./DetonateIcon";
 import PopoverTitle from "./PopoverTitle";
+import DetonateIcon from "./DetonateIcon";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -68,11 +68,10 @@ export interface RecordType {
 }
 
 export interface ContentProps {
-  description: string;
+  description?: string;
   ticket?: string;
   project?: ProjectType;
   projects?: ProjectType[];
-  time?: number;
 }
 
 const App = ({
@@ -98,8 +97,10 @@ const App = ({
 
   React.useEffect(() => {
     setRecord({ ...record, description: description, ticket });
-    chrome.storage.sync.get("isRunning", item => setIsRunning(item.isRunning));
-    chrome.storage.onChanged.addListener(changes => {
+    chrome.storage.sync.get("isRunning", (item: any) =>
+      setIsRunning(item.isRunning)
+    );
+    chrome.storage.onChanged.addListener((changes: any) => {
       setIsRunning(changes.isRunning.newValue);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,14 +144,14 @@ const App = ({
 
     chrome.runtime.sendMessage(
       { message: "addRecord", record: addRecord },
-      response => {
+      (response: any) => {
         console.log("Start addRecord response ", response);
       }
     );
   };
 
   const handleDone = () => {
-    chrome.storage.sync.get(["range", "start"], items => {
+    chrome.storage.sync.get(["range", "start"], (items: any) => {
       const updateRecord = [
         null,
         today,
@@ -166,7 +167,7 @@ const App = ({
           range: items.range,
           record: updateRecord
         },
-        function(response) {
+        (response: any) => {
           console.log("Stop updateRecord response ", response);
         }
       );
@@ -246,15 +247,15 @@ const App = ({
             <Autocomplete
               className={classes.autoComplete}
               value={project}
-              options={projects}
+              options={projects ? projects : []}
               onChange={(
                 _event: React.ChangeEvent<{}>,
                 newValue: ProjectType | null
               ): void => {
                 setRecord({
                   ...record,
-                  project: newValue.project,
-                  company: newValue.company
+                  project: newValue?.project,
+                  company: newValue?.company
                 });
               }}
               groupBy={(object: ProjectType): string => object.company}

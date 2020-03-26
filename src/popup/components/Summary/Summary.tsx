@@ -114,18 +114,14 @@ const useStyles = makeStyles((theme: Theme) =>
 const Summary = (): JSX.Element => {
   const classes = useStyles();
 
-  const {
-    locale,
-    running,
-    toggleRunning,
-    record,
-    setRecord
-  } = React.useContext(AppContext);
+  const { locale } = React.useContext(AppContext);
   //const { records, loadTable } = React.useContext(GoogleAuthContext);
 
   const [openEdit, setOpenEdit] = React.useState<boolean>(false);
-  const [continueId, setContinueId] = React.useState<string | undefined>();
-  const [records, setRecords] = React.useState<any[] | undefined>();
+  const [continueId, setContinueId] = React.useState<string>();
+  const [records, setRecords] = React.useState<any[]>();
+  const [record, setRecord] = React.useState<any>();
+  const [isRunning, setIsRunning] = React.useState<boolean>(false);
 
   const groupBy = (array: any[], key: string): any => {
     return array?.reduce((result: any, currentValue: any) => {
@@ -137,9 +133,14 @@ const Summary = (): JSX.Element => {
   };
   React.useEffect(() => {
     //Load spredsheet data
-    chrome.storage.sync.get("records", (item: any) => {
-      setRecords(item.records);
-    });
+    chrome.storage.sync.get(
+      ["isRunning", "record", "records"],
+      (items: any) => {
+        setRecords(items.records);
+        setRecord(items.record);
+        setIsRunning(items.isRunning);
+      }
+    );
   }, [records]);
   const data = groupBy(records, "date");
 
@@ -166,7 +167,7 @@ const Summary = (): JSX.Element => {
   ): void => {
     setContinueId(record.id);
     setRecord(record);
-    toggleRunning(!running);
+    setIsRunning(!isRunning);
   };
 
   const handleEdit = (
@@ -178,7 +179,7 @@ const Summary = (): JSX.Element => {
   };
 
   const handleCloseEdit = (): void => {
-    loadTable && loadTable();
+    // loadTable && loadTable();
     setOpenEdit(false);
     setRecord(defaultRecord);
   };
@@ -227,7 +228,10 @@ const Summary = (): JSX.Element => {
                       <Grid item className={classes.right}>
                         <Typography
                           variant={"subtitle2"}
-                          color={record.time < 0.5 ? "error" : "inherit"}
+                          color={record.time < 0.5 ? "secondary" : "inherit"}
+                          style={{
+                            fontWeight: record.time < 0.5 ? 900 : "inherit"
+                          }}
                         >
                           <Tooltip
                             title="Minimum time 0.5h"
@@ -322,7 +326,7 @@ const Summary = (): JSX.Element => {
                           arrow: classes.popperArrow
                         }}
                       >
-                        {record.id === continueId && running ? (
+                        {record.id === continueId && isRunning ? (
                           <StopRoundedIcon
                             fontSize="small"
                             className={classes.iconStop}

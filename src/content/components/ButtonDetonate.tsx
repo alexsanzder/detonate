@@ -3,12 +3,13 @@ import * as React from "react";
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import ButtonBase from "@material-ui/core/ButtonBase";
 import Typography from "@material-ui/core/Typography";
+
 import IconDetonate from "./IconDetonate";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     startButton: {
-      padding: theme.spacing(0, 0.5),
+      // padding: theme.spacing(0, 0.5),
       "&:focus": {
         boxShadow: "none"
       }
@@ -47,7 +48,7 @@ const ButtonDetonate = ({
 
   return (
     <ButtonBase onClick={onClick} className={classes.startButton}>
-      <IconDetonate className={classes.icon} />
+      <IconDetonate className={classes.icon} viewBox="0 0 512 512" />
       <Typography
         component="span"
         variant="subtitle2"

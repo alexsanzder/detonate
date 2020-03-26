@@ -1,8 +1,71 @@
-<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <style>
+    #info {
+      border: 1px solid black;
+      padding: 0.25em;
+    }
+  </style>
+  <script>
+    // Enter the API key from the Google Developer Console - to handle any unauthenticated
+    // requests in the code.
+    // The provided key works for this sample only when run from
+    // https://google-api-javascript-client.googlecode.com/hg/samples/simpleRequest.html
+    // To use in your own application, replace this API key with your own.
+    var apiKey = 'AIzaSyAdjHPT5Pb7Nu56WJ_nlrMGOAgUAtKjiPM';
+
+    function handleClientLoad() {
+      gapi.load('client', initClient);
+    }
+
+    function initClient() {
+      gapi.client.init({
+        apiKey: apiKey,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/urlshortener/v1/rest']
+      }).then(showInputs)
+    }
+
+    function showInputs() {
+      document.getElementById('requestFields').style.display = '';
+    }
+
+    function makeRequest() {
+      function writeResponse(resp) {
+        var responseText;
+        if (resp.code && resp.data[0].debugInfo == 'QuotaState: BLOCKED') {
+          responseText = 'Invalid API key provided. Please replace the "apiKey" value with your own.';
+        } else {
+          responseText = 'Short URL ' + shortUrl + ' expands to ' + resp.longUrl;
+        }
+        var infoDiv = document.getElementById('info');
+        infoDiv.innerHTML = '';
+        infoDiv.appendChild(document.createTextNode(responseText));
+      }
+
+      var shortUrl = document.getElementById('shortUrl').value;
+      var request = gapi.client.urlshortener.url.get({
+        'shortUrl': shortUrl
+      });
+      request.execute(writeResponse);
+    }
+  </script>
+  <script async defer src="https://apis.google.com/js/api.js" onload="this.onload=function(){};handleClientLoad();"
+    onreadystatechange="if (this.readyState === 'complete') this.onload();">
+    </script>
+</head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root"></div>
+  <p>Enter a short URL and click "Expand URL" to get the full URL.</p>
+  <div id="requestFields" style="display:none;">
+    <label for="shortUrl">Short URL </label>
+    <input id="shortUrl" type="text" value="http://goo.gl/fbsS" />
+    <button onclick="makeRequest();">
+      Expand URL
+    </button>
+  </div>
+  <div style="margin-top:0.5em;"><span id="info">Results</span></div>
 </body>
 
 </html>

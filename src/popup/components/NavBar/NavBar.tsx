@@ -17,7 +17,7 @@ import Divider from "@material-ui/core/Divider";
 import { ThemeContext } from "../../contexts/ThemeProvider";
 import GoogleAuthContext from "../../contexts/useGoogleAuth";
 
-import logo from "../../../detonate-white.svg";
+import { ReactComponent as Logo } from "../../../detonate.svg";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,7 +30,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     logo: {
       height: theme.spacing(3),
-      cursor: "none"
+      width: "auto",
+      cursor: "none",
+      "& path": {
+        fill: "#fff"
+      },
+      path: {
+        fill: "#fff"
+      }
     },
     rightToolbar: {
       marginLeft: "auto",
@@ -39,9 +46,21 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+export interface ProfileType {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
+  locale: string;
+}
+
 const NavBar = (): JSX.Element => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
   const open = Boolean(anchorEl);
 
   const { themeName, setThemeName } = React.useContext(ThemeContext);
@@ -52,6 +71,14 @@ const NavBar = (): JSX.Element => {
     loadTable
   } = React.useContext(GoogleAuthContext);
 
+  const [profile, setProfile] = React.useState<ProfileType>();
+  React.useEffect(() => {
+    chrome.storage.sync.get(["profile"], (items: any) => {
+      setProfile(items.profile);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  console.log(profile);
   const handleTheme = (): void => {
     setThemeName(themeName === "darkTheme" ? "lightTheme" : "darkTheme");
   };
@@ -67,7 +94,7 @@ const NavBar = (): JSX.Element => {
   return (
     <AppBar color="secondary" position="sticky" elevation={3}>
       <Toolbar variant="dense">
-        <img src={logo} alt="detonate" className={classes.logo} />
+        <Logo className={classes.logo} />
         <section className={classes.rightToolbar}>
           <IconButton
             color="inherit"
@@ -110,8 +137,8 @@ const NavBar = (): JSX.Element => {
           >
             <Avatar
               className={classes.small}
-              alt={currentUser?.getName()}
-              src={currentUser?.getImageUrl()}
+              alt={profile?.name}
+              src={profile?.picture}
             />
           </IconButton>
           <Menu

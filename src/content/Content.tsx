@@ -8,8 +8,8 @@ import Divider from "@material-ui/core/Divider";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 
-import PopoverTitle from "./PopoverTitle";
-import ButtonDetonate from "./ButtonDetonate";
+import PopoverTitle from "./components/PopoverTitle";
+import ButtonDetonate from "./components/ButtonDetonate";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,23 +42,29 @@ export interface RecordType {
   ticket: string;
   time: number;
 }
+export interface ProfileType {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
+  locale: string;
+}
 
 export interface ContentProps {
   description?: string;
   ticket?: string;
-  project?: ProjectType;
-  projects?: ProjectType[];
 }
 
-const Content = ({
-  description,
-  ticket,
-  project,
-  projects
-}: ContentProps): JSX.Element => {
+const Content = ({ description, ticket }: ContentProps): JSX.Element => {
   const classes = useStyles();
   const [anchor, setAnchor] = React.useState<HTMLButtonElement | null>(null);
   const [isRunning, setIsRunning] = React.useState<boolean>(false);
+  const [projects, setProjects] = React.useState<ProjectType[]>();
+  const [project, setProject] = React.useState<ProjectType>();
+  const [profile, setProfile] = React.useState<ProfileType>();
   const [record, setRecord] = React.useState<RecordType>({
     name: "",
     date: "",
@@ -73,8 +79,13 @@ const Content = ({
 
   React.useEffect(() => {
     setRecord({ ...record, description: description, ticket });
-    chrome.storage.sync.get("isRunning", (item: any) =>
-      setIsRunning(item.isRunning)
+    chrome.storage.sync.get(
+      ["isRunning", "projects", "profile"],
+      (items: any) => {
+        setIsRunning(items.isRunning);
+        setProjects(items.projects);
+        setProfile(items.profile);
+      }
     );
     chrome.storage.onChanged.addListener((changes: any) => {
       if (changes.isRunning) {
@@ -104,10 +115,8 @@ const Content = ({
   };
 
   const handleStart = () => {
-    chrome.storage.sync.set({ isRunning: true });
-    chrome.storage.sync.set({ start: Date.now() });
     const addRecord = [
-      null,
+      profile,
       today,
       record.company,
       record.project,
@@ -127,7 +136,7 @@ const Content = ({
   const handleDone = () => {
     chrome.storage.sync.get(["range", "start"], (items: any) => {
       const updateRecord = [
-        null,
+        profile.name,
         today,
         record.company,
         record.project,
@@ -154,7 +163,7 @@ const Content = ({
     chrome.storage.sync.get(["range", "start"], items => {
       var hours = Math.abs(Date.now() - items.start) / 36e5;
       const updateRecord = [
-        null,
+        profile.name,
         today,
         record.company,
         record.project,

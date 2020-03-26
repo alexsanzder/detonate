@@ -23,23 +23,25 @@
     "content_scripts": [
         {
             "matches": [
-                "https://*.atlassian.net/*",
-                "http://*.atlassian.net/*"
+                "<all_urls>"
             ],
             "js": [
-                "/static/js/content.js"
+                "./static/js/content.js"
             ],
             "run_at": "document_end"
         }
     ],
     "background": {
         "scripts": [
-            "/static/js/background.js"
+            "./static/js/background.js",
+            "./gapi-client.js"
         ],
         "run_at": "document_start",
         "persistent": false
     },
     "permissions": [
+        "tabs",
+        "activeTab",
         "identity",
         "cookies",
         "storage",

@@ -1831,6 +1831,13 @@
   resolved "https://registry.yarnpkg.com/@types/gapi.client/-/gapi.client-1.0.1.tgz#620860ae183d849e513d44b4f0422c89b8a1fc91"
   integrity sha512-/SjoU65jvBZlDQtw12OB9YCrqKQrrAdG4YpVTH4AJaJDCOkFdGXcDA2IFTm3d2UCeQwmqM/o6tNlyjKINO6MNg==
 
+"@types/gapi.people@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/gapi.people/-/gapi.people-1.0.4.tgz#33592553403891e3e6c425ab20effd5ea4aad075"
+  integrity sha512-L/cd2eqcbQlxnbd/2SWjVBYydwMV+n1JBhLrGa8RhZ61RnnXsfTObJdNb8465sTff1dpLg5VTsrE6UlRms4umA==
+  dependencies:
+    "@types/gapi" "*"
+
 "@types/gapi@*":
   version "0.0.39"
   resolved "https://registry.yarnpkg.com/@types/gapi/-/gapi-0.0.39.tgz#bc7fa8cd0cb175b36e3609790fb2ed73a33f6881"

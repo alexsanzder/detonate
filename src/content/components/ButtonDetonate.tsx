@@ -1,4 +1,5 @@
 import * as React from "react";
+import clsx from "clsx";
 
 import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import ButtonBase from "@material-ui/core/ButtonBase";
@@ -38,16 +39,21 @@ const useStyles = makeStyles((theme: Theme) =>
 export interface ButtonDetonateProps {
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   title: string;
+  className?: any;
 }
 
 const ButtonDetonate = ({
   onClick,
-  title
+  title,
+  className
 }: ButtonDetonateProps): JSX.Element => {
   const classes = useStyles();
 
   return (
-    <ButtonBase onClick={onClick} className={classes.startButton}>
+    <ButtonBase
+      onClick={onClick}
+      className={clsx(className, classes.startButton)}
+    >
       <IconDetonate className={classes.icon} viewBox="0 0 512 512" />
       <Typography
         component="span"

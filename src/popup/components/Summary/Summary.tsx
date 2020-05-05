@@ -55,7 +55,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexWrap: "wrap",
       "& > *": {
-        margin: theme.spacing(0.25)
+        margin: theme.spacing(0.25),
+        maxWidth: "130px"
       }
     },
     button: {
@@ -141,6 +142,11 @@ const Summary = (): JSX.Element => {
         setIsRunning(items.isRunning);
       }
     );
+    chrome.storage.onChanged.addListener((changes: any) => {
+      console.log(changes);
+      setIsRunning(changes.isRunning.newValue);
+      setRecords(changes.records.newValue);
+    });
   }, [records]);
   const data = groupBy(records, "date");
 

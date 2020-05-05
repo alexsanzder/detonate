@@ -10,8 +10,8 @@ import ButtonDetonate from "./ButtonDetonate";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     title: {
-      margin: 0,
-      padding: theme.spacing(1.5, 0),
+      marginBottom: theme.spacing(2.5),
+      // padding: theme.spacing(1.25, 0),
       color: theme.palette.grey[500],
       cursor: "pointer"
     },
@@ -20,6 +20,11 @@ const useStyles = makeStyles((theme: Theme) =>
       top: theme.spacing(1),
       right: theme.spacing(1),
       color: theme.palette.grey[500]
+    },
+    stopButton: {
+      position: "absolute",
+      top: theme.spacing(1.5),
+      left: theme.spacing(1.75)
     }
   })
 );
@@ -39,7 +44,11 @@ const PopoverTitle = ({
   const classes = useStyles();
   return (
     <DialogTitle disableTypography={true} className={classes.title} {...other}>
-      <ButtonDetonate onClick={onStop} title={children} />
+      <ButtonDetonate
+        onClick={onStop}
+        title={children}
+        className={classes.stopButton}
+      />
       {onClose && (
         <IconButton
           className={classes.closeButton}

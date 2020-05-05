@@ -12,7 +12,6 @@ const DISCOVERY_DOCS = [
 const SCOPE = [
   "https://www.googleapis.com/auth/userinfo.profile",
   "https://www.googleapis.com/auth/spreadsheets"
-  // "https://www.googleapis.com/auth/drive.metadata"
 ].join(" ");
 
 interface ProjectType {
@@ -39,7 +38,7 @@ const init = async (token: string): Promise<any> => {
     `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${token}`
   );
   const profile = await userInfo.json();
-  chrome.storage.sync.set({ profile });
+  chrome.storage.local.set({ profile });
 
   const response = await gapi.client.sheets.spreadsheets.values.batchGet({
     spreadsheetId: SPREADSHEET_ID,
@@ -86,26 +85,65 @@ const init = async (token: string): Promise<any> => {
 
   // Last record
   const lastRecord = records.pop();
-
-  // save in the sync storage
-  chrome.storage.sync.set({
-    projects,
-    range: lastRecord.id,
-    records: records.slice(Math.max(records.length - 15, 0)).reverse(),
-    isRunning: lastRecord.time === 0
-  });
+  if (lastRecord.time === 0) {
+    chrome.browserAction.setBadgeText({
+      text: "▶️"
+    });
+  }
+  // save in the local storage
+  chrome.storage.local.set(
+    {
+      projects,
+      range: lastRecord.id,
+      records: records.slice(Math.max(records.length - 15, 0)).reverse(),
+      isRunning: lastRecord.time === 0
+    },
+    () => {
+      chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+        if (changeInfo.status === "complete") {
+          await chrome.tabs.query(
+            { active: true, currentWindow: true },
+            tabs => {
+              const port = chrome.tabs.connect(tabs[0].id);
+              port.postMessage({ message: changeInfo.status });
+              port.onMessage.addListener(response => {
+                console.log(response);
+              });
+            }
+          );
+        }
+      });
+      // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      //   if (changeInfo.status === "complete") {
+      //     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      //       chrome.tabs.sendMessage(
+      //         tabs[0].id,
+      //         { message: "ready" },
+      //         response => {
+      //           console.log(
+      //             `message response to bakground: ${JSON.stringify(response)}`
+      //           );
+      //         }
+      //       );
+      //     });
+      //   }
+      // });
+    }
+  );
 };
 
-// Add new record
-const addRecord = async (record: any): Promise<any> => {
-  chrome.storage.sync.set({ isRunning: true, start: Date.now() });
+// Add new row
+const addRow = async ({ record, badge = "" }): Promise<any> => {
+  chrome.storage.local.set({ isRunning: true, start: Date.now(), record });
+  const values = Object.values(record);
+
   const response = await gapi.client.sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
     range: `${TABLE_NAME}!A2:G2`,
     valueInputOption: "USER_ENTERED",
     insertDataOption: "INSERT_ROWS",
     resource: {
-      values: [record]
+      values: [values]
     }
   });
 
@@ -115,26 +153,33 @@ const addRecord = async (record: any): Promise<any> => {
     }
   } = response;
 
-  chrome.storage.sync.set({ range: updatedRange });
+  chrome.browserAction.setBadgeText({ text: badge });
+  chrome.storage.local.set({ range: updatedRange });
 };
 
-// Update record
-const updateRecord = async (
-  range: string,
-  record: RecordType[]
-): Promise<any> => {
-  return await gapi.client.sheets.spreadsheets.values.update({
+// Update row
+const updateRow = async ({ range, record, badge = "" }): Promise<any> => {
+  const values = Object.values(record);
+
+  const response = await gapi.client.sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
     range: range,
     valueInputOption: "USER_ENTERED",
     resource: {
-      values: [record]
+      values: [values]
     }
   });
+
+  const {
+    result: { updatedRange }
+  } = response;
+
+  chrome.browserAction.setBadgeText({ text: badge });
+  return updatedRange;
 };
 
-// Delete record
-const deleteRecord = async (index: number): Promise<any> => {
+// Delete row
+const deleteRow = async ({ index }): Promise<any> => {
   return await gapi.client.sheets.spreadsheets.batchUpdate({
     spreadsheetId: SPREADSHEET_ID,
     resource: {
@@ -154,27 +199,42 @@ const deleteRecord = async (index: number): Promise<any> => {
   });
 };
 
-// Lisener for the exec functions
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const { message, range, record, index } = request;
-  switch (message) {
-    case "addRecord":
-      addRecord(record);
+// Browser Action
+// chrome.browserAction.setBadgeText({ text: "HI" });
+
+// Lisener for actions
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  const { action, payload } = message;
+  switch (action) {
+    case "addRow":
+      await addRow(payload);
       break;
-    case "updateRecord":
-      updateRecord(range, record);
+    case "updateRow":
+      await updateRow(payload);
       break;
-    case "deleteRecord":
-      deleteRecord(index);
+    case "deleteRow":
+      await deleteRow(payload);
       break;
     default:
       break;
   }
   // Callback for that request
-  sendResponse({ message: "Record cahnged!" });
+  sendResponse({ message: `Background action: ${action}` });
 });
 
-//load Google's javascript client libraries
+// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//   if (changeInfo.status === "complete") {
+//     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+//       chrome.tabs.sendMessage(tabs[0].id, { message: "hello" }, response => {
+//         console.log(
+//           `message response from ? to bakground: ${JSON.stringify(response)}`
+//         );
+//       });
+//     });
+//   }
+// });
+
+// Load Google's javascript client libraries
 (window as any).gapi_onload = () => {
   chrome.identity.getAuthToken({ interactive: true }, (token: string) => {
     gapi.auth.authorize(

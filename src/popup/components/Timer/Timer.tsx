@@ -115,10 +115,10 @@ const Timer = (): JSX.Element => {
     if (loading && reload && !running) {
       setSeconds(0);
       setRecord(defaultRecord);
-      loadTable && loadTable();
+      // loadTable && loadTable();
       setSuccess("");
     }
-  }, [loading, reload, running]);
+  }, [loading, reload, running, setRecord]);
 
   const handlePlay = async (): Promise<void> => {
     setSuccess("");

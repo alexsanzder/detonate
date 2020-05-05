@@ -17,8 +17,7 @@
             "48": "logo48.png",
             "128": "logo128.png"
         },
-        "default_popup": "popup.html",
-        "run_at": "document_end"
+        "default_popup": "popup.html"
     },
     "content_scripts": [
         {
@@ -27,8 +26,7 @@
             ],
             "js": [
                 "./static/js/content.js"
-            ],
-            "run_at": "document_end"
+            ]
         }
     ],
     "background": {
@@ -36,7 +34,6 @@
             "./static/js/background.js",
             "./gapi-client.js"
         ],
-        "run_at": "document_start",
         "persistent": false
     },
     "permissions": [

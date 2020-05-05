@@ -4,7 +4,6 @@ import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
 import Autocomplete, { RenderInputParams } from "@material-ui/lab/Autocomplete";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
 import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 
@@ -14,33 +13,42 @@ import ButtonDetonate from "./components/ButtonDetonate";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
-      height: "303px"
+      height: "280px",
+      width: "400px"
     },
-    divider: {
-      margin: theme.spacing(2, 0, 2.5)
-    },
-    autoComplete: {
-      width: "396px"
+    button: {
+      margin: theme.spacing(2, 0, 2),
+      textTransform: "none"
     }
   })
 );
 
+const defaultRecord = {
+  name: null,
+  date: null,
+  company: null,
+  project: null,
+  description: null,
+  ticket: null,
+  time: 0
+};
+
 export interface ProjectType {
-  id: string;
-  company: string;
-  project: string;
-  details: string;
+  id?: string;
+  company?: string;
+  project?: string;
+  details?: string;
 }
 
 export interface RecordType {
   id?: string;
-  name?: string;
-  date?: string;
-  company: string;
-  project: string;
-  description: string;
-  ticket: string;
-  time: number;
+  name?: string | null;
+  date?: string | null;
+  company?: string | null;
+  project?: string | null;
+  description?: string | null;
+  ticket?: string | null;
+  time?: number | null;
 }
 export interface ProfileType {
   id: string;
@@ -62,44 +70,50 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
   const classes = useStyles();
   const [anchor, setAnchor] = React.useState<HTMLButtonElement | null>(null);
   const [isRunning, setIsRunning] = React.useState<boolean>(false);
-  const [projects, setProjects] = React.useState<ProjectType[]>();
-  const [project, setProject] = React.useState<ProjectType>();
-  const [profile, setProfile] = React.useState<ProfileType>();
-  const [record, setRecord] = React.useState<RecordType>({
-    name: "",
-    date: "",
-    company: "",
-    project: "",
-    description: "",
-    ticket: "",
-    time: 0
-  });
+  const [projects, setProjects] = React.useState<ProjectType[] | null>(null);
+  const [project, setProject] = React.useState<ProjectType | null>(null);
+  const [profile, setProfile] = React.useState<ProfileType | null>(null);
+  const [record, setRecord] = React.useState<RecordType>(defaultRecord);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const open = Boolean(anchor);
-
-  React.useEffect(() => {
-    setRecord({ ...record, description: description, ticket });
-    chrome.storage.sync.get(
-      ["isRunning", "projects", "profile"],
-      (items: any) => {
-        setIsRunning(items.isRunning);
-        setProjects(items.projects);
-        setProfile(items.profile);
-      }
-    );
-    chrome.storage.onChanged.addListener((changes: any) => {
-      if (changes.isRunning) {
-        setIsRunning(changes.isRunning.newValue);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const today = new Date().toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit"
   });
+
+  React.useEffect(() => {
+    chrome.storage.local.get(["projects"], ({ projects }) => {
+      setProjects(projects);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  console.log(projects);
+
+  // React.useEffect(() => {
+  //   if (chrome) {
+  //     chrome.storage.local.get(
+  //       ["isRunning", "projects", ""],
+  //       ({ isRunning, projects, profile }) => {
+  //         setIsRunning(isRunning);
+  //         setProjects(projects);
+  //         setProfile(profile);
+  //         setRecord({
+  //           ...record,
+  //           name: profile.name,
+  //           date: today,
+  //           description: description,
+  //           ticket: ticket,
+  //           time: 0
+  //         });
+  //       }
+  //     );
+
+  //     chrome.storage.onChanged.addListener(({ isRunning }) => {
+  //       isRunning && setIsRunning(isRunning.newValue);
+  //     });
+  //   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [description, ticket]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (!isRunning) {
@@ -115,43 +129,28 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
   };
 
   const handleStart = () => {
-    const addRecord = [
-      profile,
-      today,
-      record.company,
-      record.project,
-      record.description,
-      record.ticket,
-      0
-    ];
-
+    const newRecord = record;
     chrome.runtime.sendMessage(
-      { message: "addRecord", record: addRecord },
+      { action: "addRow", payload: { record: newRecord, badge: "▶️" } },
       (response: any) => {
-        console.log("Start addRecord response ", response);
+        console.log("Start addRow response ", response);
       }
     );
   };
 
-  const handleDone = () => {
-    chrome.storage.sync.get(["range", "start"], (items: any) => {
-      const updateRecord = [
-        profile.name,
-        today,
-        record.company,
-        record.project,
-        record.description,
-        record.ticket,
-        0
-      ];
+  const handleUpdate = () => {
+    chrome.storage.local.get(["range"], ({ range }) => {
       chrome.runtime.sendMessage(
         {
-          message: "updateRecord",
-          range: items.range,
-          record: updateRecord
+          action: "updateRow",
+          payload: {
+            range: range,
+            record: record,
+            badge: "▶️"
+          }
         },
         (response: any) => {
-          console.log("Stop updateRecord response ", response);
+          console.log("Done updateRow response ", response);
         }
       );
       setAnchor(null);
@@ -159,41 +158,42 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
   };
 
   const handleStop = () => {
-    chrome.storage.sync.set({ isRunning: false });
-    chrome.storage.sync.get(["range", "start"], items => {
-      var hours = Math.abs(Date.now() - items.start) / 36e5;
-      const updateRecord = [
-        profile.name,
-        today,
-        record.company,
-        record.project,
-        record.description,
-        record.ticket,
-        hours
-      ];
-      chrome.runtime.sendMessage(
-        {
-          message: "updateRecord",
-          range: items.range,
-          record: updateRecord
-        },
-        (response: any) => {
-          console.log("Stop updateRecord response ", response);
-        }
-      );
-      setAnchor(null);
-    });
+    chrome.storage.local.get(
+      ["records", "range", "start"],
+      ({ records, range, start }) => {
+        const hours = Math.abs(Date.now() - start) / 36e5;
+        chrome.runtime.sendMessage(
+          {
+            action: "updateRow",
+            payload: {
+              range: range,
+              record: { ...record, time: hours }
+            }
+          },
+          (response: string) => {
+            const newRecord = { ...record, id: response };
+            chrome.storage.local.set({
+              isRunning: false,
+              records: [newRecord, ...records]
+            });
+            console.log("Stop updateRow response ", response);
+          }
+        );
+        setRecord(defaultRecord);
+        setAnchor(null);
+      }
+    );
   };
 
   return (
     <React.Fragment>
       <ButtonDetonate
         onClick={handleClick}
-        title={isRunning ? "Stop timer" : "Start timer"}
+        title={isRunning && isRunning ? "Stop timer" : "Start timer"}
       />
       <Popover
         keepMounted
-        open={open}
+        open={!!anchor}
         anchorEl={anchor}
         onClose={handleClose}
         anchorOrigin={{
@@ -216,22 +216,27 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
             id="description"
             placeholder="What are you doing?"
             name="description"
-            defaultValue={description}
+            value={description}
             inputRef={inputRef}
           />
           <Autocomplete
-            className={classes.autoComplete}
-            defaultValue={project}
-            options={projects ? projects : []}
+            multiple={false}
+            value={project && project}
+            options={projects && projects}
             onChange={(
               _event: React.ChangeEvent<{}>,
               newValue: ProjectType | null
             ): void => {
-              setRecord({
-                ...record,
-                project: newValue?.project,
-                company: newValue?.company
-              });
+              if (newValue) {
+                const { project, company } = newValue;
+                setRecord({
+                  ...record,
+                  project,
+                  company
+                });
+              }
+              setProject(newValue);
+              console.log(project);
             }}
             groupBy={(object: ProjectType): string => object.company}
             getOptionLabel={(object: ProjectType): string => object.project}
@@ -253,16 +258,15 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
             name="ticket"
             placeholder="Add ticket"
             id="ticket"
-            defaultValue={ticket}
+            value={ticket}
           />
-          <Divider className={classes.divider} />
           <Button
             fullWidth
             variant="contained"
             size="medium"
             color="secondary"
-            onClick={handleDone}
-            style={{ textTransform: "none" }}
+            onClick={handleUpdate}
+            className={classes.button}
           >
             Done
           </Button>

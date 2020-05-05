@@ -14,7 +14,7 @@ const Timer = (): JSX.Element => {
         <div className='w-full h-10'>
           <button
             type='button'
-            className='w-10 h-10 text-white bg-green-500 rounded-full shadow-md hover:bg-green-600'
+            className='w-10 h-10 text-white bg-green-600 rounded-full shadow-md hover:bg-green-500'
             aria-label='Play'
           >
             <Play className='h-4 m-2 fill-current stroke-2' />

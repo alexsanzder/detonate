@@ -1,61 +1,26 @@
-import * as React from "react";
+import React from 'react';
+import Header from './components/Header';
 
-import { CssBaseline } from "@material-ui/core";
-import Container from "@material-ui/core/Container";
-
-import AppProvider from "./contexts/AppProvider";
-import GoogleAuthContext from "./contexts/useGoogleAuth";
-import { useGoogle } from "./hooks/useGoogle";
-
-import NavBar from "./components/NavBar";
-import Login from "./components/Login";
-import Spinner from "./components/Spinner";
-import Timer from "./components/Timer";
-import Summary from "./components/Summary";
-import Footer from "./components/Footer";
-
-const discoveryDocs = [
-  "https://sheets.googleapis.com/$discovery/rest?version=v4"
-];
-const scope = [
-  "https://www.googleapis.com/auth/spreadsheets",
-  "https://www.googleapis.com/auth/drive.metadata"
-].join(" ");
-
-const Popup = (): JSX.Element => {
-  const googleAuth = useGoogle({
-    apiKey: process.env.REACT_APP_API_KEY,
-    clientId: process.env.REACT_APP_CLIENT_ID,
-    spreadsheetId: process.env.REACT_APP_SPREADSHEET_ID,
-    tableName: process.env.REACT_APP_TABLE_NAME,
-    discoveryDocs,
-    scope
-  });
-
+const Popup = () => {
   return (
-    <AppProvider>
-      <GoogleAuthContext.Provider value={googleAuth}>
-        {googleAuth.isInitialized ? (
-          <React.Fragment>
-            <CssBaseline />
-            {true ? (
-              <React.Fragment>
-                <NavBar />
-                <Timer />
-                <Container fixed>
-                  <Summary />
-                </Container>
-                <Footer />
-              </React.Fragment>
-            ) : (
-              <Login />
-            )}
-          </React.Fragment>
-        ) : (
-          <Spinner />
-        )}
-      </GoogleAuthContext.Provider>
-    </AppProvider>
+    <div className='w-full max-w-md bg-pink-500'>
+      <Header />
+      <p className='popup-greet'>
+        Thanks for using
+        <span className='brand'>Modern extension Boilerplate</span>
+      </p>
+      <p className='stack-head'>Made using :</p>
+      <p className='contrib-msg'>
+        We would love some of your help in making this boilerplate even better.
+        <br />
+        <a
+          href='https://www.github.com/kryptokinght/react-extension-boilerplate'
+          target='_blank'
+        >
+          React Extension Boilerplate
+        </a>
+      </p>
+    </div>
   );
 };
 

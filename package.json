@@ -59,6 +59,7 @@
     "react-app-polyfill": "^1.0.6",
     "react-dev-utils": "^10.2.1",
     "react-dom": "^16.13.1",
+    "react-feather": "^2.0.8",
     "resolve": "1.15.0",
     "resolve-url-loader": "3.1.1",
     "sass-loader": "8.0.2",
@@ -74,8 +75,9 @@
     "workbox-webpack-plugin": "4.3.1"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
+    "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
+    "start": "npm run build:style && node scripts/start.js",
+    "build": "npm run build:style && node scripts/build.js",
     "test": "node scripts/test.js"
   },
   "eslintConfig": {
@@ -145,5 +147,11 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.7.6",
+    "postcss-cli": "^7.1.1",
+    "tailwindcss": "^1.4.4",
+    "webextension-polyfill-ts": "^0.15.0"
   }
 }

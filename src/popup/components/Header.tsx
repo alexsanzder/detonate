@@ -8,12 +8,11 @@ const Header = (): JSX.Element => {
     setTheme(theme === 'darkTheme' ? 'lightTheme' : 'darkTheme');
   };
   return (
-    <div className='fixed top-0 z-30 flex items-center justify-between w-full h-12 px-4 py-2 text-white bg-teal-500 shadow-lg'>
+    <div className='fixed top-0 z-30 flex items-center justify-between w-full h-12 px-4 py-2 text-white bg-pink-600 shadow-lg'>
       <div>
         <svg
-          className='inline-block h-6 text-white stroke-0'
+          className='inline-block h-5 mb-1 text-white stroke-0'
           viewBox='0 0 143 24'
-          fill='none'
           xmlns='http://www.w3.org/2000/svg'
         >
           <path
@@ -22,17 +21,17 @@ const Header = (): JSX.Element => {
           />
         </svg>
       </div>
-      <div className='flex items-center justify-between text-right'>
+      <div className='flex items-center justify-between leading-snug text-right'>
         <button
           type='button'
-          className='w-8 h-8 ml-4 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
           aria-label='Sync Google Sheets'
         >
           <RefreshCw className='h-5 p-px m-1 stroke-2' />
         </button>
         <a
           type='button'
-          className='w-8 h-8 ml-4 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
           aria-label='Open Google Sheets'
           target='_blank'
           rel='noopener noreferrer'
@@ -42,7 +41,7 @@ const Header = (): JSX.Element => {
         </a>
         <button
           type='button'
-          className='w-8 h-8 ml-4 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
           onClick={handleTheme}
           aria-label='Toggle Dark/Light mode'
         >
@@ -54,7 +53,7 @@ const Header = (): JSX.Element => {
         </button>
         <button
           type='button'
-          className='w-8 h-8 ml-4 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 ml-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
           aria-label='Toggle Dark/Light mode'
         >
           <User className='h-5 p-px m-1 stroke-2' />

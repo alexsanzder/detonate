@@ -1,25 +1,16 @@
 import React from 'react';
 import Header from './components/Header';
+import Timer from './components/Timer';
+import Footer from './components/Footer';
+import Summary from './components/Summary';
 
 const Popup = () => {
   return (
-    <div className='w-full max-w-md bg-pink-500'>
+    <div className='absolute w-full'>
       <Header />
-      <p className='popup-greet'>
-        Thanks for using
-        <span className='brand'>Modern extension Boilerplate</span>
-      </p>
-      <p className='stack-head'>Made using :</p>
-      <p className='contrib-msg'>
-        We would love some of your help in making this boilerplate even better.
-        <br />
-        <a
-          href='https://www.github.com/kryptokinght/react-extension-boilerplate'
-          target='_blank'
-        >
-          React Extension Boilerplate
-        </a>
-      </p>
+      <Timer />
+      <Summary />
+      <Footer />
     </div>
   );
 };

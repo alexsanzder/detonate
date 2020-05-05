@@ -8,7 +8,7 @@ import { RecordType } from '../../hooks/useGoogle';
 const Summary = (): JSX.Element => {
   browser.runtime.sendMessage({ data: 'ready' });
 
-  const [records, setRecords] = React.useState<any[]>();
+  const [records, setRecords] = React.useState<any[]>([]);
   const [record, setRecord] = React.useState<any>();
   const [isRunning, setIsRunning] = React.useState<boolean>(false);
 
@@ -45,9 +45,9 @@ const Summary = (): JSX.Element => {
   };
 
   const data = groupBy(records, 'date');
-  console.log(data);
+
   return (
-    <div className='flex flex-col items-center justify-center w-full px-3 mt-32'>
+    <div className='flex flex-col items-center justify-center w-full px-3 pt-2 mt-32'>
       {data ? (
         Object.keys(data).map((date: string) => (
           <div className='w-full px-3 m-3 text-gray-800 border rounded-md shadow-sm'>

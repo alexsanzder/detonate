@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { RefreshCw, ExternalLink, Sun, Moon, User } from 'react-feather';
 
+const SHEET_ID = +process.env.REACT_APP_SHEET_ID;
+
 const Header = (): JSX.Element => {
   const [theme, setTheme] = React.useState('lightTheme');
 
@@ -8,7 +10,7 @@ const Header = (): JSX.Element => {
     setTheme(theme === 'darkTheme' ? 'lightTheme' : 'darkTheme');
   };
   return (
-    <div className='fixed top-0 z-30 flex items-center justify-between w-full h-12 px-4 py-2 text-white bg-pink-600 shadow-lg'>
+    <div className='absolute z-30 flex items-center justify-between w-full h-12 px-4 py-2 text-white shadow-lg bg-magenta-500'>
       <div>
         <svg
           className='inline-block h-5 mb-1 text-white stroke-0'
@@ -35,7 +37,7 @@ const Header = (): JSX.Element => {
           aria-label='Open Google Sheets'
           target='_blank'
           rel='noopener noreferrer'
-          href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=`}
+          href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${SHEET_ID}`}
         >
           <ExternalLink className='h-5 p-px m-1 stroke-2' />
         </a>

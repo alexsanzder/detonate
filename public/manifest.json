@@ -3,19 +3,19 @@
     "name": "Detonate time trackig using Google Sheets",
     "short_name": "Detonate time tracker",
     "description": "Track time on projects and tasks using Google Sheets.",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "icons": {
-        "16": "logo16.png",
-        "32": "logo32.png",
-        "48": "logo48.png",
-        "128": "logo128.png"
+        "16": "icons/logo16.png",
+        "32": "icons/logo32.png",
+        "48": "icons/logo48.png",
+        "128": "icons/logo128.png"
     },
     "browser_action": {
         "default_icon": {
-            "16": "logo16.png",
-            "32": "logo32.png",
-            "48": "logo48.png",
-            "128": "logo128.png"
+            "16": "icons/logo16.png",
+            "32": "icons/logo32.png",
+            "48": "icons/logo48.png",
+            "128": "icons/logo128.png"
         },
         "default_popup": "popup.html"
     },
@@ -25,14 +25,17 @@
                 "<all_urls>"
             ],
             "js": [
+                "./lib/browser-polyfill.js",
+                "./lib/gapi-client.js",
                 "./static/js/content.js"
             ]
         }
     ],
     "background": {
         "scripts": [
-            "./static/js/background.js",
-            "./gapi-client.js"
+            "./lib/browser-polyfill.js",
+            "./lib/gapi-client.js",
+            "./static/js/background.js"
         ],
         "persistent": false
     },

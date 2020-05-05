@@ -68,7 +68,7 @@ const resolveModule = (resolveFn, filePath) => {
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
-  appBuild: resolveApp('build'),
+  appBuild: resolveApp('extension'),
   appPublic: resolveApp('public'),
   appPages: [
     {
@@ -78,8 +78,8 @@ module.exports = {
       appIndexJs: resolveModule(resolveApp, 'src/popup/index'),
     },
     {
-      name: 'content_scripts',
-      title: 'content_scripts',
+      name: 'content',
+      title: 'content',
       appHtml: resolveApp('src/content_scripts/template.html'),
       appIndexJs: resolveModule(resolveApp, 'src/content_scripts/index'),
     },

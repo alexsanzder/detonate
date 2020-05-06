@@ -35,6 +35,9 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   console.log(message);
   const { action, payload } = message;
   switch (action) {
+    case 'loadTable':
+      await loadTable();
+      break;
     case 'addRow':
       await addRow(payload);
       break;
@@ -52,13 +55,8 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 });
 
 // Load table
-const loadTable = async (token: string): Promise<any> => {
+const loadTable = async (): Promise<any> => {
   console.log('Loading table...');
-  const userInfo = await fetch(
-    `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${token}`
-  );
-  const profile = await userInfo.json();
-  chrome.storage.local.set({ profile });
   const response = await gapi.client.sheets.spreadsheets.values.batchGet({
     spreadsheetId: SPREADSHEET_ID,
     valueRenderOption: 'UNFORMATTED_VALUE',
@@ -110,7 +108,7 @@ const loadTable = async (token: string): Promise<any> => {
     });
   }
 
-  // save in the local storage
+  // save table data in the brower local storage
   chrome.storage.local.set(
     {
       projects,
@@ -119,36 +117,7 @@ const loadTable = async (token: string): Promise<any> => {
       isRunning: lastRecord.time === 0,
     },
     () => {
-      console.log('Data stored...');
-      // chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-      //   if (changeInfo.status === 'complete') {
-      //     await chrome.tabs.query(
-      //       { active: true, currentWindow: true },
-      //       (tabs) => {
-      //         const port = chrome.tabs.connect(tabs[0].id);
-      //         port.postMessage({ message: changeInfo.status });
-      //         port.onMessage.addListener((response) => {
-      //           console.log(response);
-      //         });
-      //       }
-      //     );
-      //   }
-      // });
-      // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      //   if (changeInfo.status === "complete") {
-      //     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      //       chrome.tabs.sendMessage(
-      //         tabs[0].id,
-      //         { message: "ready" },
-      //         response => {
-      //           console.log(
-      //             `message response to bakground: ${JSON.stringify(response)}`
-      //           );
-      //         }
-      //       );
-      //     });
-      //   }
-      // });
+      console.log('Table data stored...');
     }
   );
 };
@@ -231,10 +200,17 @@ const authorize = () => {
       },
       () => {
         console.log('Loading Sheets API...');
-        gapi.client.load('sheets', 'v4', () => {
+        gapi.client.load('sheets', 'v4', async () => {
           console.log('Setting access token...');
           gapi.client.setToken({ access_token: token });
-          loadTable(token);
+          console.log('Getting User info...');
+          const userInfo = await fetch(
+            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${token}`
+          );
+          const profile = await userInfo.json();
+          chrome.storage.local.set({ profile });
+
+          loadTable();
         });
       }
     );

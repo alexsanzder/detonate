@@ -12,6 +12,10 @@ const Summary = (): JSX.Element => {
     chrome.storage.local.get(['records'], (items) => {
       setRecords(items.records);
     });
+
+    chrome.storage.onChanged.addListener((changes: any) => {
+      console.log(changes);
+    });
   }, []);
 
   const groupBy = (array: any[], key: string): any => {

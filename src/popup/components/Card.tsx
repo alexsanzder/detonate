@@ -6,7 +6,7 @@ import { RecordType } from '../../hooks/useGoogle';
 import { getTimeFormated } from '../../utils/time';
 
 const RecordTime = styled.div(({ time }: any) => [
-  tw`flex items-center justify-between tracking-tighter`,
+  tw`flex items-center justify-between tracking-tight`,
   time < 0.5 && tw`font-semibold text-red-600`,
 ]);
 

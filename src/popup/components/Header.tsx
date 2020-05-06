@@ -1,13 +1,37 @@
 import * as React from 'react';
+import { browser } from 'webextension-polyfill-ts';
 import { RefreshCw, ExternalLink, Sun, Moon, User } from 'react-feather';
 
 const SHEET_ID = +process.env.REACT_APP_SHEET_ID;
 
+export interface ProfileType {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
+  locale: string;
+}
+
 const Header = (): JSX.Element => {
   const [theme, setTheme] = React.useState('lightTheme');
+  const [profile, setProfile] = React.useState<ProfileType | null>(null);
+
+  React.useEffect(() => {
+    chrome.storage.local.get(['profile'], (items) => {
+      setProfile(items.profile);
+    });
+  }, []);
 
   const handleTheme = (): void => {
     setTheme(theme === 'darkTheme' ? 'lightTheme' : 'darkTheme');
+  };
+  const handleSync = (): void => {
+    browser.runtime.sendMessage({
+      action: 'loadTable',
+    });
   };
   return (
     <div className='absolute z-30 flex items-center justify-between w-full h-12 px-4 py-2 text-white shadow-lg bg-magenta-500'>
@@ -26,39 +50,47 @@ const Header = (): JSX.Element => {
       <div className='flex items-center justify-between leading-snug text-right'>
         <button
           type='button'
-          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
+          className='flex items-center justify-center block w-8 h-8 m-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='Sync Google Sheets'
+          onClick={handleSync}
         >
-          <RefreshCw className='h-5 p-px m-1 stroke-2' />
+          <RefreshCw className='stroke-2' height='20' width='20' />
         </button>
         <a
-          type='button'
-          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
+          className='flex items-center justify-center block w-8 h-8 m-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='Open Google Sheets'
           target='_blank'
           rel='noopener noreferrer'
           href={`https://docs.google.com/spreadsheets/d/1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48/edit#gid=${SHEET_ID}`}
         >
-          <ExternalLink className='h-5 p-px m-1 stroke-2' />
+          <ExternalLink className='stroke-2' height='20' width='20' />
         </a>
         <button
           type='button'
-          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
+          className='flex items-center justify-center block w-8 h-8 m-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           onClick={handleTheme}
           aria-label='Toggle Dark/Light mode'
         >
           {theme === 'lightTheme' ? (
-            <Sun className='h-5 p-px m-1 stroke-2' />
+            <Sun className='stroke-2' height='20' width='20' />
           ) : (
-            <Moon className='h-5 p-px m-1 stroke-2' />
+            <Moon className='stroke-2' height='20' width='20' />
           )}
         </button>
         <button
           type='button'
-          className='w-8 h-8 ml-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
-          aria-label='Toggle Dark/Light mode'
+          className='flex items-center justify-center block w-8 h-8 m-1 ml-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
+          aria-label='User profile'
         >
-          <User className='h-5 p-px m-1 stroke-2' />
+          {profile ? (
+            <img
+              className='w-6 h-6 rounded-full'
+              src={profile.picture}
+              alt={profile.name}
+            />
+          ) : (
+            <User className='stroke-2' height='20' width='20' />
+          )}
         </button>
       </div>
     </div>

@@ -62,7 +62,7 @@ const Timer = (): JSX.Element => {
       className='flex items-center justify-between w-full h-24 px-4 mt-12 bg-white border-b shadow-sm'
       onSubmit={handleSubmit}
     >
-      <div className='flex items-center justify-between w-full mr-3 border-b border-gray-400 hover:border-blue-500 focus-within:border-magenta-500'>
+      <div className='flex items-center justify-between w-full mr-3 border-b border-gray-400 hover:border-magenta-400 focus-within:border-magenta-500'>
         <input
           className='w-full h-10 px-1 pb-2 mt-2 mr-1 text-lg text-gray-900 focus:outline-none'
           placeholder='What are you working on?'

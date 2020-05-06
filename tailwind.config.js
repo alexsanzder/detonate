@@ -1,6 +1,12 @@
+const { boxShadow } = require('tailwindcss/defaultTheme');
+
 module.exports = {
   purge: ['./src/**/*.html', './src/**/*.tsx', './src/**/*.jsx'],
   theme: {
+    boxShadow: {
+      ...boxShadow,
+      focus: '0 0 0 3px rgba(225, 0, 117, 0.5)',
+    },
     extend: {
       colors: {
         magenta: {

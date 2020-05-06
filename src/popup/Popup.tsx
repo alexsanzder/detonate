@@ -11,7 +11,6 @@ const Popup = () => {
         <Header />
         <Timer />
       </div>
-
       <Summary />
       <Footer />
     </div>

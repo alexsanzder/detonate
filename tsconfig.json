@@ -22,5 +22,5 @@
       "node"
     ]
   },
-  "include": ["src/*"]
+  "include": ["src/*", "tailwind.config.js"]
 }

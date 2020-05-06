@@ -8,6 +8,15 @@
     "type": "git",
     "url": "https://github.com/alexsanzder/detonate"
   },
+  "babelMacros": {
+    "twin": {
+      "config": "./tailwind.config.js",
+      "styled": "@emotion/styled",
+      "format": "auto",
+      "hasSuggestions": true,
+      "debug": true
+    }
+  },
   "dependencies": {
     "@babel/core": "7.9.0",
     "@material-ui/core": "^4.9.7",
@@ -155,9 +164,12 @@
     ]
   },
   "devDependencies": {
+    "@emotion/core": "^10.0.28",
+    "@emotion/styled": "^10.0.27",
     "autoprefixer": "^9.7.6",
     "postcss-cli": "^7.1.1",
     "tailwindcss": "^1.4.4",
+    "twin.macro": "^1.0.0-alpha.10",
     "webextension-polyfill-ts": "^0.15.0"
   }
 }

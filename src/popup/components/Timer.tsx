@@ -2,6 +2,7 @@ import * as React from 'react';
 import styled from '@emotion/styled/macro';
 import tw from 'twin.macro';
 import { Play, Edit3, Square } from 'react-feather';
+import Edit from './Edit';
 
 interface IButtonPlay {
   isRunning: boolean;
@@ -14,6 +15,7 @@ const ButtonPlay = styled.button(({ isRunning }: IButtonPlay) => [
 
 const Timer = (): JSX.Element => {
   const [isRunning, setRunning] = React.useState(false);
+  const [showModal, setShowModal] = React.useState(false);
 
   const handlePlay = async (): Promise<void> => {
     setRunning(!isRunning);
@@ -50,6 +52,7 @@ const Timer = (): JSX.Element => {
           )}
         </ButtonPlay>
       </div>
+      {isRunning && <Edit open={isRunning} setShowModal={setShowModal} />}
     </div>
   );
 };

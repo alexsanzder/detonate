@@ -6,13 +6,15 @@ import Summary from './components/Summary';
 
 const Popup = () => {
   return (
-    <div className='w-screen max-w-md'>
+    <div className='h-full pt-32'>
       <div className='fixed top-0 w-full'>
         <Header />
         <Timer />
       </div>
-      <Summary />
-      <Footer />
+      <div className='h-full p-3 overflow-y-scroll'>
+        <Summary />
+        <Footer />
+      </div>
     </div>
   );
 };

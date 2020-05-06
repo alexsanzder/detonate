@@ -27,7 +27,7 @@ const Summary = (): JSX.Element => {
   const itemsRecords = groupBy(records, 'date');
 
   return (
-    <div className='flex flex-col items-center justify-center w-full px-3 pt-2 mt-32'>
+    <div className='flex flex-col items-center justify-center w-full'>
       {itemsRecords ? (
         Object.keys(itemsRecords).map((date: string) => (
           <Card records={itemsRecords} date={date} />

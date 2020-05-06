@@ -19,7 +19,8 @@
       "gapi.people",
       "gapi.client.sheets",
       "jest",
-      "node"
+      "node",
+      "@emotion/core"
     ]
   },
   "include": ["src/*", "tailwind.config.js"]

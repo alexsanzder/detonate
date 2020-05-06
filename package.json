@@ -8,14 +8,11 @@
     "type": "git",
     "url": "https://github.com/alexsanzder/detonate"
   },
-  "babelMacros": {
-    "twin": {
-      "config": "./tailwind.config.js",
-      "styled": "@emotion/styled",
-      "format": "auto",
-      "hasSuggestions": true,
-      "debug": true
-    }
+  "scripts": {
+    "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
+    "start": "yarn build:style && node scripts/start.js",
+    "build": "yarn build:style && node scripts/build.js",
+    "test": "node scripts/test.js"
   },
   "dependencies": {
     "@babel/core": "7.9.0",
@@ -89,11 +86,14 @@
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "4.3.1"
   },
-  "scripts": {
-    "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "start": "yarn build:style && node scripts/start.js",
-    "build": "yarn build:style && node scripts/build.js",
-    "test": "node scripts/test.js"
+  "devDependencies": {
+    "@emotion/core": "^10.0.28",
+    "@emotion/styled": "^10.0.27",
+    "autoprefixer": "^9.7.6",
+    "postcss-cli": "^7.1.1",
+    "tailwindcss": "^1.4.4",
+    "twin.macro": "^1.0.0-alpha.10",
+    "webextension-polyfill-ts": "^0.15.0"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -163,13 +163,14 @@
       "react-app"
     ]
   },
-  "devDependencies": {
-    "@emotion/core": "^10.0.28",
-    "@emotion/styled": "^10.0.27",
-    "autoprefixer": "^9.7.6",
-    "postcss-cli": "^7.1.1",
-    "tailwindcss": "^1.4.4",
-    "twin.macro": "^1.0.0-alpha.10",
-    "webextension-polyfill-ts": "^0.15.0"
+  "babelMacros": {
+    "twin": {
+      "config": "./tailwind.config.js",
+      "styled": "@emotion/styled",
+      "format": "auto",
+      "hasSuggestions": true,
+      "debug": true
+    }
   }
+
 }

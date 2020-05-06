@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from '@emotion/styled/macro';
 import tw from 'twin.macro';
-import { Play, Edit2, AlertTriangle } from 'react-feather';
+import { Play, Edit3, AlertTriangle } from 'react-feather';
 import { RecordType } from '../../hooks/useGoogle';
 import { getTimeFormated } from '../../utils/time';
 
@@ -34,7 +34,7 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
   };
 
   return (
-    <div className='w-full px-3 m-3 border rounded-md shadow-sm'>
+    <div className='w-full px-3 mb-3 border rounded-md shadow-sm'>
       <div className='flex items-center justify-between py-4 text-base font-semibold text-gray-800'>
         <div className='tracking-tight'>{formatedDate(date)}</div>
         <div className='tracking-tighter'>{totalTime(records[date])}</div>
@@ -82,8 +82,8 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 className='p-2 mx-1 rounded-full hover:text-blue-500 hover:bg-gray-300 hover:bg-opacity-50 focus:outline-none focus:shadow-outline'
                 aria-label='Edit this record'
               >
-                <Edit2
-                  className='fill-current stroke-0'
+                <Edit3
+                  className='fill-current stroke-2'
                   width='16'
                   height='16'
                 />
@@ -94,7 +94,7 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 aria-label='Continue tracking whith this record'
               >
                 <Play
-                  className='fill-current stroke-0'
+                  className='fill-current stroke-1'
                   width='16'
                   height='16'
                 />

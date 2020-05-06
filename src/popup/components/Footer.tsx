@@ -3,7 +3,7 @@ const SHEET_ID = +process.env.REACT_APP_SHEET_ID;
 
 const Footer = (): JSX.Element => {
   return (
-    <div className='m-6 text-center'>
+    <div className='m-5 text-center'>
       <a
         className='px-4 py-2 text-sm border rounded-md shadow-sm text-magenta-500 border-magenta-500 hover:bg-magenta-500 hover:text-white hover:border-transparent'
         aria-label='See more on Google Sheets'

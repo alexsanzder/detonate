@@ -5,7 +5,7 @@ const Footer = (): JSX.Element => {
   return (
     <div className='m-5 text-center'>
       <a
-        className='px-4 py-2 text-sm border rounded-md shadow-sm text-magenta-500 border-magenta-500 hover:bg-magenta-500 hover:text-white hover:border-transparent'
+        className='px-5 py-3 text-sm border rounded-md shadow-sm text-magenta-500 border-magenta-500 hover:bg-magenta-500 hover:text-white hover:border-transparent'
         aria-label='See more on Google Sheets'
         target='_blank'
         rel='noopener noreferrer'

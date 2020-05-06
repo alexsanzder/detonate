@@ -6,7 +6,7 @@ import Summary from './components/Summary';
 
 const Popup = () => {
   return (
-    <div className='h-full pt-32'>
+    <div className='h-full pt-36'>
       <div className='fixed top-0 w-full'>
         <Header />
         <Timer />

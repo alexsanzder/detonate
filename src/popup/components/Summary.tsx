@@ -3,12 +3,10 @@ import { browser } from 'webextension-polyfill-ts';
 
 import Card from './Card';
 
-browser.runtime.sendMessage({ data: 'ready' });
+browser.runtime.sendMessage({ action: 'ready' });
 
 const Summary = (): JSX.Element => {
   const [records, setRecords] = React.useState<any[]>([]);
-  const [record, setRecord] = React.useState<any>();
-  const [isRunning, setIsRunning] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     chrome.storage.local.get(['records'], (items) => {

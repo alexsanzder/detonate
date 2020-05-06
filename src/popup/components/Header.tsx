@@ -26,14 +26,14 @@ const Header = (): JSX.Element => {
       <div className='flex items-center justify-between leading-snug text-right'>
         <button
           type='button'
-          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='Sync Google Sheets'
         >
           <RefreshCw className='h-5 p-px m-1 stroke-2' />
         </button>
         <a
           type='button'
-          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='Open Google Sheets'
           target='_blank'
           rel='noopener noreferrer'
@@ -43,7 +43,7 @@ const Header = (): JSX.Element => {
         </a>
         <button
           type='button'
-          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 mx-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           onClick={handleTheme}
           aria-label='Toggle Dark/Light mode'
         >
@@ -55,7 +55,7 @@ const Header = (): JSX.Element => {
         </button>
         <button
           type='button'
-          className='w-8 h-8 ml-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25'
+          className='w-8 h-8 ml-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='Toggle Dark/Light mode'
         >
           <User className='h-5 p-px m-1 stroke-2' />

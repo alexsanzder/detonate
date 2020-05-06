@@ -30,8 +30,25 @@ interface RecordType {
 /* eslint-disable no-undef */
 console.log('Background.js file loaded');
 
-chrome.runtime.onMessage.addListener(function (message) {
+// Lisener for actions
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   console.log(message);
+  const { action, payload } = message;
+  switch (action) {
+    case 'addRow':
+      await addRow(payload);
+      break;
+    case 'updateRow':
+      await updateRow(payload);
+      break;
+    case 'deleteRow':
+      await deleteRow(payload);
+      break;
+    default:
+      break;
+  }
+  // Callback for that request
+  sendResponse({ message: `Background action: ${action}` });
 });
 
 // Load table
@@ -86,7 +103,6 @@ const loadTable = async (token: string): Promise<any> => {
       .filter((record) => record.time !== undefined);
 
   // Last record
-  // const lastRecord = records.pop();
   const lastRecord = records.slice(-1)[0];
   if (lastRecord.time === 0) {
     chrome.browserAction.setBadgeText({
@@ -135,6 +151,73 @@ const loadTable = async (token: string): Promise<any> => {
       // });
     }
   );
+};
+
+// Add new row
+const addRow = async ({ record, badge = '' }): Promise<any> => {
+  chrome.storage.local.set({ isRunning: true, start: Date.now(), record });
+  const values = Object.values(record);
+
+  const response = await gapi.client.sheets.spreadsheets.values.append({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${TABLE_NAME}!A2:G2`,
+    valueInputOption: 'USER_ENTERED',
+    insertDataOption: 'INSERT_ROWS',
+    resource: {
+      values: [values],
+    },
+  });
+
+  const {
+    result: {
+      updates: { updatedRange },
+    },
+  } = response;
+
+  chrome.browserAction.setBadgeText({ text: badge });
+  chrome.storage.local.set({ range: updatedRange });
+};
+
+// Update row
+const updateRow = async ({ range, record, badge = '' }): Promise<any> => {
+  const values = Object.values(record);
+
+  const response = await gapi.client.sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: range,
+    valueInputOption: 'USER_ENTERED',
+    resource: {
+      values: [values],
+    },
+  });
+
+  const {
+    result: { updatedRange },
+  } = response;
+
+  chrome.browserAction.setBadgeText({ text: badge });
+  return updatedRange;
+};
+
+// Delete row
+const deleteRow = async ({ index }): Promise<any> => {
+  return await gapi.client.sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SPREADSHEET_ID,
+    resource: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: SHEET_ID,
+              dimension: 'ROWS',
+              startIndex: index - 1,
+              endIndex: index,
+            },
+          },
+        },
+      ],
+    },
+  });
 };
 
 const authorize = () => {

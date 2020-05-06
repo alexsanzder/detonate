@@ -1,4 +1,4 @@
-const { boxShadow } = require('tailwindcss/defaultTheme');
+const { boxShadow, margin } = require('tailwindcss/defaultTheme');
 
 module.exports = {
   purge: ['./src/**/*.html', './src/**/*.tsx', './src/**/*.jsx'],
@@ -8,6 +8,9 @@ module.exports = {
       focus: '0 0 0 3px rgba(225, 0, 117, 0.5)',
     },
     extend: {
+      spacing: {
+        '36': '9rem',
+      },
       colors: {
         magenta: {
           '100': '#FCE6F1',

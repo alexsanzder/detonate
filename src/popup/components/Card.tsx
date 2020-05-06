@@ -34,7 +34,7 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
   };
 
   return (
-    <div className='w-full px-3 mb-3 border rounded-md shadow-sm'>
+    <div className='w-full px-3 mb-4 border rounded-md shadow-sm'>
       <div className='flex items-center justify-between py-4 text-base font-semibold text-gray-800'>
         <div className='tracking-tight'>{formatedDate(date)}</div>
         <div className='tracking-tighter'>{totalTime(records[date])}</div>
@@ -61,17 +61,17 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
           <div className='flex items-center justify-between pt-2 pb-4'>
             <div className='flex items-center justify-between'>
               {record.company && (
-                <div className='inline-flex items-center h-6 px-2 mx-0 text-xs font-medium tracking-tighter bg-gray-300 bg-opacity-50 rounded-md'>
+                <div className='inline-flex items-center h-6 px-2 mx-0 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
                   {record.company}
                 </div>
               )}
               {record.project && (
-                <div className='inline-flex items-center h-6 px-2 mx-1 text-xs font-medium tracking-tighter bg-gray-300 bg-opacity-50 rounded-md'>
+                <div className='inline-flex items-center h-6 px-2 mx-1 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
                   {record.project}
                 </div>
               )}
               {record.ticket && (
-                <div className='inline-flex items-center h-6 px-2 mx-1 text-xs font-medium tracking-tighter bg-gray-300 bg-opacity-50 rounded-md'>
+                <div className='inline-flex items-center h-6 px-2 mx-1 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
                   {record.ticket}
                 </div>
               )}

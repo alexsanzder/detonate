@@ -2,8 +2,9 @@ import * as React from 'react';
 import styled from '@emotion/styled/macro';
 import tw from 'twin.macro';
 import { Play, Edit3, AlertTriangle } from 'react-feather';
-import { RecordType } from '../../hooks/useGoogle';
+
 import { getTimeFormated } from '../../utils/time';
+import { RecordType } from '../../@types';
 
 const RecordTime = styled.div(({ time }: any) => [
   tw`flex items-center justify-between tracking-tight`,
@@ -11,7 +12,7 @@ const RecordTime = styled.div(({ time }: any) => [
 ]);
 
 export interface CardProps {
-  records: any;
+  records: RecordType[];
   date: string;
 }
 
@@ -82,22 +83,14 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 className='p-2 mx-1 rounded-full hover:text-blue-500 hover:bg-gray-300 hover:bg-opacity-50 focus:outline-none focus:shadow-outline'
                 aria-label='Edit this record'
               >
-                <Edit3
-                  className='fill-current stroke-2'
-                  width='16'
-                  height='16'
-                />
+                <Edit3 className='fill-current stroke-2' width='16' height='16' />
               </button>
               <button
                 type='button'
                 className='p-2 ml-1 rounded-full hover:text-green-600 hover:bg-gray-300 hover:bg-opacity-50 focus:outline-none focus:shadow-outline'
                 aria-label='Continue tracking whith this record'
               >
-                <Play
-                  className='fill-current stroke-1'
-                  width='16'
-                  height='16'
-                />
+                <Play className='fill-current stroke-1' width='16' height='16' />
               </button>
             </div>
           </div>

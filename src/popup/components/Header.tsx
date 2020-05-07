@@ -2,39 +2,36 @@ import * as React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 import { RefreshCw, ExternalLink, Sun, Moon, User } from 'react-feather';
 
-const SHEET_ID = +process.env.REACT_APP_SHEET_ID;
+import { ProfileType, MessageType } from '../../@types';
 
-export interface ProfileType {
-  id: string;
-  email: string;
-  verified_email: boolean;
-  name: string;
-  given_name: string;
-  family_name: string;
-  picture: string;
-  locale: string;
-}
+const SHEET_ID = +process.env.REACT_APP_SHEET_ID;
 
 const Header = (): JSX.Element => {
   const [theme, setTheme] = React.useState('lightTheme');
   const [profile, setProfile] = React.useState<ProfileType | null>(null);
 
   React.useEffect(() => {
-    chrome.storage.local.get(['profile'], (items) => {
+    (async (): Promise<void> => {
+      const items = await browser.storage.local.get(['profile']);
       setProfile(items.profile);
-    });
+    })();
   }, []);
 
   const handleTheme = (): void => {
     setTheme(theme === 'darkTheme' ? 'lightTheme' : 'darkTheme');
   };
-  const handleSync = (): void => {
-    browser.runtime.sendMessage({
-      action: 'loadTable',
-    });
+
+  const handleSync = async (): Promise<void> => {
+    const message: MessageType = {
+      action: 'LOAD_TABLE',
+    };
+
+    const response = await browser.runtime.sendMessage(message);
+    console.log('LOAD_TABLE response ', response);
   };
+
   return (
-    <div className='absolute z-30 flex items-center justify-between w-full h-12 px-4 py-2 text-white shadow-lg bg-magenta-500'>
+    <div className='absolute z-30 flex items-center justify-between w-full h-12 py-2 pl-4 pr-3 text-white shadow-lg bg-magenta-500'>
       <div>
         <svg
           className='inline-block h-5 mb-1 text-white stroke-0'
@@ -79,15 +76,11 @@ const Header = (): JSX.Element => {
         </button>
         <button
           type='button'
-          className='flex items-center justify-center block w-8 h-8 m-1 ml-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
+          className='flex items-center justify-center block w-8 h-8 m-1 ml-1 mr-px rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='User profile'
         >
           {profile ? (
-            <img
-              className='w-6 h-6 rounded-full'
-              src={profile.picture}
-              alt={profile.name}
-            />
+            <img className='w-6 h-6 rounded-full' src={profile.picture} alt={profile.name} />
           ) : (
             <User className='stroke-2' height='20' width='20' />
           )}

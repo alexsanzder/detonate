@@ -16,6 +16,17 @@ export interface EditProps {
 }
 
 const Edit = ({ timer, onClose }: EditProps): JSX.Element => {
+  const descriptionRef = React.useRef<HTMLInputElement>(null);
+  const [projects, setProjects] = React.useState<ProjectsType | null>(null);
+
+  // Initial Effect
+  React.useEffect(() => {
+    descriptionRef?.current.focus();
+    chrome.storage.local.get(['projects'], (items) => {
+      setProjects(items.projects);
+    });
+  }, []);
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-white'>
       <div className='relative w-full max-w-sm mx-auto'>
@@ -23,6 +34,7 @@ const Edit = ({ timer, onClose }: EditProps): JSX.Element => {
           {timer}
         </div>
         <input
+          ref={descriptionRef}
           className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add description'
         />

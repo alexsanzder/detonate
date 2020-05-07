@@ -1,4 +1,6 @@
 /* global chrome gapi */
+import { browser } from 'webextension-polyfill-ts';
+
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 const SPREADSHEET_ID = process.env.REACT_APP_SPREADSHEET_ID;
 const SHEET_ID = +process.env.REACT_APP_SHEET_ID;
@@ -9,53 +11,13 @@ const SCOPE = [
   'https://www.googleapis.com/auth/spreadsheets',
 ].join(' ');
 
-interface ProjectType {
-  id: string;
-  company: string;
-  project: string;
-  details: string;
-}
-
-interface RecordType {
-  id?: string;
-  name?: string;
-  date?: string;
-  company: string;
-  project: string;
-  description: string;
-  ticket: string;
-  time: number;
-}
+import { ProjectType, RecordType } from '../@types';
 
 /* eslint-disable no-undef */
-console.log('Background.js file loaded');
-
-// Lisener for actions
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-  console.log(message);
-  const { action, payload } = message;
-  switch (action) {
-    case 'loadTable':
-      await loadTable();
-      break;
-    case 'addRow':
-      await addRow(payload);
-      break;
-    case 'updateRow':
-      await updateRow(payload);
-      break;
-    case 'deleteRow':
-      await deleteRow(payload);
-      break;
-    default:
-      break;
-  }
-  // Callback for that request
-  sendResponse({ message: `Background action: ${action}` });
-});
+console.log('Background.js file loaded!');
 
 // Load table
-const loadTable = async (): Promise<any> => {
+const loadTable = async (): Promise<void> => {
   console.log('Loading table...');
   const response = await gapi.client.sheets.spreadsheets.values.batchGet({
     spreadsheetId: SPREADSHEET_ID,
@@ -78,7 +40,7 @@ const loadTable = async (): Promise<any> => {
           project: value[1],
           details: value[0],
         };
-      }
+      },
     );
 
   const records =
@@ -96,37 +58,33 @@ const loadTable = async (): Promise<any> => {
             ticket: value[5],
             time: value[6],
           };
-        }
+        },
       )
       .filter((record) => record.time !== undefined);
 
   // Last record
   const lastRecord = records.slice(-1)[0];
   if (lastRecord.time === 0) {
-    chrome.browserAction.setBadgeText({
+    browser.browserAction.setBadgeText({
       text: '▶️',
     });
   }
 
   // save table data in the brower local storage
-  chrome.storage.local.set(
-    {
-      projects,
-      range: lastRecord.id,
-      records: records.slice(Math.max(records.length - 15, 0)).reverse(),
-      isRunning: lastRecord.time === 0,
-    },
-    () => {
-      console.log('Table data stored...');
-    }
-  );
+  browser.storage.local.set({
+    projects,
+    range: lastRecord.id,
+    records: records.slice(Math.max(records.length - 15, 0)).reverse(),
+    isRunning: lastRecord.time === 0,
+  });
+
+  console.log('Table Data stored!');
 };
 
 // Add new row
-const addRow = async ({ record, badge = '' }): Promise<any> => {
-  chrome.storage.local.set({ isRunning: true, start: Date.now(), record });
+const addRow = async ({ record }): Promise<any> => {
+  browser.storage.local.set({ isRunning: true, start: Date.now(), record });
   const values = Object.values(record);
-
   const response = await gapi.client.sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
     range: `${TABLE_NAME}!A2:G2`,
@@ -143,14 +101,13 @@ const addRow = async ({ record, badge = '' }): Promise<any> => {
     },
   } = response;
 
-  chrome.browserAction.setBadgeText({ text: badge });
-  chrome.storage.local.set({ range: updatedRange });
+  return updatedRange;
 };
 
 // Update row
-const updateRow = async ({ range, record, badge = '' }): Promise<any> => {
+const updateRow = async ({ range, record, badge = '' }): Promise<string> => {
+  browser.browserAction.setBadgeText({ text: badge });
   const values = Object.values(record);
-
   const response = await gapi.client.sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
     range: range,
@@ -163,8 +120,7 @@ const updateRow = async ({ range, record, badge = '' }): Promise<any> => {
   const {
     result: { updatedRange },
   } = response;
-
-  chrome.browserAction.setBadgeText({ text: badge });
+  console.log(updatedRange);
   return updatedRange;
 };
 
@@ -189,11 +145,59 @@ const deleteRow = async ({ index }): Promise<any> => {
   });
 };
 
-const authorize = () => {
+/**
+ * ON MESSAGE
+ * comes from the content script embedded in the page or popup
+ */
+browser.runtime.onMessage.addListener(
+  async (message): Promise<{ status: string; payload: any }> => {
+    console.log('Message action', message);
+    const { action, payload } = message;
+
+    switch (action) {
+      case 'CLEAR_STORAGE':
+        await browser.storage.local.clear();
+        return Promise.resolve({ status: 'SUCCESS', payload: undefined });
+
+      case 'LOAD_TABLE':
+        loadTable();
+        const storage = await browser.storage.local.get(['records', 'projects']);
+        return Promise.resolve({ status: 'SUCCESS', payload: storage });
+
+      case 'ADD_ROW':
+        const addResponse = await addRow(payload);
+        return Promise.resolve({ status: 'ADD_SUCCESS', payload: { updatedRage: addResponse } });
+
+      case 'UPDATE_ROW':
+        const updateResponse = await updateRow(payload);
+        return Promise.resolve({
+          status: 'UPDATE_SUCCESS',
+          payload: { updatedRage: updateResponse },
+        });
+
+      case 'FINISH_ROW':
+        const setResponse = await updateRow(payload);
+        return Promise.resolve({ status: 'FINISH_SUCCESS', payload: { updatedRage: null } });
+
+      case 'DELETE_ROW':
+        const detatedResponse = await deleteRow(payload);
+        return Promise.resolve({ status: 'DELETE_SUCCESS', payload: detatedResponse });
+
+      default:
+        return Promise.resolve({
+          status: 'ERROR',
+          payload: 'unhandled message',
+        });
+    }
+  },
+);
+
+const authorize = (): void => {
   console.log('Authorizing...');
   chrome.identity.getAuthToken({ interactive: true }, (token: string) => {
     gapi.auth.authorize(
       {
+        // eslint-disable-next-line @typescript-eslint/camelcase
         client_id: CLIENT_ID,
         scope: SCOPE,
         immediate: true,
@@ -202,24 +206,25 @@ const authorize = () => {
         console.log('Loading Sheets API...');
         gapi.client.load('sheets', 'v4', async () => {
           console.log('Setting access token...');
+          // eslint-disable-next-line @typescript-eslint/camelcase
           gapi.client.setToken({ access_token: token });
           console.log('Getting User info...');
           const userInfo = await fetch(
-            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${token}`
+            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${token}`,
           );
           const profile = await userInfo.json();
-          chrome.storage.local.set({ profile });
+          browser.storage.local.set({ profile });
 
           loadTable();
         });
-      }
+      },
     );
   });
 };
 
-const loadScript = (url) => {
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = () => {
+const loadScript = (url): void => {
+  const request = new XMLHttpRequest();
+  request.onreadystatechange = (): void => {
     if (request.readyState !== 4) {
       return;
     }
@@ -235,6 +240,7 @@ const loadScript = (url) => {
 
 chrome.identity.getAuthToken({ interactive: true }, function () {
   //load Google's javascript client libraries
+  // eslint-disable-next-line @typescript-eslint/camelcase
   (window as any).gapi_onload = authorize;
   loadScript('https://apis.google.com/js/client.js');
 });

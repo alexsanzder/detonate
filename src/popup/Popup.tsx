@@ -4,7 +4,7 @@ import Timer from './components/Timer';
 import Footer from './components/Footer';
 import Summary from './components/Summary';
 
-const Popup = () => {
+const Popup = (): JSX.Element => {
   return (
     <div className='h-full pt-36'>
       <div className='fixed top-0 w-full'>

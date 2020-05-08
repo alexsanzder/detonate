@@ -56,7 +56,7 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 width='14'
                 height='14'
               />
-              <span>{getTimeFormated(record.time)}</span>
+              <span>{record.time === 0 ? 'running...' : getTimeFormated(record.time)}</span>
             </RecordTime>
           </div>
           <div className='flex items-center justify-between pt-2 pb-4'>

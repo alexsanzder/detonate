@@ -1,15 +1,19 @@
 import * as React from 'react';
 import tw from 'twin.macro';
+
 import { browser } from 'webextension-polyfill-ts';
 import { Play, Edit3, Square } from 'react-feather';
 import Edit from './Edit';
 
 import { useInterval } from '../../hooks/useInterval';
-import { getTimeFromSeconds, getFraction } from '../../utils/time';
+import { getTimeFromSeconds } from '../../utils/time';
+import { ADD_ROW, UPDATE_ROW, FINISH_ROW, SYNC } from '../../utils/actions';
 
-import { ProfileType, RecordType, MessageType } from '../../@types';
+import { RecordType, MessageType } from '../../@types';
 
 const Button = tw.button`w-10 h-10 text-white rounded-full shadow-lg focus:outline-none focus:shadow-outline`;
+const InputContainer = tw.div`flex items-center justify-between w-full mr-3`;
+const Input = tw.input`w-full h-10 px-1 pb-2 mt-2 mr-1 text-lg text-gray-900 focus:outline-none truncate`;
 
 const defaultRecord = {
   name: null,
@@ -21,90 +25,109 @@ const defaultRecord = {
   time: 0,
 };
 
+interface Storage {
+  start?: number;
+}
+// initialize timer
+const start = async () => {
+  const { start } = await browser.storage.local.get();
+  return Promise.resolve(start);
+};
+console.log(start);
+const time = Math.abs(Date.now() - start) / 36e5;
+
 const Timer = (): JSX.Element => {
-  const [timer, setTimer] = React.useState<number>(0);
+  const [timer, setTimer] = React.useState<number>(time);
   const [isRunning, setRunning] = React.useState<boolean>(false);
   const [showEdit, setShowEdit] = React.useState<boolean>(false);
+  const [description, setDescription] = React.useState<string>('');
+  const [placeholder, setPlaceholder] = React.useState<string>('');
   const [record, setRecord] = React.useState<RecordType>(defaultRecord);
-  const [action, setAction] = React.useState<string | null>(null);
-  const [range, setRange] = React.useState<string>('');
+  const [action, setAction] = React.useState<string | null>(SYNC);
 
-  useInterval(() => setTimer((timer) => timer + 1), isRunning ? 1000 : null);
-
-  // Current Date for the record
-  const today = new Date().toLocaleDateString('de', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
-  // Initial Effect
+  // Initial Render
   const descriptionRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
-    descriptionRef?.current.focus();
     (async (): Promise<void> => {
-      const items = await browser.storage.local.get(['profile']);
-      setRecord({
-        ...record,
-        name: items.profile.name,
-        date: today,
-      });
+      // Funny commits //
+      const response = await (await fetch('http://whatthecommit.com/index.json')).json();
+      setPlaceholder(response.commit_message);
+      descriptionRef.current.placeholder = `What are you working on? e.g. ${response.commit_message}`;
+      //setDescription(response.commit_message);
+      // Funny commits //
+
+      const { isRunning, lastRecord } = await browser.storage.local.get([
+        'isRunning',
+        'start',
+        'lastRecord',
+      ]);
+      if (isRunning) {
+        setRecord(lastRecord);
+        setDescription(lastRecord.description);
+        setRunning(isRunning);
+      } else {
+        descriptionRef.current.focus();
+        descriptionRef.current.setSelectionRange(0, 0);
+      }
     })();
   }, []);
 
-  // Manage request in backgrond.js
+  useInterval(() => setTimer((timer) => timer + 1), isRunning ? 1000 : null);
+  React.useEffect(() => {
+    setRunning(isRunning);
+  }, [timer]);
+
+  // Handle request in backgrond.js
   React.useEffect(() => {
     action &&
       (async (): Promise<void> => {
+        console.log('ACTION', action, record);
         const message = {
           action,
-          payload: { record, range },
-        };
-        const response = await browser.runtime.sendMessage(message);
-        const {
-          status,
-          payload: { updatedRage },
-        } = response;
-        const item = await browser.storage.local.get('records');
-        console.log(item.records);
+          payload: { record },
+        } as MessageType;
+        const { status, payload } = await browser.runtime.sendMessage(message);
+
+        console.log(action, status, payload);
         switch (status) {
           case 'ADD_SUCCESS':
-            setRange(updatedRage);
-            item.records.push(record);
-            await browser.storage.local.set({ records: item.records });
+            setRecord(payload.record);
             break;
           case 'UPDATE_SUCCESS':
-            setRange(updatedRage);
+            setRecord(payload.record);
             break;
-          case 'FINISH_ROW':
-            setRange(updatedRage);
+          case 'FINISH_SUCCESS':
+            setRecord(defaultRecord);
             break;
         }
       })();
   }, [action]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handlePlay = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    browser.browserAction.setBadgeText({ text: '▶️' });
     setRunning(true);
-    const { description } = record;
+    setDescription(description === '' ? placeholder : description);
     setRecord({
       ...record,
-      description: description === null ? '(no description)' : description,
+      description: description === '' ? placeholder : description,
     });
 
-    setAction('ADD_ROW');
+    setAction(ADD_ROW);
   };
 
-  const handleStop = (): void => {
-    browser.browserAction.setBadgeText({ text: '' });
+  const handleStop = async (): Promise<void> => {
     setRunning(false);
-    setRecord({
-      ...record,
-      time: getFraction(timer),
-    });
-
-    setAction('FINISH_ROW');
+    setTimer(0);
+    // More funny commits //
+    const response = await (await fetch('http://whatthecommit.com/index.json')).json();
+    setPlaceholder(response.commit_message);
+    descriptionRef.current.placeholder = `What are you working on? e.g. ${response.commit_message}`;
+    //setDescription(response.commit_message);
+    // More funny commits //
+    setDescription('');
+    descriptionRef.current.focus();
+    descriptionRef.current.setSelectionRange(0, 0);
+    setAction(FINISH_ROW);
   };
 
   const handleOpenEdit = (value: boolean): void => {
@@ -112,7 +135,7 @@ const Timer = (): JSX.Element => {
   };
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-    setRecord({ ...record, description: e.target.value });
+    setDescription(e.target.value);
   };
 
   const handleInputClick = (): void => {
@@ -121,22 +144,30 @@ const Timer = (): JSX.Element => {
 
   return (
     <form
-      className='flex items-center justify-between w-full h-24 px-4 mt-12 bg-white border-b shadow-sm'
-      onSubmit={handleSubmit}
+      className='flex items-center justify-between w-full h-24 px-4 mt-12 bg-white border-b shadow-md'
+      onSubmit={handlePlay}
     >
-      <div className='flex items-center justify-between w-full mr-3 border-b border-gray-400 hover:border-magenta-400 focus-within:border-magenta-500'>
-        <input
+      <InputContainer
+        className={
+          !isRunning
+            ? 'border-b border-gray-400 hover:border-magenta-400 focus-within:border-magenta-500'
+            : 'cursor-pointer'
+        }
+        onClick={handleInputClick}
+      >
+        <Input
+          className={isRunning ? 'max-w-sm cursor-pointer' : 'cursor-text'}
           ref={descriptionRef}
-          className='w-full h-10 px-1 pb-2 mt-2 mr-1 text-lg text-gray-900 focus:outline-none'
           placeholder='What are you working on?'
-          value={record.description}
+          value={description}
           onChange={handleInputChange}
-          onClick={handleInputClick}
         />
         {isRunning && (
-          <span className='px-1 text-lg text-gray-900'>{getTimeFromSeconds(timer)}</span>
+          <span className='w-1/4 px-1 text-lg text-right text-gray-900'>
+            {getTimeFromSeconds(timer)}
+          </span>
         )}
-      </div>
+      </InputContainer>
       <div className='flex items-center justify-end'>
         {isRunning ? (
           <>

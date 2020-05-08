@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 import { RefreshCw, ExternalLink, Sun, Moon, User } from 'react-feather';
+import { SYNC } from '../../utils/actions';
 
 import { ProfileType, MessageType } from '../../@types';
 
@@ -23,11 +24,11 @@ const Header = (): JSX.Element => {
 
   const handleSync = async (): Promise<void> => {
     const message: MessageType = {
-      action: 'LOAD_TABLE',
+      action: SYNC,
     };
 
     const response = await browser.runtime.sendMessage(message);
-    console.log('LOAD_TABLE response ', response);
+    console.log('Sync response ', response);
   };
 
   return (

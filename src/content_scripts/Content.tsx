@@ -1,26 +1,26 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
-import Autocomplete, { RenderInputParams } from "@material-ui/lab/Autocomplete";
-import Container from "@material-ui/core/Container";
-import Button from "@material-ui/core/Button";
-import Popover from "@material-ui/core/Popover";
-import TextField from "@material-ui/core/TextField";
+import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
+import Autocomplete, { RenderInputParams } from '@material-ui/lab/Autocomplete';
+import Container from '@material-ui/core/Container';
+import Button from '@material-ui/core/Button';
+import Popover from '@material-ui/core/Popover';
+import TextField from '@material-ui/core/TextField';
 
-import PopoverTitle from "./components/PopoverTitle";
-import ButtonDetonate from "./components/ButtonDetonate";
+import PopoverTitle from './components/PopoverTitle';
+import ButtonDetonate from './components/ButtonDetonate';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
-      height: "280px",
-      width: "400px"
+      height: '280px',
+      width: '400px',
     },
     button: {
       margin: theme.spacing(2, 0, 2),
-      textTransform: "none"
-    }
-  })
+      textTransform: 'none',
+    },
+  }),
 );
 
 const defaultRecord = {
@@ -30,7 +30,7 @@ const defaultRecord = {
   project: null,
   description: null,
   ticket: null,
-  time: 0
+  time: 0,
 };
 
 export interface ProjectType {
@@ -75,17 +75,16 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
   const [profile, setProfile] = React.useState<ProfileType | null>(null);
   const [record, setRecord] = React.useState<RecordType>(defaultRecord);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const today = new Date().toLocaleDateString("de-DE", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
+  const today = new Date().toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   });
 
   React.useEffect(() => {
-    chrome.storage.local.get(["projects"], ({ projects }) => {
+    chrome.storage.local.get(['projects'], ({ projects }) => {
       setProjects(projects);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   console.log(projects);
 
@@ -112,8 +111,65 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
   //       isRunning && setIsRunning(isRunning.newValue);
   //     });
   //   }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [description, ticket]);
+
+  const handleClose = () => {
+    setAnchor(null);
+  };
+
+  const handleStart = () => {
+    const newRecord = record;
+    chrome.runtime.sendMessage(
+      { action: 'addRow', payload: { record: newRecord, badge: '▶️' } },
+      (response: any) => {
+        console.log('Start addRow response ', response);
+      },
+    );
+  };
+
+  const handleUpdate = () => {
+    chrome.storage.local.get(['range'], ({ range }) => {
+      chrome.runtime.sendMessage(
+        {
+          action: 'updateRow',
+          payload: {
+            range: range,
+            record: record,
+            badge: '▶️',
+          },
+        },
+        (response: any) => {
+          console.log('Done updateRow response ', response);
+        },
+      );
+      setAnchor(null);
+    });
+  };
+
+  const handleStop = () => {
+    chrome.storage.local.get(['records', 'range', 'start'], ({ records, range, start }) => {
+      const hours = Math.abs(Date.now() - start) / 36e5;
+      chrome.runtime.sendMessage(
+        {
+          action: 'updateRow',
+          payload: {
+            range: range,
+            record: { ...record, time: hours },
+          },
+        },
+        (response: string) => {
+          const newRecord = { ...record, id: response };
+          chrome.storage.local.set({
+            isRunning: false,
+            records: [newRecord, ...records],
+          });
+          console.log('Stop updateRow response ', response);
+        },
+      );
+      setRecord(defaultRecord);
+      setAnchor(null);
+    });
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (!isRunning) {
@@ -123,73 +179,11 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
       handleStop();
     }
   };
-
-  const handleClose = () => {
-    setAnchor(null);
-  };
-
-  const handleStart = () => {
-    const newRecord = record;
-    chrome.runtime.sendMessage(
-      { action: "addRow", payload: { record: newRecord, badge: "▶️" } },
-      (response: any) => {
-        console.log("Start addRow response ", response);
-      }
-    );
-  };
-
-  const handleUpdate = () => {
-    chrome.storage.local.get(["range"], ({ range }) => {
-      chrome.runtime.sendMessage(
-        {
-          action: "updateRow",
-          payload: {
-            range: range,
-            record: record,
-            badge: "▶️"
-          }
-        },
-        (response: any) => {
-          console.log("Done updateRow response ", response);
-        }
-      );
-      setAnchor(null);
-    });
-  };
-
-  const handleStop = () => {
-    chrome.storage.local.get(
-      ["records", "range", "start"],
-      ({ records, range, start }) => {
-        const hours = Math.abs(Date.now() - start) / 36e5;
-        chrome.runtime.sendMessage(
-          {
-            action: "updateRow",
-            payload: {
-              range: range,
-              record: { ...record, time: hours }
-            }
-          },
-          (response: string) => {
-            const newRecord = { ...record, id: response };
-            chrome.storage.local.set({
-              isRunning: false,
-              records: [newRecord, ...records]
-            });
-            console.log("Stop updateRow response ", response);
-          }
-        );
-        setRecord(defaultRecord);
-        setAnchor(null);
-      }
-    );
-  };
-
   return (
     <React.Fragment>
       <ButtonDetonate
         onClick={handleClick}
-        title={isRunning && isRunning ? "Stop timer" : "Start timer"}
+        title={isRunning && isRunning ? 'Stop timer' : 'Start timer'}
       />
       <Popover
         keepMounted
@@ -197,25 +191,25 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
         anchorEl={anchor}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "left"
+          vertical: 'top',
+          horizontal: 'left',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "left"
+          vertical: 'top',
+          horizontal: 'left',
         }}
       >
-        <Container component="main" maxWidth="xs" className={classes.container}>
+        <Container component='main' maxWidth='xs' className={classes.container}>
           <PopoverTitle onClose={handleClose} onStop={handleStop}>
             Stop timer
           </PopoverTitle>
           <TextField
-            variant="outlined"
-            margin="dense"
+            variant='outlined'
+            margin='dense'
             fullWidth
-            id="description"
-            placeholder="What are you doing?"
-            name="description"
+            id='description'
+            placeholder='What are you doing?'
+            name='description'
             value={description}
             inputRef={inputRef}
           />
@@ -223,16 +217,13 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
             multiple={false}
             value={project && project}
             options={projects && projects}
-            onChange={(
-              _event: React.ChangeEvent<{}>,
-              newValue: ProjectType | null
-            ): void => {
+            onChange={(_event: React.ChangeEvent<{}>, newValue: ProjectType | null): void => {
               if (newValue) {
                 const { project, company } = newValue;
                 setRecord({
                   ...record,
                   project,
-                  company
+                  company,
                 });
               }
               setProject(newValue);
@@ -244,27 +235,27 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
               <TextField
                 {...params}
                 fullWidth
-                variant="outlined"
-                margin="dense"
-                name="project"
-                placeholder="Add project"
+                variant='outlined'
+                margin='dense'
+                name='project'
+                placeholder='Add project'
               />
             )}
           />
           <TextField
-            variant="outlined"
-            margin="dense"
+            variant='outlined'
+            margin='dense'
             fullWidth
-            name="ticket"
-            placeholder="Add ticket"
-            id="ticket"
+            name='ticket'
+            placeholder='Add ticket'
+            id='ticket'
             value={ticket}
           />
           <Button
             fullWidth
-            variant="contained"
-            size="medium"
-            color="secondary"
+            variant='contained'
+            size='medium'
+            color='secondary'
             onClick={handleUpdate}
             className={classes.button}
           >

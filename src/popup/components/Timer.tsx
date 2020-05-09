@@ -6,9 +6,8 @@ import { Play, Edit3, Square } from 'react-feather';
 import Edit from './Edit';
 
 import { useInterval } from '../../hooks/useInterval';
-import { useStorageSync } from '../../hooks/useStorageSync';
-import { getTimeFromSeconds, getFraction } from '../../utils/time';
-import { ADD_ROW, UPDATE_ROW, FINISH_ROW, SYNC } from '../../utils/actions';
+import { getTimeFromSeconds } from '../../utils/time';
+import { ADD_ROW, FINISH_ROW, SYNC } from '../../utils/actions';
 
 import { RecordType, MessageType } from '../../@types';
 
@@ -42,13 +41,6 @@ const Timer = (): JSX.Element => {
   const descriptionRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     (async (): Promise<void> => {
-      // Funny commits //
-      const response = await (await fetch('http://whatthecommit.com/index.json')).json();
-      setPlaceholder(response.commit_message);
-      descriptionRef.current.placeholder = `What are you working on? e.g. ${response.commit_message}`;
-      //setDescription(response.commit_message);
-      // Funny commits //
-
       const { isRunning, start, lastRecord } = await browser.storage.local.get();
       if (isRunning) {
         // Continue timer
@@ -59,6 +51,13 @@ const Timer = (): JSX.Element => {
         setDescription(lastRecord.description);
         setRunning(isRunning);
       } else {
+        // Funny commits //
+        const response = await (await fetch('http://whatthecommit.com/index.json')).json();
+        setPlaceholder(response.commit_message);
+        descriptionRef.current.placeholder = `What are you working on? e.g. ${response.commit_message}`;
+        //setDescription(response.commit_message);
+        // Funny commits //
+
         descriptionRef.current.focus();
         descriptionRef.current.setSelectionRange(0, 0);
       }

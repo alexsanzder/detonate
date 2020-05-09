@@ -27,6 +27,7 @@ const postcssNormalize = require('postcss-normalize');
 
 const appPackageJson = require(paths.appPackageJson);
 const ExtensionReloader = require('webpack-extension-reloader');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -648,6 +649,19 @@ module.exports = function (webpackEnv) {
           extensionPage: 'popup',
         },
       }),
+      new CopyWebpackPlugin([
+        {
+          /***********************************************************************/
+          /* If you have different configurations for development and production,*/
+          /* you can have two manifests (one for each environment)               */
+          /***********************************************************************/
+          from:
+            process.env.NODE_ENV === 'development'
+              ? './src/manifest.dev.json'
+              : './src/manifest.prod.json',
+          to: 'manifest.json',
+        },
+      ]),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.

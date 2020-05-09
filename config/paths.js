@@ -76,13 +76,13 @@ module.exports = {
       appIndexJs: resolveModule(resolveApp, 'src/popup/index'),
     },
     {
-      name: 'content-script',
+      name: process.env.NODE_ENV === 'development' ? 'content-script' : 'content-script.bundle',
       title: 'content-script',
       appHtml: resolveApp('src/content_scripts/template.html'),
       appIndexJs: resolveModule(resolveApp, 'src/content_scripts/index'),
     },
     {
-      name: 'background',
+      name: process.env.NODE_ENV === 'development' ? 'background' : 'background.bundle',
       title: 'background',
       appHtml: resolveApp('src/background/template.html'),
       appIndexJs: resolveModule(resolveApp, 'src/background/index'),

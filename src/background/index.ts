@@ -1,5 +1,4 @@
 /* global chrome gapi */
-import * as React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 
 import { CLEAR_STORAGE, SYNC, ADD_ROW, UPDATE_ROW, FINISH_ROW, DELETE_ROW } from '../utils/actions';

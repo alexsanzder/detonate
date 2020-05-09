@@ -37,7 +37,7 @@ console.log(start);
 const time = Math.abs(Date.now() - start) / 36e5;
 
 const Timer = (): JSX.Element => {
-  const [timer, setTimer] = React.useState<number>(time);
+  const [timer, setTimer] = React.useState<number>(0);
   const [isRunning, setRunning] = React.useState<boolean>(false);
   const [showEdit, setShowEdit] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
@@ -105,6 +105,10 @@ const Timer = (): JSX.Element => {
 
   const handlePlay = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    browser.storage.local.set({
+      isRunning: true,
+      start: Date.now(),
+    });
     setRunning(true);
     setDescription(description === '' ? placeholder : description);
     setRecord({

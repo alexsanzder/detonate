@@ -69,7 +69,7 @@ const Header = (): JSX.Element => {
           onClick={handleTheme}
           aria-label='Toggle Dark/Light mode'
         >
-          {theme === 'lightTheme' ? (
+          {theme === 'darkTheme' ? (
             <Sun className='stroke-2' height='20' width='20' />
           ) : (
             <Moon className='stroke-2' height='20' width='20' />

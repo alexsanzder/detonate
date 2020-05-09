@@ -12,7 +12,8 @@
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
     "start": "yarn build:style && node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "watch": "node scripts/watch.js"
   },
   "dependencies": {
     "@babel/core": "7.9.0",
@@ -96,7 +97,8 @@
     "prettier": "^2.0.5",
     "tailwindcss": "^1.4.4",
     "twin.macro": "^1.0.0-alpha.10",
-    "webextension-polyfill-ts": "^0.15.0"
+    "webextension-polyfill-ts": "^0.15.0",
+    "webpack-extension-reloader": "^1.1.4"
   },
   "eslintConfig": {
     "extends": "react-app"

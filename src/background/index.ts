@@ -133,8 +133,6 @@ const addRow = async ({ record }): Promise<RecordType> => {
 
   const lastRecord = { ...organizedRecord, id: updatedRange };
   browser.storage.local.set({
-    isRunning: true,
-    start: Date.now(),
     lastRecord,
   });
 

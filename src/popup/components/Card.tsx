@@ -27,7 +27,7 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
     });
   };
 
-  const totalTime = (records: any): string => {
+  const totalTime = (records: RecordType[]): string => {
     const total = records?.reduce((acc: number, curr: any) => {
       return acc + curr.time;
     }, 0);

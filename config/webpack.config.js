@@ -168,7 +168,7 @@ module.exports = function (webpackEnv) {
   paths.appPages.forEach((appPage) => {
     entries[appPage.name] = [
       appPage.appIndexJs,
-      isEnvDevelopment && require.resolve('react-dev-utils/webpackHotDevClient'),
+      //isEnvDevelopment && require.resolve('react-dev-utils/webpackHotDevClient'),
     ].filter(Boolean);
   });
 

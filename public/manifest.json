@@ -27,7 +27,7 @@
             "js": [
                 "./lib/browser-polyfill.js",
                 "./lib/gapi-client.js",
-                "./static/js/content-script.js"
+                "./static/js/content-script.bundle.js"
             ]
         }
     ],
@@ -35,7 +35,7 @@
         "scripts": [
             "./lib/browser-polyfill.js",
             "./lib/gapi-client.js",
-            "./static/js/background.js"
+            "./static/js/background.bundle.js"
         ],
         "persistent": false
     },

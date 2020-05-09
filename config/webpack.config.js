@@ -638,11 +638,16 @@ module.exports = function (webpackEnv) {
           formatter: isEnvProduction ? typescriptFormatter : undefined,
         }),
       // Chrome extension hot reloading.
-      isEnvDevelopment &&
-        new ExtensionReloader({
-          watch: true,
-          reloadPage: true,
-        }),
+      new ExtensionReloader({
+        watch: true,
+        reloadPage: true,
+        entries: {
+          // The entries used for the content/background scripts or extension pages
+          contentScript: 'content-script',
+          background: 'background',
+          extensionPage: 'popup',
+        },
+      }),
     ].filter(Boolean),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.

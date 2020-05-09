@@ -6,7 +6,8 @@ import { Play, Edit3, Square } from 'react-feather';
 import Edit from './Edit';
 
 import { useInterval } from '../../hooks/useInterval';
-import { getTimeFromSeconds } from '../../utils/time';
+import { useStorageSync } from '../../hooks/useStorageSync';
+import { getTimeFromSeconds, getFraction } from '../../utils/time';
 import { ADD_ROW, UPDATE_ROW, FINISH_ROW, SYNC } from '../../utils/actions';
 
 import { RecordType, MessageType } from '../../@types';
@@ -25,17 +26,6 @@ const defaultRecord = {
   time: 0,
 };
 
-interface Storage {
-  start?: number;
-}
-// initialize timer
-const start = async () => {
-  const { start } = await browser.storage.local.get();
-  return Promise.resolve(start);
-};
-console.log(start);
-const time = Math.abs(Date.now() - start) / 36e5;
-
 const Timer = (): JSX.Element => {
   const [timer, setTimer] = React.useState<number>(0);
   const [isRunning, setRunning] = React.useState<boolean>(false);
@@ -44,6 +34,9 @@ const Timer = (): JSX.Element => {
   const [placeholder, setPlaceholder] = React.useState<string>('');
   const [record, setRecord] = React.useState<RecordType>(defaultRecord);
   const [action, setAction] = React.useState<string | null>(SYNC);
+
+  // Timer
+  useInterval(() => setTimer((timer) => timer + 1), isRunning ? 1000 : null);
 
   // Initial Render
   const descriptionRef = React.useRef<HTMLInputElement>(null);
@@ -56,12 +49,12 @@ const Timer = (): JSX.Element => {
       //setDescription(response.commit_message);
       // Funny commits //
 
-      const { isRunning, lastRecord } = await browser.storage.local.get([
-        'isRunning',
-        'start',
-        'lastRecord',
-      ]);
+      const { isRunning, start, lastRecord } = await browser.storage.local.get();
       if (isRunning) {
+        // Continue timer
+        const time = Math.abs(Date.now() - start) / 1000;
+        setTimer(time);
+        setRunning(isRunning);
         setRecord(lastRecord);
         setDescription(lastRecord.description);
         setRunning(isRunning);
@@ -71,11 +64,6 @@ const Timer = (): JSX.Element => {
       }
     })();
   }, []);
-
-  useInterval(() => setTimer((timer) => timer + 1), isRunning ? 1000 : null);
-  React.useEffect(() => {
-    setRunning(isRunning);
-  }, [timer]);
 
   // Handle request in backgrond.js
   React.useEffect(() => {

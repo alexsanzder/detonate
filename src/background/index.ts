@@ -67,7 +67,9 @@ const loadTable = async (): Promise<void> => {
 
   // Last record
   const lastRecord = records.slice(-1)[0];
+
   if (lastRecord.time === 0) {
+    records.pop();
     browser.browserAction.setBadgeText({
       text: '▶️',
     });
@@ -190,59 +192,59 @@ browser.runtime.onMessage.addListener(
   async (message): Promise<{ status: string; payload: {} }> => {
     console.log('Message action', message);
     const { action, payload } = message;
+    if (action)
+      switch (action) {
+        case CLEAR_STORAGE:
+          await browser.storage.local.clear();
+          return Promise.resolve({ status: 'SUCCESS', payload: undefined });
 
-    switch (action) {
-      case CLEAR_STORAGE:
-        await browser.storage.local.clear();
-        return Promise.resolve({ status: 'SUCCESS', payload: undefined });
+        case SYNC:
+          loadTable();
+          const storage = await browser.storage.local.get(['records', 'projects']);
+          return Promise.resolve({ status: 'SUCCESS', payload: storage });
 
-      case SYNC:
-        loadTable();
-        const storage = await browser.storage.local.get(['records', 'projects']);
-        return Promise.resolve({ status: 'SUCCESS', payload: storage });
+        case ADD_ROW:
+          browser.browserAction.setBadgeText({ text: '▶️' });
+          const addRecord = await addRow(payload);
+          return Promise.resolve({ status: 'ADD_SUCCESS', payload: { record: addRecord } });
 
-      case ADD_ROW:
-        browser.browserAction.setBadgeText({ text: '▶️' });
-        const addRecord = await addRow(payload);
-        return Promise.resolve({ status: 'ADD_SUCCESS', payload: { record: addRecord } });
+        case UPDATE_ROW:
+          browser.browserAction.setBadgeText({ text: '' });
+          const updateRecord = await updateRow(payload);
+          return Promise.resolve({
+            status: 'UPDATE_SUCCESS',
+            payload: { record: updateRecord },
+          });
 
-      case UPDATE_ROW:
-        browser.browserAction.setBadgeText({ text: '' });
-        const updateRecord = await updateRow(payload);
-        return Promise.resolve({
-          status: 'UPDATE_SUCCESS',
-          payload: { record: updateRecord },
-        });
+        case FINISH_ROW:
+          browser.browserAction.setBadgeText({ text: '' });
+          const { record } = payload;
+          const { records, start } = await browser.storage.local.get(['records', 'start']);
+          const time = Math.abs(Date.now() - start) / 36e5;
 
-      case FINISH_ROW:
-        browser.browserAction.setBadgeText({ text: '' });
-        const { record } = payload;
-        const { records, start } = await browser.storage.local.get(['records', 'start']);
-        const time = Math.abs(Date.now() - start) / 36e5;
+          const newRecord = { ...record, time };
+          chrome.storage.local.set({ range: null });
 
-        const newRecord = { ...record, time };
-        chrome.storage.local.set({ range: null });
+          const finishRecord = await updateRow(newRecord);
+          browser.storage.local.set({
+            isRunning: false,
+            start: 0,
+            records: [finishRecord, ...records],
+          });
 
-        const finishRecord = await updateRow(newRecord);
-        browser.storage.local.set({
-          isRunning: false,
-          start: 0,
-          records: [finishRecord, ...records],
-        });
+          return Promise.resolve({ status: 'FINISH_SUCCESS', payload: { record: finishRecord } });
 
-        return Promise.resolve({ status: 'FINISH_SUCCESS', payload: { record: finishRecord } });
+        case DELETE_ROW:
+          alert('NOP');
+          const delatedResponse = await deleteRow(payload);
+          return Promise.resolve({ status: 'DELETE_SUCCESS', payload: delatedResponse });
 
-      case DELETE_ROW:
-        alert('NOP');
-        const delatedResponse = await deleteRow(payload);
-        return Promise.resolve({ status: 'DELETE_SUCCESS', payload: delatedResponse });
-
-      default:
-        return Promise.resolve({
-          status: 'ERROR',
-          payload: 'unhandled message',
-        });
-    }
+        default:
+          return Promise.resolve({
+            status: 'ERROR',
+            payload: 'unhandled message',
+          });
+      }
   },
 );
 

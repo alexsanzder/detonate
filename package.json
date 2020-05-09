@@ -10,7 +10,6 @@
   },
   "scripts": {
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "start": "yarn build:style && node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "watch": "node scripts/watch.js"

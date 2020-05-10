@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 import { RefreshCw, ExternalLink, Sun, Moon, User } from 'react-feather';
-import { SYNC } from '../../utils/actions';
+import { SYNC } from '../../store/actions';
 
 import { ProfileType, MessageType } from '../../@types';
 

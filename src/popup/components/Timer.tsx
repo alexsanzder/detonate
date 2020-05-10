@@ -5,9 +5,10 @@ import { browser } from 'webextension-polyfill-ts';
 import { Play, Edit3, Square } from 'react-feather';
 import Edit from './Edit';
 
+import Context from '../../store/context';
+import { ADD_ROW, FINISH_ROW, TOGGLE_EDIT } from '../../store/actions';
 import { useInterval } from '../../hooks/useInterval';
 import { getTimeFromSeconds } from '../../utils/time';
-import { ADD_ROW, FINISH_ROW, SYNC } from '../../utils/actions';
 
 import { RecordType, MessageType } from '../../@types';
 
@@ -26,9 +27,11 @@ const defaultRecord = {
 };
 
 const Timer = (): JSX.Element => {
+  const { state, dispatch } = React.useContext(Context);
+  // console.log(state);
+
   const [timer, setTimer] = React.useState<number>(0);
   const [isRunning, setRunning] = React.useState<boolean>(false);
-  const [showEdit, setShowEdit] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
   const [placeholder, setPlaceholder] = React.useState<string>('');
   const [record, setRecord] = React.useState<RecordType>(defaultRecord);
@@ -166,7 +169,7 @@ const Timer = (): JSX.Element => {
               type='button'
               className='mr-2 bg-blue-600 hover:bg-blue-700'
               aria-label='Edit Timer'
-              onClick={(): void => handleOpenEdit(true)}
+              onClick={(): void => dispatch({ type: TOGGLE_EDIT })}
             >
               <Edit3 className='h-4 m-2 fill-current' />
             </Button>
@@ -186,7 +189,7 @@ const Timer = (): JSX.Element => {
           </Button>
         )}
       </div>
-      {showEdit && <Edit timer={getTimeFromSeconds(timer)} onClose={handleOpenEdit} />}
+      {state.showEdit && <Edit timer={getTimeFromSeconds(timer)} onClose={handleOpenEdit} />}
     </form>
   );
 };

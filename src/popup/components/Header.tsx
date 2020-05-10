@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 import { RefreshCw, ExternalLink, Sun, Moon, User } from 'react-feather';
+import Context from '../../store/context';
 import { SYNC } from '../../store/actions';
 
 import { ProfileType, MessageType } from '../../@types';
@@ -8,6 +9,8 @@ import { ProfileType, MessageType } from '../../@types';
 const SHEET_ID = +process.env.REACT_APP_SHEET_ID;
 
 const Header = (): JSX.Element => {
+  const { state, dispatch } = React.useContext(Context);
+  // console.log(state);
   const [theme, setTheme] = React.useState('lightTheme');
   const [profile, setProfile] = React.useState<ProfileType | null>(null);
 
@@ -20,15 +23,6 @@ const Header = (): JSX.Element => {
 
   const handleTheme = (): void => {
     setTheme(theme === 'darkTheme' ? 'lightTheme' : 'darkTheme');
-  };
-
-  const handleSync = async (): Promise<void> => {
-    const message: MessageType = {
-      action: SYNC,
-    };
-
-    const response = await browser.runtime.sendMessage(message);
-    console.log('Sync response ', response);
   };
 
   return (
@@ -50,7 +44,9 @@ const Header = (): JSX.Element => {
           type='button'
           className='flex items-center justify-center block w-8 h-8 m-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='Sync Google Sheets'
-          onClick={handleSync}
+          onClick={(): void => {
+            dispatch({ type: SYNC });
+          }}
         >
           <RefreshCw className='stroke-2' height='20' width='20' />
         </button>

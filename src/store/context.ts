@@ -2,7 +2,7 @@ import * as React from 'react';
 import { initialState, GlobalStateProps, Actions } from './useGlobalState';
 
 export interface ContextType {
-  state: GlobalStateProps;
+  state: GlobalStateProps | Promise<GlobalStateProps>;
   dispatch: React.Dispatch<Actions>;
 }
 

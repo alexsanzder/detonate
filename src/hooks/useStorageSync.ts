@@ -3,14 +3,14 @@ import { browser } from 'webextension-polyfill-ts';
 
 export function useStorageSync<Value>(
   key: string,
-  defaultValue: Value,
+  defaultValue?: Value,
 ): [Value, (value: Value) => Promise<void>, () => Promise<void>] {
   const [value, setValue] = React.useState<Value>(defaultValue);
   const getStorageValue = (): Promise<Value> =>
     browser.storage.sync
       .get(key)
       .catch(() => browser.storage.local.get(key))
-      .then((items) => items[key]);
+      .then((items) => (key ? items[key] : items));
   const setStorageValue = (value: Value): Promise<void> =>
     browser.storage.sync
       .set({ [key]: value })

@@ -188,11 +188,11 @@ const deleteRow = async ({ index }): Promise<any> => {
  * comes from the content script embedded in the page or popup
  */
 browser.runtime.onMessage.addListener(
-  async (message): Promise<{ status: string; payload: {} }> => {
-    console.log('Message action', message);
-    const { action, payload } = message;
-    if (action)
-      switch (action) {
+  async ({ type, payload }): Promise<{ status: string; payload: {} }> => {
+    console.log('Message type', type);
+
+    if (type)
+      switch (type) {
         case CLEAR_STORAGE:
           await browser.storage.local.clear();
           return Promise.resolve({ status: 'SUCCESS', payload: undefined });

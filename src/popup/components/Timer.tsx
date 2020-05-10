@@ -10,7 +10,7 @@ import { ADD_ROW, FINISH_ROW, TOGGLE_EDIT } from '../../store/actions';
 import { useInterval } from '../../hooks/useInterval';
 import { getTimeFromSeconds } from '../../utils/time';
 
-import { RecordType, MessageType } from '../../@types';
+import { RecordType } from '../../@types';
 
 const Button = tw.button`w-10 h-10 text-white rounded-full shadow-lg focus:outline-none focus:shadow-outline`;
 const InputContainer = tw.div`flex items-center justify-between w-full mr-3`;
@@ -28,17 +28,16 @@ const defaultRecord = {
 
 const Timer = (): JSX.Element => {
   const { state, dispatch } = React.useContext(Context);
-  // console.log(state);
+  //console.log(state);
 
   const [timer, setTimer] = React.useState<number>(0);
-  const [isRunning, setRunning] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
   const [placeholder, setPlaceholder] = React.useState<string>('');
   const [record, setRecord] = React.useState<RecordType>(defaultRecord);
   const [action, setAction] = React.useState<string | null>(null);
 
   // Timer
-  useInterval(() => setTimer((timer) => timer + 1), isRunning ? 1000 : null);
+  useInterval(() => setTimer((timer) => timer + 1), state.isRunning ? 1000 : null);
 
   // Initial Render
   const descriptionRef = React.useRef<HTMLInputElement>(null);
@@ -47,12 +46,11 @@ const Timer = (): JSX.Element => {
       const { isRunning, start, lastRecord } = await browser.storage.local.get();
       if (isRunning) {
         // Continue timer
+        //dispatch({ type: 'TOGGLE_RUNNING' });
         const time = Math.abs(Date.now() - start) / 1000;
         setTimer(time);
-        setRunning(isRunning);
         setRecord(lastRecord);
         setDescription(lastRecord.description);
-        setRunning(isRunning);
       } else {
         // Funny commits //
         const response = await (await fetch('http://whatthecommit.com/index.json')).json();
@@ -75,7 +73,7 @@ const Timer = (): JSX.Element => {
         const message = {
           action,
           payload: { record },
-        } as MessageType;
+        };
         const { status, payload } = await browser.runtime.sendMessage(message);
 
         console.log(action, status, payload);
@@ -99,7 +97,7 @@ const Timer = (): JSX.Element => {
       isRunning: true,
       start: Date.now(),
     });
-    setRunning(true);
+    //setRunning(true);
     setDescription(description === '' ? placeholder : description);
     setRecord({
       ...record,
@@ -110,7 +108,7 @@ const Timer = (): JSX.Element => {
   };
 
   const handleStop = async (): Promise<void> => {
-    setRunning(false);
+    //setRunning(false);
     setTimer(0);
     // More funny commits //
     const response = await (await fetch('http://whatthecommit.com/index.json')).json();
@@ -124,16 +122,12 @@ const Timer = (): JSX.Element => {
     setAction(FINISH_ROW);
   };
 
-  const handleOpenEdit = (value: boolean): void => {
-    setShowEdit(value);
-  };
-
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     setDescription(e.target.value);
   };
 
   const handleInputClick = (): void => {
-    isRunning && handleOpenEdit(true);
+    state.isRunning && dispatch({ type: TOGGLE_EDIT });
   };
 
   return (
@@ -143,27 +137,27 @@ const Timer = (): JSX.Element => {
     >
       <InputContainer
         className={
-          !isRunning
+          !state.isRunning
             ? 'border-b border-gray-400 hover:border-magenta-400 focus-within:border-magenta-500'
             : 'cursor-pointer'
         }
         onClick={handleInputClick}
       >
         <Input
-          className={isRunning ? 'max-w-sm cursor-pointer' : 'cursor-text'}
+          className={state.isRunning ? 'max-w-sm cursor-pointer' : 'cursor-text'}
           ref={descriptionRef}
           placeholder='What are you working on?'
           value={description}
           onChange={handleInputChange}
         />
-        {isRunning && (
+        {state.isRunning && (
           <span className='w-1/4 px-1 text-lg text-right text-gray-900'>
             {getTimeFromSeconds(timer)}
           </span>
         )}
       </InputContainer>
       <div className='flex items-center justify-end'>
-        {isRunning ? (
+        {state.isRunning ? (
           <>
             <Button
               type='button'
@@ -189,7 +183,7 @@ const Timer = (): JSX.Element => {
           </Button>
         )}
       </div>
-      {state.showEdit && <Edit timer={getTimeFromSeconds(timer)} onClose={handleOpenEdit} />}
+      {state.showEdit && <Edit timer={getTimeFromSeconds(timer)} onClose={null} />}
     </form>
   );
 };

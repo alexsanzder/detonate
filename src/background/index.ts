@@ -16,11 +16,11 @@ const SCOPE = [
 import { ProjectType, RecordType } from '../@types';
 
 /* eslint-disable no-undef */
-console.log('Background.js file loaded!');
+// console.log('Background.js file loaded!');
 
 // Load table
 const loadTable = async (): Promise<void> => {
-  console.log('Loading table...');
+  console.log('Loading table data...');
   const response = await gapi.client.sheets.spreadsheets.values.batchGet({
     spreadsheetId: SPREADSHEET_ID,
     valueRenderOption: 'UNFORMATTED_VALUE',
@@ -83,7 +83,7 @@ const loadTable = async (): Promise<void> => {
     isRunning: lastRecord.time === 0,
   });
 
-  console.log('Table Data stored!');
+  console.log('Table data loaded!');
 };
 
 // Orginize record object to be sure it has the same order for the row
@@ -222,7 +222,7 @@ browser.runtime.onMessage.addListener(
           const time = Math.abs(Date.now() - start) / 36e5;
 
           const newRecord = { ...record, time };
-          chrome.storage.local.set({ range: null });
+          browser.storage.local.set({ range: null });
 
           const finishRecord = await updateRow(newRecord);
           browser.storage.local.set({
@@ -247,34 +247,32 @@ browser.runtime.onMessage.addListener(
   },
 );
 
-const authorize = (): void => {
-  console.log('Authorizing...');
-  chrome.identity.getAuthToken({ interactive: true }, (token: string) => {
-    gapi.auth.authorize(
-      {
+const authorize = (token: string): void => {
+  // console.log('Authorizing...');
+  gapi.auth.authorize(
+    {
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      client_id: CLIENT_ID,
+      scope: SCOPE,
+      immediate: true,
+    },
+    () => {
+      // console.log('Loading Sheets API...');
+      gapi.client.load('sheets', 'v4', async () => {
+        // console.log('Setting access token...');
         // eslint-disable-next-line @typescript-eslint/camelcase
-        client_id: CLIENT_ID,
-        scope: SCOPE,
-        immediate: true,
-      },
-      () => {
-        console.log('Loading Sheets API...');
-        gapi.client.load('sheets', 'v4', async () => {
-          console.log('Setting access token...');
-          // eslint-disable-next-line @typescript-eslint/camelcase
-          gapi.client.setToken({ access_token: token });
-          console.log('Getting User info...');
-          const userInfo = await fetch(
-            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${token}`,
-          );
-          const profile = await userInfo.json();
-          browser.storage.local.set({ profile });
+        gapi.client.setToken({ access_token: token });
+        // console.log('Getting user info...');
+        const userInfo = await fetch(
+          `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${token}`,
+        );
+        const profile = await userInfo.json();
+        browser.storage.local.set({ profile });
 
-          loadTable();
-        });
-      },
-    );
-  });
+        loadTable();
+      });
+    },
+  );
 };
 
 const loadScript = (url): void => {
@@ -293,9 +291,9 @@ const loadScript = (url): void => {
   request.send();
 };
 
-chrome.identity.getAuthToken({ interactive: true }, function () {
-  //load Google's javascript client libraries
+chrome.identity.getAuthToken({ interactive: true }, (token) => {
   // eslint-disable-next-line @typescript-eslint/camelcase
-  (window as any).gapi_onload = authorize;
+  (window as any).gapi_onload = (): void => authorize(token);
+  //load Google's javascript client libraries
   loadScript('https://apis.google.com/js/client.js');
 });

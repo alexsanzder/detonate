@@ -32,7 +32,7 @@ const Timer = (): JSX.Element => {
   const [description, setDescription] = React.useState<string>('');
   const [placeholder, setPlaceholder] = React.useState<string>('');
   const [record, setRecord] = React.useState<RecordType>(defaultRecord);
-  const [action, setAction] = React.useState<string | null>(SYNC);
+  const [action, setAction] = React.useState<string | null>(null);
 
   // Timer
   useInterval(() => setTimer((timer) => timer + 1), isRunning ? 1000 : null);

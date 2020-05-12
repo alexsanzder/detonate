@@ -3,8 +3,9 @@ import styled from '@emotion/styled/macro';
 import tw from 'twin.macro';
 import { Play, Edit3, AlertTriangle } from 'react-feather';
 
-import { getTimeFormated } from '../../utils/time';
+import Context, { ContextType } from '../../store/context';
 import { RecordType } from '../../@types';
+import { getTimeFormated } from '../../utils/time';
 
 const RecordTime = styled.div(({ time }: any) => [
   tw`flex items-center justify-between tracking-tight`,
@@ -17,6 +18,8 @@ export interface CardProps {
 }
 
 const Card = ({ records, date }: CardProps): JSX.Element => {
+  const { state, dispatch } = React.useContext<ContextType>(Context);
+
   const formatedDate = (date: string): string => {
     const splits = date.split('.');
     return new Date(splits.reverse().join('-')).toLocaleDateString('de', {
@@ -82,6 +85,12 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 type='button'
                 className='p-2 mx-1 rounded-full hover:text-blue-500 hover:bg-gray-300 hover:bg-opacity-50 focus:outline-none focus:shadow-outline'
                 aria-label='Edit this record'
+                onClick={(): void =>
+                  dispatch({
+                    type: 'EDIT',
+                    payload: { record },
+                  })
+                }
               >
                 <Edit3 className='fill-current stroke-2' width='16' height='16' />
               </button>

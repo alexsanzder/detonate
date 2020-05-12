@@ -7,35 +7,46 @@ import { TOGGLE_EDIT } from './actions';
 
 export interface Actions {
   type: string;
-  payload?: { action: string; message?: any };
+  payload?: any;
 }
 
-const reducer = (state: GlobalStateType, action: Actions): Promise<GlobalStateType> => {
+/**
+ * SEND MESSAGE
+ * send message to background.js
+ */
+const sendMessage = async (payload): Promise<any> => {
+  const response = await browser.runtime.sendMessage(payload);
+  // console.log(response);
+  return response.payload;
+};
+
+const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
   const { type, payload } = action;
   console.log('Actions', action);
 
   switch (type) {
     case 'SEND_MESSAGE':
-      return browser.runtime
-        .sendMessage(payload)
-        .catch((error) => {
-          console.error(error);
-        })
-        .then((response) => {
-          return {
-            ...state,
-            ...response.payload,
-          };
-        });
+      const response = sendMessage(payload);
+      return {
+        ...state,
+        ...response,
+      };
 
-    case TOGGLE_EDIT:
-      return Promise.resolve({
+    case 'EDIT':
+      return {
         ...state,
         showEdit: !state.showEdit,
-      });
+        editRecord: payload.record,
+      };
+
+    case TOGGLE_EDIT:
+      return {
+        ...state,
+        showEdit: !state.showEdit,
+      };
 
     default:
-      return Promise.resolve(state);
+      return state;
   }
 };
 

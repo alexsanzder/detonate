@@ -5,29 +5,106 @@ import { Play, Edit3, AlertTriangle } from 'react-feather';
 import Context, { ContextType } from '../../store/context';
 import { TOGGLE_EDIT, UPDATE_ROW } from '../../store/actions';
 
+import { getTimeObject, getTimeObjectFromSeconds } from '../../utils/time';
+
 export interface EditProps {
-  timer: string;
+  timer?: number;
 }
 
 const Edit = ({ timer }: EditProps): JSX.Element => {
   const { state, dispatch } = React.useContext<ContextType>(Context);
 
-  // const [projects, setProjects] = React.useState<ProjectsType | null>(null);
-  const descriptionRef = React.useRef<HTMLInputElement>(null);
+  const [selectionRange, setSelectionRange] = React.useState<boolean>(false);
+  const [hours, setHours] = React.useState<string>('');
+  const [minutes, setMinutes] = React.useState<string>('');
+  const [seconds, setSeconds] = React.useState<string>('');
+  const [description, setDescription] = React.useState<string>('');
 
-  // Initial Effect
+  const descriptionRef = React.useRef<HTMLInputElement>(null);
+  const timerRef = React.useRef<HTMLInputElement>(null);
+  const hoursRef = React.useRef<HTMLInputElement>(null);
+  const minutesRef = React.useRef<HTMLInputElement>(null);
+  const secondsRef = React.useRef<HTMLInputElement>(null);
+
   React.useEffect(() => {
-    descriptionRef?.current.focus();
-    // chrome.storage.local.get(['projects'], (items) => {
-    //   setProjects(items.projects);
-    // });
-  }, []);
+    const { hours, minutes, seconds } = state.editRecord
+      ? getTimeObject(state.editRecord.time)
+      : getTimeObjectFromSeconds(timer);
+    setHours(hours);
+    setMinutes(minutes);
+    setSeconds(seconds);
+    setSelectionRange(true);
+  }, [timer]);
+
+  React.useEffect(() => {
+    if (state.editRecord) {
+      hoursRef.current.setSelectionRange(0, 0);
+      hoursRef.current.focus();
+    } else {
+      timerRef.current.disabled = true;
+      hoursRef.current.disabled = true;
+      minutesRef.current.disabled = true;
+      secondsRef.current.disabled = true;
+      descriptionRef.current.setSelectionRange(0, 0);
+      descriptionRef.current.focus();
+    }
+  }, [selectionRange]);
+
+  const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>): void => {
+    const re = /^[0-9\b]+$/;
+    if (target.value === '' || re.test(target.value)) {
+      switch (target.name) {
+        case 'hours':
+          +target.value <= 24 && setHours(target.value);
+          break;
+        case 'minutes':
+          +target.value <= 59 && setMinutes(target.value);
+          break;
+        case 'seconds':
+          +target.value <= 59 && setSeconds(target.value);
+          break;
+        default:
+          break;
+      }
+    }
+  };
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-white'>
       <div className='relative w-full max-w-sm mx-auto'>
-        <div className='w-full p-3 my-3 text-lg text-3xl font-medium text-center border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'>
-          {timer}
+        <div
+          ref={timerRef}
+          className='w-full p-3 my-3 text-lg text-3xl font-medium text-center border rounded-md hover:border-blue-500 focus-within:border-blue-500 focus:outline-none'
+          onFocus={(): void => {
+            timerRef.current.classList.add('shadow-outline');
+          }}
+          onBlur={(): void => timerRef.current.classList.remove('shadow-outline')}
+        >
+          <span className='flex flex-no-wrap items-center justify-center w-1/2 m-auto text-center focus-within:border-blue-500'>
+            <input
+              ref={hoursRef}
+              className='w-1/4 text-center focus:outline-none'
+              name='hours'
+              value={hours}
+              onChange={handleChange}
+            />
+            :
+            <input
+              ref={minutesRef}
+              className='w-1/4 text-center focus:outline-none'
+              name='minutes'
+              value={minutes}
+              onChange={handleChange}
+            />
+            :
+            <input
+              ref={secondsRef}
+              className='w-1/4 text-center focus:outline-none'
+              name='seconds'
+              value={seconds}
+              onChange={handleChange}
+            />
+          </span>
         </div>
         <input
           ref={descriptionRef}

@@ -12,6 +12,7 @@ export interface GlobalStateType {
   showEdit: boolean;
   isRunning: boolean;
   lastRecord: RecordType;
+  editRecord: RecordType;
   profile: any;
   projects: any;
   range: string;

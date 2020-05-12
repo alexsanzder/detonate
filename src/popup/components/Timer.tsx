@@ -98,60 +98,65 @@ const Timer = (): JSX.Element => {
   };
 
   return (
-    <form
-      className='flex items-center justify-between w-full h-24 px-4 mt-12 bg-white border-b shadow-md'
-      onSubmit={handlePlay}
-    >
-      <InputContainer
-        className={
-          !isRunning
-            ? 'border-b border-gray-400 hover:border-magenta-400 focus-within:border-magenta-500'
-            : 'cursor-pointer'
-        }
-        onClick={handleInputClick}
-      >
-        <Input
-          className={isRunning ? 'max-w-sm cursor-pointer' : 'cursor-text'}
-          ref={descriptionRef}
-          placeholder='What are you working on?'
-          value={description}
-          onChange={handleInputChange}
-        />
-        {isRunning && (
-          <span className='w-1/4 px-1 text-lg text-right text-gray-900'>
-            {getTimeFromSeconds(timer)}
-          </span>
-        )}
-      </InputContainer>
-      <div className='flex items-center justify-end'>
-        {isRunning ? (
-          <>
-            <Button
-              type='button'
-              className='mr-2 bg-blue-600 hover:bg-blue-700'
-              aria-label='Edit Timer'
-              onClick={(): void => dispatch({ type: TOGGLE_EDIT })}
-            >
-              <Edit3 className='h-4 m-2 fill-current' />
-            </Button>
+    <>
+      {!state.showEdit ? (
+        <form
+          className='flex items-center justify-between w-full h-24 px-4 mt-12 bg-white border-b shadow-md'
+          onSubmit={handlePlay}
+        >
+          <InputContainer
+            className={
+              !isRunning
+                ? 'border-b border-gray-400 hover:border-magenta-400 focus-within:border-magenta-500'
+                : 'cursor-pointer'
+            }
+            onClick={handleInputClick}
+          >
+            <Input
+              className={isRunning ? 'max-w-sm cursor-pointer' : 'cursor-text'}
+              ref={descriptionRef}
+              placeholder='What are you working on?'
+              value={description}
+              onChange={handleInputChange}
+            />
+            {isRunning && (
+              <span className='w-1/4 px-1 text-lg text-right text-gray-900'>
+                {getTimeFromSeconds(timer)}
+              </span>
+            )}
+          </InputContainer>
+          <div className='flex items-center justify-end'>
+            {isRunning ? (
+              <>
+                <Button
+                  type='button'
+                  className='mr-2 bg-blue-600 hover:bg-blue-700'
+                  aria-label='Edit Timer'
+                  onClick={(): void => dispatch({ type: TOGGLE_EDIT })}
+                >
+                  <Edit3 className='h-4 m-2 fill-current' />
+                </Button>
 
-            <Button
-              type='button'
-              className='bg-red-600 hover:bg-red-700'
-              aria-label='Stop'
-              onClick={handleStop}
-            >
-              <Square className='h-4 m-2 fill-current' />
-            </Button>
-          </>
-        ) : (
-          <Button type='submit' className='bg-green-600 hover:bg-green-700' aria-label='Play'>
-            <Play className='h-4 m-2 fill-current' />
-          </Button>
-        )}
-      </div>
-      {state.showEdit && <Edit timer={getTimeFromSeconds(timer)} />}
-    </form>
+                <Button
+                  type='button'
+                  className='bg-red-600 hover:bg-red-700'
+                  aria-label='Stop'
+                  onClick={handleStop}
+                >
+                  <Square className='h-4 m-2 fill-current' />
+                </Button>
+              </>
+            ) : (
+              <Button type='submit' className='bg-green-600 hover:bg-green-700' aria-label='Play'>
+                <Play className='h-4 m-2 fill-current' />
+              </Button>
+            )}
+          </div>
+        </form>
+      ) : (
+        <Edit timer={state.editRecord ? 0 : timer} />
+      )}
+    </>
   );
 };
 

@@ -187,8 +187,8 @@ const deleteRow = async ({ index }): Promise<any> => {
  * GET ALL ITEMS LOCAL STORAGE
  * comes from the browser.storage.local
  */
-const getLocalStorage = async (): Promise<any> => {
-  const storage = await browser.storage.local.get(null);
+const getLocalStorage = async (value = null): Promise<any> => {
+  const storage = await browser.storage.local.get(value);
   // console.log(storage);
   return storage;
 };
@@ -246,17 +246,29 @@ browser.runtime.onMessage.addListener(
         //     payload: { record: updateRecord },
         //   });
 
-        // case DELETE_ROW:
-        //   alert('NOP');
-        //   const delatedResponse = await deleteRow(payload);
-        //   return Promise.resolve({ status: 'DELETE_SUCCESS', payload: delatedResponse });
+        case DELETE_ROW: {
+          //confirm('¯_(ツ)_/¯ ' + message.id);
+          await deleteRow(message);
+          await loadTable();
+          const { records } = await getLocalStorage('records');
+          const deleted = records.filter((el) => el.id !== message.id);
+          browser.storage.local.set({
+            records: deleted,
+          });
+          const storage = await getLocalStorage();
+          return Promise.resolve({
+            status: 'DELETE_SUCCESS',
+            payload: { showEdit: false, ...storage },
+          });
+        }
 
-        case SYNC:
+        case SYNC: {
+          browser.storage.local.remove('editRecord');
           browser.storage.local.remove('records');
           await loadTable();
           const storage = await getLocalStorage();
           return Promise.resolve({ status: 'SUCCESS', payload: storage });
-
+        }
         // case CLEAR_STORAGE:
         //   await browser.storage.local.clear();
         //   return Promise.resolve({ status: 'SUCCESS', payload: undefined });

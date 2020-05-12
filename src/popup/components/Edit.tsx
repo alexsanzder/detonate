@@ -2,8 +2,11 @@ import * as React from 'react';
 import styled from '@emotion/styled/macro';
 import tw from 'twin.macro';
 import { Play, Edit3, AlertTriangle } from 'react-feather';
+
+const TABLE_NAME = process.env.REACT_APP_TABLE_NAME;
+
 import Context, { ContextType } from '../../store/context';
-import { TOGGLE_EDIT, UPDATE_ROW } from '../../store/actions';
+import { TOGGLE_EDIT, UPDATE_ROW, DELETE_ROW } from '../../store/actions';
 
 import { getTimeObject, getTimeObjectFromSeconds } from '../../utils/time';
 
@@ -110,6 +113,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
           ref={descriptionRef}
           className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add description'
+          value={state.editRecord ? state.editRecord.description : state.lastRecord.description}
         />
 
         <input
@@ -133,7 +137,24 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
             >
               Cancel
             </button>
-            <button className='w-1/2 py-3 ml-1 text-base text-white bg-red-600 border border-red-600 rounded-md shadow-md hover:border-red-700 hover:bg-red-700 focus:outline-none focus:shadow-outline'>
+            <button
+              className='w-1/2 py-3 ml-1 text-base text-white bg-red-600 border border-red-600 rounded-md shadow-md hover:border-red-700 hover:bg-red-700 focus:outline-none focus:shadow-outline'
+              onClick={(): void => {
+                const index = state.editRecord
+                  ? state.editRecord.id.replace(/(^.+\D)(\d+)(\D.+$)/i, '$2')
+                  : state.lastRecord.id.replace(`${TABLE_NAME}!A`, '');
+                dispatch({
+                  type: 'SEND_MESSAGE',
+                  payload: {
+                    action: DELETE_ROW,
+                    message: {
+                      index,
+                      id: state.editRecord.id,
+                    },
+                  },
+                });
+              }}
+            >
               Delete
             </button>
           </div>

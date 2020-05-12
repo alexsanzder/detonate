@@ -17,7 +17,7 @@ export interface Actions {
 const sendMessage = async (payload): Promise<any> => {
   const response = await browser.runtime.sendMessage(payload);
   // console.log(response);
-  return response.payload;
+  return Promise.resolve(response.payload);
 };
 
 const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
@@ -27,9 +27,11 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
   switch (type) {
     case 'SEND_MESSAGE':
       const response = sendMessage(payload);
+      //console.log('SEND_MESSAGE', payload, response);
       return {
         ...state,
         ...response,
+        showEdit: false,
       };
 
     case 'EDIT':
@@ -43,6 +45,7 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
       return {
         ...state,
         showEdit: !state.showEdit,
+        editRecord: undefined,
       };
 
     default:

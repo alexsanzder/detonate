@@ -6,8 +6,6 @@ import Summary from './components/Summary';
 import Context from '../store/context';
 const Popup = (): JSX.Element => {
   const { state, dispatch } = React.useContext(Context);
-  console.log(state);
-
   return (
     <div className='h-full pt-36'>
       <div className='fixed top-0 w-full'>

@@ -1,19 +1,16 @@
 import React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 
+import Context, { ContextType } from '../../store/context';
 import { RecordType } from '../../@types';
 
 import Card from './Card';
 
 const Summary = (): JSX.Element => {
-  const [records, setRecords] = React.useState<RecordType[]>([]);
+  const { state } = React.useContext<ContextType>(Context);
+  const [records, setRecords] = React.useState<RecordType[]>(state.records);
 
   React.useEffect(() => {
-    (async (): Promise<void> => {
-      const items = await browser.storage.local.get(['records']);
-      setRecords(items.records);
-    })();
-
     browser.storage.onChanged.addListener(({ records }: any) => {
       records && setRecords(records.newValue);
     });

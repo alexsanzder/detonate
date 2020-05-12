@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { initialState, GlobalStateProps, Actions } from './useGlobalState';
+
+import { Actions } from './useGlobalState';
+import { GlobalStateType } from './GlobalStateProvider';
 
 export interface ContextType {
-  state: GlobalStateProps | Promise<GlobalStateProps>;
+  state: GlobalStateType;
   dispatch: React.Dispatch<Actions>;
 }
 
 const Context = React.createContext<ContextType>({
-  state: initialState,
+  state: null,
   dispatch: () => null,
 });
 

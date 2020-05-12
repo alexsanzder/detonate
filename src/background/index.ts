@@ -77,10 +77,10 @@ const loadTable = async (): Promise<void> => {
   // save table data in the brower local storage
   browser.storage.local.set({
     projects,
-    lastRecord,
-    range: lastRecord.id,
-    records: records.slice(Math.max(records.length - 15, 0)).reverse(),
+    lastRecord: lastRecord.time === 0 ? lastRecord : null,
+    records: records.slice(Math.max(records.length - 20, 0)).reverse(),
     isRunning: lastRecord.time === 0,
+    start: 0,
   });
 
   console.log('Table data loaded!');
@@ -100,6 +100,7 @@ const organize = (record): RecordType => ({
 
 // Add row
 const addRow = async ({ record }): Promise<RecordType> => {
+  delete record.id;
   const { profile } = await browser.storage.local.get(['profile']);
 
   // Current Date for the record
@@ -114,6 +115,7 @@ const addRow = async ({ record }): Promise<RecordType> => {
     ...record,
     name: profile.name,
     date: today,
+    time: 0,
   } as RecordType;
 
   const organizedRecord = organize(newRecord);
@@ -135,6 +137,7 @@ const addRow = async ({ record }): Promise<RecordType> => {
   const lastRecord = { ...organizedRecord, id: updatedRange };
   browser.storage.local.set({
     lastRecord,
+    updatedRange,
   });
 
   return lastRecord;
@@ -144,7 +147,6 @@ const addRow = async ({ record }): Promise<RecordType> => {
 const updateRow = async ({ id: range, ...record }): Promise<RecordType> => {
   const organizedRecord = organize(record);
   const values = Object.values(organizedRecord);
-  console.log('record to update', range, record);
   const {
     result: { updatedRange },
   } = await gapi.client.sheets.spreadsheets.values.update({
@@ -157,8 +159,8 @@ const updateRow = async ({ id: range, ...record }): Promise<RecordType> => {
   });
 
   const lastRecord = { ...organizedRecord, id: updatedRange };
-  browser.storage.local.set({ lastRecord });
-  console.log(lastRecord);
+  browser.storage.local.set({ lastRecord, updatedRange });
+
   return lastRecord;
 };
 
@@ -189,7 +191,7 @@ const deleteRow = async ({ index }): Promise<any> => {
  */
 browser.runtime.onMessage.addListener(
   async ({ type, payload }): Promise<{ status: string; payload: {} }> => {
-    console.log('Message type', type);
+    console.log('Message type', type, payload);
 
     if (type)
       switch (type) {
@@ -198,40 +200,61 @@ browser.runtime.onMessage.addListener(
           return Promise.resolve({ status: 'SUCCESS', payload: undefined });
 
         case SYNC:
-          loadTable();
-          const storage = await browser.storage.local.get(['records', 'projects']);
+          browser.storage.local.remove('records');
+          await loadTable();
+          const storage = await browser.storage.local.get();
           return Promise.resolve({ status: 'SUCCESS', payload: storage });
 
-        case ADD_ROW:
+        case ADD_ROW: {
+          console.log(ADD_ROW, payload);
           browser.browserAction.setBadgeText({ text: '▶️' });
           const addRecord = await addRow(payload);
-          return Promise.resolve({ status: 'ADD_SUCCESS', payload: { record: addRecord } });
+          console.log('ADD_ROW_RES', addRecord);
+          const now = Date.now();
+          browser.storage.local.set({
+            isRunning: true,
+            start: now,
+          });
+
+          return browser.storage.local.get().then((items) => {
+            return Promise.resolve({ status: 'ADD_SUCCESS', payload: items });
+          });
+        }
 
         case UPDATE_ROW:
           browser.browserAction.setBadgeText({ text: '' });
+          console.log(payload);
           const updateRecord = await updateRow(payload);
           return Promise.resolve({
             status: 'UPDATE_SUCCESS',
             payload: { record: updateRecord },
           });
 
-        case FINISH_ROW:
+        case FINISH_ROW: {
+          console.log(FINISH_ROW, payload);
           browser.browserAction.setBadgeText({ text: '' });
           const { record } = payload;
           const { records, start } = await browser.storage.local.get(['records', 'start']);
           const time = Math.abs(Date.now() - start) / 36e5;
 
           const newRecord = { ...record, time };
-          browser.storage.local.set({ range: null });
-
           const finishRecord = await updateRow(newRecord);
+          console.log(finishRecord);
           browser.storage.local.set({
             isRunning: false,
             start: 0,
             records: [finishRecord, ...records],
+            showEdit: null,
+            lastRecord: null,
           });
 
-          return Promise.resolve({ status: 'FINISH_SUCCESS', payload: { record: finishRecord } });
+          return browser.storage.local.get().then((items) => {
+            return Promise.resolve({
+              status: 'FINISH_SUCCESS',
+              payload: items,
+            });
+          });
+        }
 
         case DELETE_ROW:
           alert('NOP');

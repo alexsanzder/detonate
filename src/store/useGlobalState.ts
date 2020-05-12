@@ -1,78 +1,41 @@
 import * as React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 
-import { RecordType } from '../@types';
 import { GlobalStateType } from './GlobalStateProvider';
 import { ContextType } from './context';
-import { SYNC, TOGGLE_EDIT, ADD_ROW, FINISH_ROW, UPDATE_ROW } from './actions';
+import { TOGGLE_EDIT } from './actions';
 
 export interface Actions {
   type: string;
-  payload?: any;
+  payload?: { action: string; message?: any };
 }
 
-const sendMessage = async (action: Actions): Promise<any> => {
-  return await browser.runtime.sendMessage(action);
-};
+const reducer = (state: GlobalStateType, action: Actions): Promise<GlobalStateType> => {
+  const { type, payload } = action;
+  console.log('Actions', action);
 
-const reducer = async (state: GlobalStateType, action: Actions): Promise<GlobalStateType> => {
-  switch (action.type) {
-    case SYNC:
-      (async (): Promise<GlobalStateType> => {
-        const response = await sendMessage(action);
-        return state;
-      })();
-      return state;
-
-    case ADD_ROW:
-      const response = await browser.runtime.sendMessage(action);
-      console.log(response);
-      return {
-        ...state,
-        ...response,
-      };
-
-    case UPDATE_ROW:
-      (async (): Promise<GlobalStateType> => {
-        const response = await sendMessage(action);
-        return {
-          ...state,
-          lastRecord: response.payload.record,
-        };
-      })();
-      return state;
-
-    case FINISH_ROW:
-      (async (): Promise<GlobalStateType> => {
-        const response = await sendMessage(action);
-        console.log('FINISH_ROW', response);
-        return {
-          ...state,
-          ...response,
-        };
-      })();
-      return state;
-
-    case 'LAST_RECORD':
-      return {
-        ...state,
-        lastRecord: action.payload,
-      };
-
-    case 'TOGGLE_RUNNING':
-      return {
-        ...state,
-        isRunning: !state.isRunning,
-      };
+  switch (type) {
+    case 'SEND_MESSAGE':
+      return browser.runtime
+        .sendMessage(payload)
+        .catch((error) => {
+          console.error(error);
+        })
+        .then((response) => {
+          return {
+            ...state,
+            ...response.payload,
+          };
+        });
 
     case TOGGLE_EDIT:
-      return {
+      return Promise.resolve({
         ...state,
         showEdit: !state.showEdit,
-      };
+      });
 
     default:
-      return state;
+      return Promise.resolve(state);
   }
 };
 

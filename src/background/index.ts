@@ -15,7 +15,6 @@ const SCOPE = [
 
 import { ProjectType, RecordType } from '../@types';
 
-/* eslint-disable no-undef */
 // console.log('Background.js file loaded!');
 
 // Load table
@@ -80,7 +79,6 @@ const loadTable = async (): Promise<void> => {
     lastRecord: lastRecord.time === 0 ? lastRecord : null,
     records: records.slice(Math.max(records.length - 20, 0)).reverse(),
     isRunning: lastRecord.time === 0,
-    start: 0,
   });
 
   console.log('Table data loaded!');
@@ -136,7 +134,7 @@ const addRow = async ({ record }): Promise<RecordType> => {
 
   const lastRecord = { ...organizedRecord, id: updatedRange };
   browser.storage.local.set({
-    lastRecord,
+    lastRecord: { ...lastRecord },
     updatedRange,
   });
 
@@ -186,80 +184,82 @@ const deleteRow = async ({ index }): Promise<any> => {
 };
 
 /**
+ * GET ALL ITEMS LOCAL STORAGE
+ * comes from the browser.storage.local
+ */
+const getLocalStorage = async (): Promise<any> => {
+  const storage = await browser.storage.local.get(null);
+  // console.log(storage);
+  return storage;
+};
+
+/**
  * ON MESSAGE
  * comes from the content script embedded in the page or popup
  */
 browser.runtime.onMessage.addListener(
-  async ({ type, payload }): Promise<{ status: string; payload: {} }> => {
-    console.log('Message type', type, payload);
-
-    if (type)
-      switch (type) {
-        case CLEAR_STORAGE:
-          await browser.storage.local.clear();
-          return Promise.resolve({ status: 'SUCCESS', payload: undefined });
-
-        case SYNC:
-          browser.storage.local.remove('records');
-          await loadTable();
-          const storage = await browser.storage.local.get();
-          return Promise.resolve({ status: 'SUCCESS', payload: storage });
-
+  async ({ action, message }): Promise<{ status: string; payload: any }> => {
+    if (action)
+      switch (action) {
         case ADD_ROW: {
-          console.log(ADD_ROW, payload);
           browser.browserAction.setBadgeText({ text: '▶️' });
-          const addRecord = await addRow(payload);
-          console.log('ADD_ROW_RES', addRecord);
+          const addRecord = await addRow(message);
+
           const now = Date.now();
           browser.storage.local.set({
             isRunning: true,
             start: now,
           });
 
-          return browser.storage.local.get().then((items) => {
-            return Promise.resolve({ status: 'ADD_SUCCESS', payload: items });
-          });
+          const storage = await getLocalStorage();
+          return Promise.resolve({ status: 'ADD_SUCCESS', payload: { ...storage } });
         }
 
-        case UPDATE_ROW:
-          browser.browserAction.setBadgeText({ text: '' });
-          console.log(payload);
-          const updateRecord = await updateRow(payload);
-          return Promise.resolve({
-            status: 'UPDATE_SUCCESS',
-            payload: { record: updateRecord },
-          });
-
         case FINISH_ROW: {
-          console.log(FINISH_ROW, payload);
           browser.browserAction.setBadgeText({ text: '' });
-          const { record } = payload;
           const { records, start } = await browser.storage.local.get(['records', 'start']);
           const time = Math.abs(Date.now() - start) / 36e5;
+          const newRecord = { ...message.record, time };
 
-          const newRecord = { ...record, time };
           const finishRecord = await updateRow(newRecord);
-          console.log(finishRecord);
+
           browser.storage.local.set({
             isRunning: false,
             start: 0,
             records: [finishRecord, ...records],
-            showEdit: null,
-            lastRecord: null,
+            lastRecord: {},
           });
 
-          return browser.storage.local.get().then((items) => {
-            return Promise.resolve({
-              status: 'FINISH_SUCCESS',
-              payload: items,
-            });
+          const storage = await getLocalStorage();
+          return Promise.resolve({
+            status: 'FINISH_SUCCESS',
+            payload: { ...storage },
           });
         }
 
-        case DELETE_ROW:
-          alert('NOP');
-          const delatedResponse = await deleteRow(payload);
-          return Promise.resolve({ status: 'DELETE_SUCCESS', payload: delatedResponse });
+        // case UPDATE_ROW:
+        //   browser.browserAction.setBadgeText({ text: '' });
+        //   console.log(payload);
+        //   const updateRecord = await updateRow(payload);
+        //   return Promise.resolve({
+        //     status: 'UPDATE_SUCCESS',
+        //     payload: { record: updateRecord },
+        //   });
+
+        // case DELETE_ROW:
+        //   alert('NOP');
+        //   const delatedResponse = await deleteRow(payload);
+        //   return Promise.resolve({ status: 'DELETE_SUCCESS', payload: delatedResponse });
+
+        case SYNC:
+          browser.storage.local.remove('records');
+          await loadTable();
+          const storage = await getLocalStorage();
+          return Promise.resolve({ status: 'SUCCESS', payload: storage });
+
+        // case CLEAR_STORAGE:
+        //   await browser.storage.local.clear();
+        //   return Promise.resolve({ status: 'SUCCESS', payload: undefined });
 
         default:
           return Promise.resolve({

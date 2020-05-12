@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { browser } from 'webextension-polyfill-ts';
+
 import tw from 'twin.macro';
 import { Play, Edit3, Square } from 'react-feather';
 import Edit from './Edit';
@@ -7,6 +9,7 @@ import Context, { ContextType } from '../../store/context';
 import { ADD_ROW, FINISH_ROW, TOGGLE_EDIT } from '../../store/actions';
 import { useInterval } from '../../hooks/useInterval';
 import { getTimeFromSeconds } from '../../utils/time';
+import { RecordType } from '../../@types';
 
 const Button = tw.button`w-10 h-10 text-white rounded-full shadow-lg focus:outline-none focus:shadow-outline`;
 const InputContainer = tw.div`flex items-center justify-between w-full mr-3`;
@@ -14,9 +17,8 @@ const Input = tw.input`w-full h-10 px-1 pb-2 mt-2 mr-1 text-lg text-gray-900 foc
 
 const Timer = (): JSX.Element => {
   const { state, dispatch } = React.useContext<ContextType>(Context);
-  console.log(state);
 
-  const [isRunning, setRunning] = React.useState<boolean>(state.isRunning);
+  const [isRunning, setRunning] = React.useState<boolean>(state && state.isRunning);
   const [timer, setTimer] = React.useState<number>(
     state.start ? Math.abs(Date.now() - state.start) / 1000 : 0,
   );
@@ -24,6 +26,7 @@ const Timer = (): JSX.Element => {
     state.isRunning && state.lastRecord ? state.lastRecord.description : '',
   );
   const [placeholder, setPlaceholder] = React.useState<string>('');
+  const [lastRecord, setLastRecord] = React.useState<RecordType>(state.lastRecord);
 
   // Timer
   useInterval(() => setTimer((timer) => timer + 1), isRunning ? 1000 : null);
@@ -40,6 +43,10 @@ const Timer = (): JSX.Element => {
     })();
     descriptionRef.current.focus();
     descriptionRef.current.setSelectionRange(0, 0);
+
+    browser.storage.onChanged.addListener(({ lastRecord }: any) => {
+      lastRecord && setLastRecord(lastRecord.newValue);
+    });
   }, []);
 
   const handlePlay = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -47,10 +54,11 @@ const Timer = (): JSX.Element => {
     setDescription(description === '' ? placeholder : description);
     setRunning(!isRunning);
     dispatch({
-      type: ADD_ROW,
+      type: 'SEND_MESSAGE',
       payload: {
-        record: {
-          description: description === '' ? placeholder : description,
+        action: ADD_ROW,
+        message: {
+          record: { description: description === '' ? placeholder : description },
         },
       },
     });
@@ -69,7 +77,16 @@ const Timer = (): JSX.Element => {
     setDescription('');
     descriptionRef.current.focus();
     descriptionRef.current.setSelectionRange(0, 0);
-    dispatch({ type: FINISH_ROW, payload: { record: state.lastRecord } });
+
+    dispatch({
+      type: 'SEND_MESSAGE',
+      payload: {
+        action: FINISH_ROW,
+        message: {
+          record: lastRecord,
+        },
+      },
+    });
   };
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -133,7 +150,7 @@ const Timer = (): JSX.Element => {
           </Button>
         )}
       </div>
-      {state.showEdit && <Edit timer={getTimeFromSeconds(timer)} onClose={null} />}
+      {state.showEdit && <Edit timer={getTimeFromSeconds(timer)} />}
     </form>
   );
 };

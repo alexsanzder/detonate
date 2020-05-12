@@ -45,7 +45,12 @@ const Header = (): JSX.Element => {
           className='flex items-center justify-center block w-8 h-8 m-1 rounded-full hover:bg-gray-100 hover:bg-opacity-25 focus:outline-none focus:shadow-outline'
           aria-label='Sync Google Sheets'
           onClick={(): void => {
-            dispatch({ type: SYNC });
+            dispatch({
+              type: 'SEND_MESSAGE',
+              payload: {
+                action: SYNC,
+              },
+            });
           }}
         >
           <RefreshCw className='stroke-2' height='20' width='20' />

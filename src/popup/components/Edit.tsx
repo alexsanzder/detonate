@@ -2,29 +2,25 @@ import * as React from 'react';
 import styled from '@emotion/styled/macro';
 import tw from 'twin.macro';
 import { Play, Edit3, AlertTriangle } from 'react-feather';
-import { RecordType } from '../../hooks/useGoogle';
-import {
-  getSeconds,
-  getFraction,
-  getTimeFormated,
-  getTimeFromSeconds,
-} from '../../utils/time';
+import Context, { ContextType } from '../../store/context';
+import { TOGGLE_EDIT, UPDATE_ROW } from '../../store/actions';
 
 export interface EditProps {
   timer: string;
-  onClose: (arg: boolean) => void;
 }
 
-const Edit = ({ timer, onClose }: EditProps): JSX.Element => {
+const Edit = ({ timer }: EditProps): JSX.Element => {
+  const { state, dispatch } = React.useContext<ContextType>(Context);
+
+  // const [projects, setProjects] = React.useState<ProjectsType | null>(null);
   const descriptionRef = React.useRef<HTMLInputElement>(null);
-  const [projects, setProjects] = React.useState<ProjectsType | null>(null);
 
   // Initial Effect
   React.useEffect(() => {
     descriptionRef?.current.focus();
-    chrome.storage.local.get(['projects'], (items) => {
-      setProjects(items.projects);
-    });
+    // chrome.storage.local.get(['projects'], (items) => {
+    //   setProjects(items.projects);
+    // });
   }, []);
 
   return (
@@ -56,7 +52,7 @@ const Edit = ({ timer, onClose }: EditProps): JSX.Element => {
           <div className='flex items-center w-full my-3'>
             <button
               className='w-1/2 py-3 mr-1 text-base text-gray-600 border border-gray-600 rounded-md shadow-md hover:bg-gray-200 focus:outline-none focus:shadow-outline'
-              onClick={() => onClose(false)}
+              onClick={(): void => dispatch({ type: TOGGLE_EDIT })}
             >
               Cancel
             </button>

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { browser } from 'webextension-polyfill-ts';
 
 import useGlobalState from './useGlobalState';
 
@@ -27,7 +28,17 @@ const useGlobalStateProvider = ({
   initialState,
   children,
 }: GlobalStateProviderProps): JSX.Element => {
-  return <Context.Provider value={useGlobalState(initialState)}>{children}</Context.Provider>;
+  const [state, setState] = React.useState(initialState);
+
+  React.useEffect(() => {
+    browser.storage.onChanged.addListener((items: any) => {
+      setState({ ...state, ...items });
+    });
+  }, []);
+
+  console.log('Context', state);
+
+  return <Context.Provider value={useGlobalState(state)}>{children}</Context.Provider>;
 };
 
 export default useGlobalStateProvider;

@@ -41,6 +41,12 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         editRecord: payload.record,
       };
 
+    case 'UPDATE_EDIT':
+      return {
+        ...state,
+        editRecord: payload.record,
+      };
+
     case TOGGLE_EDIT:
       return {
         ...state,

@@ -135,7 +135,7 @@ const addRow = async ({ record }): Promise<RecordType> => {
   const lastRecord = { ...organizedRecord, id: updatedRange };
   browser.storage.local.set({
     lastRecord: { ...lastRecord },
-    updatedRange,
+    // updatedRange,
   });
 
   return lastRecord;
@@ -157,7 +157,10 @@ const updateRow = async ({ id: range, ...record }): Promise<RecordType> => {
   });
 
   const lastRecord = { ...organizedRecord, id: updatedRange };
-  browser.storage.local.set({ lastRecord, updatedRange });
+  browser.storage.local.set({
+    lastRecord,
+    //updatedRange
+  });
 
   return lastRecord;
 };
@@ -215,6 +218,28 @@ browser.runtime.onMessage.addListener(
           return Promise.resolve({ status: 'ADD_SUCCESS', payload: { ...storage } });
         }
 
+        case UPDATE_ROW: {
+          const updatedRecord = await updateRow(message.record);
+
+          console.log(updatedRecord);
+
+          const { records } = await getLocalStorage('records');
+          const recordIndex = records.findIndex((record) => record.id === updatedRecord.id);
+          records[recordIndex] = updatedRecord;
+
+          browser.storage.local.set({
+            records: records,
+          });
+
+          const storage = await getLocalStorage();
+          console.log(storage.records);
+
+          return Promise.resolve({
+            status: 'UPDATE_SUCCESS',
+            payload: { ...storage },
+          });
+        }
+
         case FINISH_ROW: {
           browser.browserAction.setBadgeText({ text: '' });
           const { records, start } = await browser.storage.local.get(['records', 'start']);
@@ -237,21 +262,12 @@ browser.runtime.onMessage.addListener(
           });
         }
 
-        // case UPDATE_ROW:
-        //   browser.browserAction.setBadgeText({ text: '' });
-        //   console.log(payload);
-        //   const updateRecord = await updateRow(payload);
-        //   return Promise.resolve({
-        //     status: 'UPDATE_SUCCESS',
-        //     payload: { record: updateRecord },
-        //   });
-
         case DELETE_ROW: {
           //confirm('¯_(ツ)_/¯ ' + message.id);
           await deleteRow(message);
           await loadTable();
           const { records } = await getLocalStorage('records');
-          const deleted = records.filter((el) => el.id !== message.id);
+          const deleted = records.filter((record) => record.id !== message.id);
           browser.storage.local.set({
             records: deleted,
           });

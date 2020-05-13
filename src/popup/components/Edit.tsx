@@ -8,7 +8,7 @@ const TABLE_NAME = process.env.REACT_APP_TABLE_NAME;
 import Context, { ContextType } from '../../store/context';
 import { TOGGLE_EDIT, UPDATE_ROW, DELETE_ROW } from '../../store/actions';
 
-import { getTimeObject, getTimeObjectFromSeconds } from '../../utils/time';
+import { getTimeObject, getTimeObjectFromSeconds, getSeconds, getFraction } from '../../utils/time';
 
 export interface EditProps {
   timer?: number;
@@ -21,7 +21,6 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
   const [hours, setHours] = React.useState<string>('');
   const [minutes, setMinutes] = React.useState<string>('');
   const [seconds, setSeconds] = React.useState<string>('');
-  const [description, setDescription] = React.useState<string>('');
 
   const descriptionRef = React.useRef<HTMLInputElement>(null);
   const timerRef = React.useRef<HTMLInputElement>(null);
@@ -54,11 +53,12 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
   }, [selectionRange]);
 
   const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>): void => {
-    const re = /^[0-9\b]+$/;
-    if (target.value === '' || re.test(target.value)) {
+    const regex = /^[0-9\b]+$/;
+
+    if (target.value === '' || regex.test(target.value)) {
       switch (target.name) {
         case 'hours':
-          +target.value <= 24 && setHours(target.value);
+          +target.value <= 59 && setHours(target.value);
           break;
         case 'minutes':
           +target.value <= 59 && setMinutes(target.value);
@@ -69,43 +69,88 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
         default:
           break;
       }
+      const hours = hoursRef.current.value === '' ? '00' : hoursRef.current.value;
+      const minutes = minutesRef.current.value === '' ? '00' : minutesRef.current.value;
+      const seconds = secondsRef.current.value === '' ? '00' : secondsRef.current.value;
+
+      const time = `${hours}:${minutes}:${seconds}`;
+      console.log(`${hours}:${minutes}:${seconds}`);
+      console.log(getSeconds(time));
+      dispatch({
+        type: 'UPDATE_EDIT',
+        payload: {
+          record: { ...state.editRecord, time: getSeconds(time) },
+        },
+      });
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+
+    dispatch({
+      type: 'SEND_MESSAGE',
+      payload: {
+        action: UPDATE_ROW,
+        message: {
+          record: { ...state.editRecord, time: getFraction(state.editRecord.time) },
+        },
+      },
+    });
   };
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-white'>
-      <div className='relative w-full max-w-sm mx-auto'>
+      <form className='relative w-full max-w-sm mx-auto' onSubmit={handleSubmit}>
         <div
           ref={timerRef}
           className='w-full p-3 my-3 text-lg text-3xl font-medium text-center border rounded-md hover:border-blue-500 focus-within:border-blue-500 focus:outline-none'
           onFocus={(): void => {
             timerRef.current.classList.add('shadow-outline');
           }}
-          onBlur={(): void => timerRef.current.classList.remove('shadow-outline')}
+          onBlur={(): void => {
+            timerRef.current.classList.remove('shadow-outline');
+          }}
         >
           <span className='flex flex-no-wrap items-center justify-center w-1/2 m-auto text-center focus-within:border-blue-500'>
             <input
               ref={hoursRef}
+              type='text'
+              maxLength={2}
               className='w-1/4 text-center focus:outline-none'
               name='hours'
               value={hours}
               onChange={handleChange}
+              onBlur={(e) => {
+                console.log(e.target.value);
+                e.target.value === '' && setHours('00');
+              }}
             />
             :
             <input
               ref={minutesRef}
+              type='text'
+              maxLength={2}
               className='w-1/4 text-center focus:outline-none'
               name='minutes'
               value={minutes}
               onChange={handleChange}
+              onBlur={(e) => {
+                e.target.value === '' && setSeconds('00');
+              }}
             />
             :
             <input
               ref={secondsRef}
+              type='text'
+              maxLength={2}
               className='w-1/4 text-center focus:outline-none'
               name='seconds'
               value={seconds}
               onChange={handleChange}
+              onBlur={(e) => {
+                e.target.value === '' && setMinutes('00');
+              }}
             />
           </span>
         </div>
@@ -114,20 +159,49 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
           className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add description'
           value={state.editRecord ? state.editRecord.description : state.lastRecord.description}
+          onChange={(e) => {
+            dispatch({
+              type: 'UPDATE_EDIT',
+              payload: {
+                record: { ...state.editRecord, description: e.target.value },
+              },
+            });
+          }}
         />
 
         <input
           className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add project'
+          value={state.editRecord ? state.editRecord.project : state.lastRecord.project}
+          onChange={(e) => {
+            dispatch({
+              type: 'UPDATE_EDIT',
+              payload: {
+                record: { ...state.editRecord, project: e.target.value },
+              },
+            });
+          }}
         />
 
         <input
           className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add ticket'
+          value={state.editRecord ? state.editRecord.ticket : state.lastRecord.ticket}
+          onChange={(e) => {
+            dispatch({
+              type: 'UPDATE_EDIT',
+              payload: {
+                record: { ...state.editRecord, ticket: e.target.value },
+              },
+            });
+          }}
         />
 
         <div className='flex flex-col items-center justify-between w-full pt-4 mt-8 border-t'>
-          <button className='w-full py-3 text-base text-white bg-blue-600 border border-blue-600 rounded-md shadow-md hover:border-blue-700 hover:bg-blue-700 focus:outline-none focus:shadow-outline'>
+          <button
+            type='submit'
+            className='w-full py-3 text-base text-white bg-blue-600 border border-blue-600 rounded-md shadow-md hover:border-blue-700 hover:bg-blue-700 focus:outline-none focus:shadow-outline'
+          >
             Done
           </button>
           <div className='flex items-center w-full my-3'>
@@ -159,7 +233,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
             </button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

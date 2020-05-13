@@ -29,7 +29,7 @@ const useGlobalStateProvider = ({
   initialState,
   children,
 }: GlobalStateProviderProps): JSX.Element => {
-  const [state, setState] = React.useState(initialState);
+  const [state, setState] = React.useState({ ...initialState, showEdit: false });
 
   React.useEffect(() => {
     browser.storage.onChanged.addListener((items: any) => {

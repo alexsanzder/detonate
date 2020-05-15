@@ -3,7 +3,8 @@ import { browser } from 'webextension-polyfill-ts';
 
 import { GlobalStateType } from './GlobalStateProvider';
 import { ContextType } from './context';
-import { TOGGLE_EDIT } from './actions';
+import { SYNC, EDIT_RECORD, ADD_ROW, UPDATE_ROW, DELETE_ROW, FINISH_ROW } from './actions';
+import { MessageType } from '../@types';
 
 export interface Actions {
   type: string;
@@ -14,9 +15,9 @@ export interface Actions {
  * SEND MESSAGE
  * send message to background.js
  */
-const sendMessage = async (payload): Promise<any> => {
-  const response = await browser.runtime.sendMessage(payload);
-  // console.log(response);
+const sendMessage = async (message: MessageType): Promise<any> => {
+  const response = await browser.runtime.sendMessage(message);
+  console.log(response);
   return Promise.resolve(response.payload);
 };
 
@@ -25,33 +26,82 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
   console.log('Actions', action);
 
   switch (type) {
-    case 'SEND_MESSAGE':
-      const response = sendMessage(payload);
-      //console.log('SEND_MESSAGE', payload, response);
+    case SYNC:
+      const message = {
+        action: SYNC,
+      };
+
+      const response = sendMessage(message);
+      return {
+        ...state,
+        ...response,
+      };
+
+    case ADD_ROW: {
+      const message = {
+        action: ADD_ROW,
+        message: payload,
+      };
+      // console.log('ADD_ROW', message);
+
+      const response = sendMessage(message);
       return {
         ...state,
         ...response,
         showEdit: false,
       };
+    }
 
-    case 'EDIT':
-      return {
-        ...state,
-        showEdit: !state.showEdit,
-        editRecord: payload.record,
+    case UPDATE_ROW: {
+      const message = {
+        action: UPDATE_ROW,
+        message: payload,
       };
+      // console.log('UPDATE_ROW', message);
 
-    case 'UPDATE_EDIT':
+      const response = sendMessage(message);
       return {
         ...state,
-        editRecord: payload.record,
+        ...response,
+        showEdit: false,
       };
+    }
 
-    case TOGGLE_EDIT:
+    case FINISH_ROW: {
+      const message = {
+        action: FINISH_ROW,
+        message: payload,
+      };
+      // console.log('FINISH_ROW', message);
+
+      const response = sendMessage(message);
       return {
         ...state,
-        showEdit: !state.showEdit,
-        editRecord: undefined,
+        ...response,
+        showEdit: false,
+      };
+    }
+
+    case DELETE_ROW: {
+      const message = {
+        action: DELETE_ROW,
+        message: payload,
+      };
+      // console.log('DELETE_ROW', message);
+
+      const response = sendMessage(message);
+      return {
+        ...state,
+        ...response,
+        showEdit: false,
+      };
+    }
+
+    case EDIT_RECORD:
+      return {
+        ...state,
+        showEdit: payload.showEdit,
+        editRecord: payload.record,
       };
 
     default:

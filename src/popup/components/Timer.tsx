@@ -6,9 +6,9 @@ import { Play, Edit3, Square } from 'react-feather';
 import Edit from './Edit';
 
 import Context, { ContextType } from '../../store/context';
-import { ADD_ROW, FINISH_ROW, TOGGLE_EDIT } from '../../store/actions';
+import { ADD_ROW, FINISH_ROW, EDIT_RECORD } from '../../store/actions';
 import { useInterval } from '../../hooks/useInterval';
-import { getTimeFromSeconds } from '../../utils/time';
+import { getTimeObjectFromSeconds } from '../../utils/converTime';
 import { RecordType } from '../../@types';
 
 const Button = tw.button`w-10 h-10 text-white rounded-full shadow-lg focus:outline-none focus:shadow-outline`;
@@ -23,7 +23,7 @@ const Timer = (): JSX.Element => {
     state.start ? Math.abs(Date.now() - state.start) / 1000 : 0,
   );
   const [description, setDescription] = React.useState<string>(
-    state.isRunning && state.lastRecord ? state.lastRecord.description : '',
+    state.isRunning ? state.lastRecord.description : '',
   );
   const [placeholder, setPlaceholder] = React.useState<string>('');
   const [lastRecord, setLastRecord] = React.useState<RecordType>(state.lastRecord);
@@ -54,12 +54,9 @@ const Timer = (): JSX.Element => {
     setDescription(description === '' ? placeholder : description);
     setRunning(!isRunning);
     dispatch({
-      type: 'SEND_MESSAGE',
+      type: ADD_ROW,
       payload: {
-        action: ADD_ROW,
-        message: {
-          record: { description: description === '' ? placeholder : description },
-        },
+        record: { description: description === '' ? placeholder : description },
       },
     });
   };
@@ -79,12 +76,9 @@ const Timer = (): JSX.Element => {
     descriptionRef.current.setSelectionRange(0, 0);
 
     dispatch({
-      type: 'SEND_MESSAGE',
+      type: FINISH_ROW,
       payload: {
-        action: FINISH_ROW,
-        message: {
-          record: lastRecord,
-        },
+        record: lastRecord,
       },
     });
   };
@@ -94,7 +88,11 @@ const Timer = (): JSX.Element => {
   };
 
   const handleInputClick = (): void => {
-    isRunning && dispatch({ type: TOGGLE_EDIT });
+    isRunning &&
+      dispatch({
+        type: EDIT_RECORD,
+        payload: { record: lastRecord, isRunning: true, showEdit: true },
+      });
   };
 
   return (
@@ -121,7 +119,7 @@ const Timer = (): JSX.Element => {
             />
             {isRunning && (
               <span className='w-1/4 px-1 text-lg text-right text-gray-900'>
-                {getTimeFromSeconds(timer)}
+                {getTimeObjectFromSeconds(timer, true)}
               </span>
             )}
           </InputContainer>
@@ -132,7 +130,12 @@ const Timer = (): JSX.Element => {
                   type='button'
                   className='mr-2 bg-blue-600 hover:bg-blue-700'
                   aria-label='Edit Timer'
-                  onClick={(): void => dispatch({ type: TOGGLE_EDIT })}
+                  onClick={(): void =>
+                    dispatch({
+                      type: EDIT_RECORD,
+                      payload: { record: lastRecord, isRunning: true, showEdit: true },
+                    })
+                  }
                 >
                   <Edit3 className='h-4 m-2 fill-current' />
                 </Button>
@@ -154,7 +157,7 @@ const Timer = (): JSX.Element => {
           </div>
         </form>
       ) : (
-        <Edit timer={state.editRecord ? 0 : timer} />
+        <Edit timer={isRunning ? timer : null} />
       )}
     </>
   );

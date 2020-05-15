@@ -1,52 +1,50 @@
-import React from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import TextField from "@material-ui/core/TextField";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Container from "@material-ui/core/Container";
-import Slide from "@material-ui/core/Slide";
-import { TransitionProps } from "@material-ui/core/transitions";
-import Divider from "@material-ui/core/Divider";
-import Grid from "@material-ui/core/Grid";
+import React from 'react';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import TextField from '@material-ui/core/TextField';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Container from '@material-ui/core/Container';
+import Slide from '@material-ui/core/Slide';
+import { TransitionProps } from '@material-ui/core/transitions';
+import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
 
-import TicketsAutocomplete from "../TicketsSelect";
-import ProjectsAutocomplete from "../ProjectsSelect";
+import TicketsAutocomplete from '../TicketsSelect';
+import ProjectsAutocomplete from '../ProjectsSelect';
 
-import { AppContext } from "../../contexts/AppProvider";
-import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { AppContext } from '../../contexts/AppProvider';
+import GoogleAuthContext from '../../contexts/useGoogleAuth';
 import {
   getSeconds,
   getFraction,
   getTimeFormated,
-  getTimeFromSeconds
-} from "../../utils/time";
+  getTimeFromSeconds,
+} from '../../utils/converTime';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     paper: {
       marginTop: theme.spacing(8),
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center"
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     form: {
-      width: "100%", // Fix IE 11 issue.
-      marginTop: theme.spacing(1)
+      width: '100%', // Fix IE 11 issue.
+      marginTop: theme.spacing(1),
     },
     timer: {
-      textAlign: "center",
-      fontSize: 30
+      textAlign: 'center',
+      fontSize: 30,
     },
-    divider: { margin: theme.spacing(2, 0, 3) }
-  })
+    divider: { margin: theme.spacing(2, 0, 3) },
+  }),
 );
 
-const Transition = React.forwardRef<unknown, TransitionProps>(
-  function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  }
-);
+const Transition = React.forwardRef<unknown, TransitionProps>(function Transition(props, ref) {
+  return <Slide direction='up' ref={ref} {...props} />;
+});
 
 export interface EditProps {
   open: boolean;
@@ -61,12 +59,12 @@ const Edit: React.FC<EditProps> = ({
   handleClose,
   timer,
   record,
-  setRecord
+  setRecord,
 }): JSX.Element => {
   const classes = useStyles();
   const { toggleReload, toggleRunning, running } = React.useContext(AppContext);
   const { updateRecord, deleteRecord } = React.useContext(GoogleAuthContext);
-  const [time, setTime] = React.useState<string>("");
+  const [time, setTime] = React.useState<string>('');
 
   React.useEffect(() => {
     setTime(getTimeFormated(record?.time));
@@ -83,66 +81,57 @@ const Edit: React.FC<EditProps> = ({
         record.project,
         record.description,
         record.ticket,
-        fraction
+        fraction,
       ]));
     const {
-      result: { updatedRange }
+      result: { updatedRange },
     } = response;
     updatedRange && handleClose();
   };
 
   const handleDelete = async (): Promise<void> => {
     const index = timer
-      ? record.id.replace(/(^.+\D)(\d+)(\D.+$)/i, "$2")
-      : record.id.replace("aSa!A", "");
+      ? record.id.replace(/(^.+\D)(\d+)(\D.+$)/i, '$2')
+      : record.id.replace('aSa!A', '');
     const response = deleteRecord && (await deleteRecord(parseInt(index)));
     toggleReload(true);
     toggleRunning(false);
     response && handleClose();
   };
 
-  const handleChangeTime = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleChangeTime = (event: React.ChangeEvent<HTMLInputElement>): void => {
     //setRecord({ ...record, time: event.target.value });
     setTime(event.target.value);
   };
 
-  const handleChangeDecription = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleChangeDecription = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setRecord({ ...record, description: event.target.value });
   };
 
   return (
-    <Dialog
-      fullScreen
-      open={open}
-      onClose={handleClose}
-      TransitionComponent={Transition}
-    >
-      <Container component="main" maxWidth="xs">
+    <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
+      <Container component='main' maxWidth='xs'>
         <div className={classes.paper}>
           <CssBaseline />
           <form className={classes.form} noValidate>
             <TextField
-              variant="outlined"
-              margin="normal"
+              variant='outlined'
+              margin='normal'
               fullWidth
-              name="time"
+              name='time'
               inputProps={{ className: classes.timer }}
               InputProps={{
-                readOnly: running
+                readOnly: running,
               }}
               value={timer ? timer : time}
               onChange={handleChangeTime}
             />
             <TextField
-              variant="outlined"
-              margin="normal"
+              variant='outlined'
+              margin='normal'
               fullWidth
-              name="description"
-              placeholder="What are you working on?"
+              name='description'
+              placeholder='What are you working on?'
               value={record?.description}
               onChange={handleChangeDecription}
             />
@@ -153,9 +142,9 @@ const Edit: React.FC<EditProps> = ({
               <Grid item xs={12}>
                 <Button
                   fullWidth
-                  variant="contained"
-                  size="large"
-                  color="primary"
+                  variant='contained'
+                  size='large'
+                  color='primary'
                   onClick={handleUpdate}
                 >
                   Done
@@ -164,9 +153,9 @@ const Edit: React.FC<EditProps> = ({
               <Grid item xs>
                 <Button
                   fullWidth
-                  variant="outlined"
-                  size="large"
-                  color="default"
+                  variant='outlined'
+                  size='large'
+                  color='default'
                   onClick={handleClose}
                 >
                   Cancel
@@ -175,9 +164,9 @@ const Edit: React.FC<EditProps> = ({
               <Grid item xs>
                 <Button
                   fullWidth
-                  variant="contained"
-                  size="large"
-                  color="secondary"
+                  variant='contained'
+                  size='large'
+                  color='secondary'
                   onClick={handleDelete}
                 >
                   Delete

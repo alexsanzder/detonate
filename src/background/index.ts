@@ -65,7 +65,6 @@ const loadTable = async (): Promise<void> => {
 
   // Last record
   const lastRecord = records.slice(-1)[0];
-
   if (lastRecord.time === 0) {
     records.pop();
     browser.browserAction.setBadgeText({
@@ -76,7 +75,7 @@ const loadTable = async (): Promise<void> => {
   // save table data in the brower local storage
   browser.storage.local.set({
     projects,
-    lastRecord: lastRecord.time === 0 ? lastRecord : null,
+    lastRecord,
     records: records.slice(Math.max(records.length - 20, 0)).reverse(),
     isRunning: lastRecord.time === 0,
   });
@@ -134,7 +133,7 @@ const addRow = async ({ record }): Promise<RecordType> => {
 
   const lastRecord = { ...organizedRecord, id: updatedRange };
   browser.storage.local.set({
-    lastRecord: { ...lastRecord },
+    lastRecord,
     // updatedRange,
   });
 
@@ -202,6 +201,7 @@ const getLocalStorage = async (value = null): Promise<any> => {
  */
 browser.runtime.onMessage.addListener(
   async ({ action, message }): Promise<{ status: string; payload: any }> => {
+    console.log(action, message);
     if (action)
       switch (action) {
         case ADD_ROW: {
@@ -220,7 +220,6 @@ browser.runtime.onMessage.addListener(
 
         case UPDATE_ROW: {
           const updatedRecord = await updateRow(message.record);
-
           console.log(updatedRecord);
 
           const { records } = await getLocalStorage('records');
@@ -274,20 +273,22 @@ browser.runtime.onMessage.addListener(
           const storage = await getLocalStorage();
           return Promise.resolve({
             status: 'DELETE_SUCCESS',
-            payload: { showEdit: false, ...storage },
+            payload: storage,
           });
         }
 
         case SYNC: {
+          browser.storage.local.remove('updatedRange');
           browser.storage.local.remove('editRecord');
           browser.storage.local.remove('records');
           await loadTable();
           const storage = await getLocalStorage();
-          return Promise.resolve({ status: 'SUCCESS', payload: storage });
+          return Promise.resolve({ status: 'SYNC_SUCCESS', payload: storage });
         }
-        // case CLEAR_STORAGE:
-        //   await browser.storage.local.clear();
-        //   return Promise.resolve({ status: 'SUCCESS', payload: undefined });
+
+        case CLEAR_STORAGE:
+          await browser.storage.local.clear();
+          return Promise.resolve({ status: 'SUCCESS', payload: undefined });
 
         default:
           return Promise.resolve({

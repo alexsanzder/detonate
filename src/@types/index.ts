@@ -28,6 +28,6 @@ export interface ProfileType {
 }
 
 export interface MessageType {
-  type: string;
-  payload?: any;
+  action: string;
+  message?: any;
 }

@@ -1,115 +1,115 @@
-import * as React from "react";
-import clsx from "clsx";
+import * as React from 'react';
+import clsx from 'clsx';
 
-import { createStyles, Theme, makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import CardActionArea from "@material-ui/core/CardActionArea";
-import CardContent from "@material-ui/core/CardContent";
-import CardActions from "@material-ui/core/CardActions";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import Chip from "@material-ui/core/Chip";
-import Divider from "@material-ui/core/Divider";
-import Tooltip from "@material-ui/core/Tooltip";
+import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import Chip from '@material-ui/core/Chip';
+import Divider from '@material-ui/core/Divider';
+import Tooltip from '@material-ui/core/Tooltip';
 
-import PlayArrowRoundedIcon from "@material-ui/icons/PlayArrowRounded";
-import EditRoundedIcon from "@material-ui/icons/EditRounded";
-import StopRoundedIcon from "@material-ui/icons/StopRounded";
-import WarningRoundedIcon from "@material-ui/icons/WarningRounded";
+import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
+import EditRoundedIcon from '@material-ui/icons/EditRounded';
+import StopRoundedIcon from '@material-ui/icons/StopRounded';
+import WarningRoundedIcon from '@material-ui/icons/WarningRounded';
 
-import Edit from "../Edit";
-import Placeholder from "../Placeholder";
+import Edit from '../Edit';
+import Placeholder from '../Placeholder';
 
-import { AppContext, defaultRecord } from "../../contexts/AppProvider";
-import GoogleAuthContext from "../../contexts/useGoogleAuth";
+import { AppContext, defaultRecord } from '../../contexts/AppProvider';
+import GoogleAuthContext from '../../contexts/useGoogleAuth';
 
-import { getTimeFormated } from "../../utils/time";
+import { getTimeFormated } from '../../utils/converTime';
 
-import { RecordType } from "../../hooks/useGoogle";
+import { RecordType } from '../../hooks/useGoogle';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: "100%",
-      paddingTop: theme.spacing(2.5)
+      width: '100%',
+      paddingTop: theme.spacing(2.5),
     },
     card: {
-      width: "100%",
-      marginBottom: theme.spacing(2.5)
+      width: '100%',
+      marginBottom: theme.spacing(2.5),
     },
     cardHeader: {
-      height: 55.63
+      height: 55.63,
     },
     cardContent: {
-      padding: theme.spacing(2, 2, 1)
+      padding: theme.spacing(2, 2, 1),
     },
     right: {
-      marginLeft: "auto"
+      marginLeft: 'auto',
     },
     divider: {
-      margin: theme.spacing(0, 2, 0, 2)
+      margin: theme.spacing(0, 2, 0, 2),
     },
     chips: {
-      display: "flex",
-      flexWrap: "wrap",
-      "& > *": {
+      display: 'flex',
+      flexWrap: 'wrap',
+      '& > *': {
         margin: theme.spacing(0.25),
-        maxWidth: "130px"
-      }
+        maxWidth: '130px',
+      },
     },
     button: {
-      "&:hover": {
-        backgroundColor: "inherit"
-      }
+      '&:hover': {
+        backgroundColor: 'inherit',
+      },
     },
     container: {
-      position: "relative"
+      position: 'relative',
     },
     buttons: {
-      position: "absolute",
-      top: "-44px",
-      right: " 0"
+      position: 'absolute',
+      top: '-44px',
+      right: ' 0',
     },
     iconPlay: {
-      "&:hover": {
-        color: theme.palette.success.main
-      }
+      '&:hover': {
+        color: theme.palette.success.main,
+      },
     },
     iconEdit: {
-      "&:hover": {
-        color: theme.palette.primary.main
-      }
+      '&:hover': {
+        color: theme.palette.primary.main,
+      },
     },
     iconStop: {
-      "&:hover": {
-        color: theme.palette.secondary.main
-      }
+      '&:hover': {
+        color: theme.palette.secondary.main,
+      },
     },
     time: {
-      marginLeft: "auto",
-      marginRight: theme.spacing(-1)
+      marginLeft: 'auto',
+      marginRight: theme.spacing(-1),
     },
     popper: {
       top: theme.spacing(-2.5),
       backgroundColor: theme.palette.grey[600],
-      border: "none"
+      border: 'none',
     },
     popperArrow: {
-      color: theme.palette.grey[600]
+      color: theme.palette.grey[600],
     },
     hide: {
-      display: "none"
+      display: 'none',
     },
     warning: {
-      display: "block",
-      padding: theme.spacing(0, 0.5, 0, 0)
+      display: 'block',
+      padding: theme.spacing(0, 0.5, 0, 0),
     },
     disabled: {
-      opacity: 0.5
-    }
-  })
+      opacity: 0.5,
+    },
+  }),
 );
 
 const Summary = (): JSX.Element => {
@@ -126,37 +126,32 @@ const Summary = (): JSX.Element => {
 
   const groupBy = (array: any[], key: string): any => {
     return array?.reduce((result: any, currentValue: any) => {
-      (result[currentValue[key]] = result[currentValue[key]] || []).push(
-        currentValue
-      );
+      (result[currentValue[key]] = result[currentValue[key]] || []).push(currentValue);
       return result;
     }, {});
   };
   React.useEffect(() => {
     //Load spredsheet data
-    chrome.storage.sync.get(
-      ["isRunning", "record", "records"],
-      (items: any) => {
-        setRecords(items.records);
-        setRecord(items.record);
-        setIsRunning(items.isRunning);
-      }
-    );
+    chrome.storage.sync.get(['isRunning', 'record', 'records'], (items: any) => {
+      setRecords(items.records);
+      setRecord(items.record);
+      setIsRunning(items.isRunning);
+    });
     chrome.storage.onChanged.addListener((changes: any) => {
       console.log(changes);
       setIsRunning(changes.isRunning.newValue);
       setRecords(changes.records.newValue);
     });
   }, [records]);
-  const data = groupBy(records, "date");
+  const data = groupBy(records, 'date');
 
   const formatedDate = (date: string): string => {
-    const splits = date.split(".");
-    return new Date(splits.reverse().join("-")).toLocaleDateString(locale, {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric"
+    const splits = date.split('.');
+    return new Date(splits.reverse().join('-')).toLocaleDateString(locale, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
@@ -167,19 +162,13 @@ const Summary = (): JSX.Element => {
     return getTimeFormated(total);
   };
 
-  const handleContinue = (
-    _event: React.ChangeEvent<{}>,
-    record: RecordType
-  ): void => {
+  const handleContinue = (_event: React.ChangeEvent<{}>, record: RecordType): void => {
     setContinueId(record.id);
     setRecord(record);
     setIsRunning(!isRunning);
   };
 
-  const handleEdit = (
-    _event: React.ChangeEvent<{}>,
-    record: RecordType
-  ): void => {
+  const handleEdit = (_event: React.ChangeEvent<{}>, record: RecordType): void => {
     setRecord(record);
     setOpenEdit(!openEdit);
   };
@@ -198,12 +187,12 @@ const Summary = (): JSX.Element => {
             <CardHeader
               disableTypography
               title={
-                <Typography color="textPrimary" variant="body1">
+                <Typography color='textPrimary' variant='body1'>
                   <b>{formatedDate(date)}</b>
                 </Typography>
               }
               action={
-                <Typography color="textPrimary" variant="body1">
+                <Typography color='textPrimary' variant='body1'>
                   <b>{totalTime(data[date])}</b>
                 </Typography>
               }
@@ -211,21 +200,18 @@ const Summary = (): JSX.Element => {
             {data[date].map((record: RecordType) => (
               <React.Fragment key={record.id}>
                 <Divider className={classes.divider} light />
-                <CardActionArea
-                  key={record.id}
-                  onClick={(e): void => handleEdit(e, record)}
-                >
+                <CardActionArea key={record.id} onClick={(e): void => handleEdit(e, record)}>
                   <CardContent className={classes.cardContent}>
-                    <Grid container wrap="nowrap">
+                    <Grid container wrap='nowrap'>
                       <Grid item xs={9}>
                         <Typography
                           noWrap
-                          variant="subtitle2"
+                          variant='subtitle2'
                           classes={{
                             root:
-                              record.description === "(no description)"
+                              record.description === '(no description)'
                                 ? classes.disabled
-                                : undefined
+                                : undefined,
                           }}
                         >
                           {record.description}
@@ -233,29 +219,26 @@ const Summary = (): JSX.Element => {
                       </Grid>
                       <Grid item className={classes.right}>
                         <Typography
-                          variant={"subtitle2"}
-                          color={record.time < 0.5 ? "secondary" : "inherit"}
+                          variant={'subtitle2'}
+                          color={record.time < 0.5 ? 'secondary' : 'inherit'}
                           style={{
-                            fontWeight: record.time < 0.5 ? 900 : "inherit"
+                            fontWeight: record.time < 0.5 ? 900 : 'inherit',
                           }}
                         >
                           <Tooltip
-                            title="Minimum time 0.5h"
+                            title='Minimum time 0.5h'
                             arrow
                             classes={{
-                              tooltip:
-                                record.time < 0.5
-                                  ? classes.popper
-                                  : classes.hide,
-                              arrow: classes.popperArrow
+                              tooltip: record.time < 0.5 ? classes.popper : classes.hide,
+                              arrow: classes.popperArrow,
                             }}
                           >
                             <Grid container>
                               <Grid item>
                                 <WarningRoundedIcon
-                                  fontSize="small"
+                                  fontSize='small'
                                   className={clsx(classes.hide, {
-                                    [classes.warning]: record.time < 0.5
+                                    [classes.warning]: record.time < 0.5,
                                   })}
                                 />
                               </Grid>
@@ -270,29 +253,29 @@ const Summary = (): JSX.Element => {
                     <Grid item className={classes.chips} xs={10}>
                       {record.company && (
                         <Chip
-                          size="small"
-                          color="default"
-                          variant="outlined"
+                          size='small'
+                          color='default'
+                          variant='outlined'
                           label={record.company}
-                          disabled={record.company === "(no company)"}
+                          disabled={record.company === '(no company)'}
                         />
                       )}
                       {record.project && (
                         <Chip
-                          size="small"
-                          color="default"
-                          variant="outlined"
+                          size='small'
+                          color='default'
+                          variant='outlined'
                           label={record.project && record.project}
-                          disabled={record.project === "(no project)"}
+                          disabled={record.project === '(no project)'}
                         />
                       )}
                       {record.ticket && (
                         <Chip
-                          size="small"
-                          color="default"
-                          variant="outlined"
+                          size='small'
+                          color='default'
+                          variant='outlined'
                           label={record.ticket}
-                          disabled={record.ticket === "(no ticket)"}
+                          disabled={record.ticket === '(no ticket)'}
                         />
                       )}
                     </Grid>
@@ -302,46 +285,37 @@ const Summary = (): JSX.Element => {
                   <div className={classes.buttons}>
                     <IconButton
                       className={classes.button}
-                      size="medium"
+                      size='medium'
                       onClick={(e): void => handleEdit(e, record)}
                     >
                       <Tooltip
-                        title="Edit this record"
+                        title='Edit this record'
                         arrow
                         classes={{
                           tooltip: classes.popper,
-                          arrow: classes.popperArrow
+                          arrow: classes.popperArrow,
                         }}
                       >
-                        <EditRoundedIcon
-                          fontSize="small"
-                          className={classes.iconEdit}
-                        />
+                        <EditRoundedIcon fontSize='small' className={classes.iconEdit} />
                       </Tooltip>
                     </IconButton>
                     <IconButton
                       className={classes.button}
-                      size="medium"
+                      size='medium'
                       onClick={(e): void => handleContinue(e, record)}
                     >
                       <Tooltip
-                        title="Continue whit this record"
+                        title='Continue whit this record'
                         arrow
                         classes={{
                           tooltip: classes.popper,
-                          arrow: classes.popperArrow
+                          arrow: classes.popperArrow,
                         }}
                       >
                         {record.id === continueId && isRunning ? (
-                          <StopRoundedIcon
-                            fontSize="small"
-                            className={classes.iconStop}
-                          />
+                          <StopRoundedIcon fontSize='small' className={classes.iconStop} />
                         ) : (
-                          <PlayArrowRoundedIcon
-                            fontSize="small"
-                            className={classes.iconPlay}
-                          />
+                          <PlayArrowRoundedIcon fontSize='small' className={classes.iconPlay} />
                         )}
                       </Tooltip>
                     </IconButton>
@@ -354,12 +328,7 @@ const Summary = (): JSX.Element => {
       ) : (
         <Placeholder />
       )}
-      <Edit
-        open={openEdit}
-        handleClose={handleCloseEdit}
-        record={record}
-        setRecord={setRecord}
-      />
+      <Edit open={openEdit} handleClose={handleCloseEdit} record={record} setRecord={setRecord} />
     </Grid>
   );
 };

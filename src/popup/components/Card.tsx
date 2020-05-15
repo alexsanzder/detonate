@@ -4,8 +4,9 @@ import tw from 'twin.macro';
 import { Play, Edit3, AlertTriangle } from 'react-feather';
 
 import Context, { ContextType } from '../../store/context';
+import { ADD_ROW, FINISH_ROW, EDIT_RECORD } from '../../store/actions';
 import { RecordType } from '../../@types';
-import { getTimeFormated } from '../../utils/time';
+import { getTimeObjectFromFraction } from '../../utils/converTime';
 
 const RecordTime = styled.div(({ time }: any) => [
   tw`flex items-center justify-between tracking-tight`,
@@ -30,11 +31,11 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
     });
   };
 
-  const totalTime = (records: RecordType[]): string => {
+  const totalTime = (records: RecordType[]): any => {
     const total = records?.reduce((acc: number, curr: any) => {
       return acc + curr.time;
     }, 0);
-    return getTimeFormated(total);
+    return getTimeObjectFromFraction(total, true);
   };
 
   return (
@@ -59,7 +60,9 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 width='14'
                 height='14'
               />
-              <span>{record.time === 0 ? 'running...' : getTimeFormated(record.time)}</span>
+              <span>
+                {record.time === 0 ? 'running...' : getTimeObjectFromFraction(record.time, true)}
+              </span>
             </RecordTime>
           </div>
           <div className='flex items-center justify-between pt-2 pb-4'>
@@ -87,8 +90,8 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 aria-label='Edit this record'
                 onClick={(): void =>
                   dispatch({
-                    type: 'EDIT',
-                    payload: { record },
+                    type: EDIT_RECORD,
+                    payload: { record, showEdit: true },
                   })
                 }
               >

@@ -46,10 +46,7 @@ const Header = (): JSX.Element => {
           aria-label='Sync Google Sheets'
           onClick={(): void => {
             dispatch({
-              type: 'SEND_MESSAGE',
-              payload: {
-                action: SYNC,
-              },
+              type: SYNC,
             });
           }}
         >

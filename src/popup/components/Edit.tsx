@@ -1,14 +1,16 @@
 import * as React from 'react';
-import styled from '@emotion/styled/macro';
-import tw from 'twin.macro';
-import { Play, Edit3, AlertTriangle } from 'react-feather';
 
 const TABLE_NAME = process.env.REACT_APP_TABLE_NAME;
 
 import Context, { ContextType } from '../../store/context';
-import { TOGGLE_EDIT, UPDATE_ROW, DELETE_ROW } from '../../store/actions';
-
-import { getTimeObject, getTimeObjectFromSeconds, getSeconds, getFraction } from '../../utils/time';
+import { EDIT_RECORD, UPDATE_ROW, DELETE_ROW } from '../../store/actions';
+import {
+  getTimeObjectFromFraction,
+  getTimeObjectFromSeconds,
+  getSeconds,
+  getFraction,
+  Time,
+} from '../../utils/converTime';
 
 export interface EditProps {
   timer?: number;
@@ -16,7 +18,6 @@ export interface EditProps {
 
 const Edit = ({ timer }: EditProps): JSX.Element => {
   const { state, dispatch } = React.useContext<ContextType>(Context);
-
   const [selectionRange, setSelectionRange] = React.useState<boolean>(false);
   const [hours, setHours] = React.useState<string>('');
   const [minutes, setMinutes] = React.useState<string>('');
@@ -29,9 +30,10 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
   const secondsRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    const { hours, minutes, seconds } = state.editRecord
-      ? getTimeObject(state.editRecord.time)
-      : getTimeObjectFromSeconds(timer);
+    const { hours, minutes, seconds }: any = timer
+      ? getTimeObjectFromSeconds(timer)
+      : getTimeObjectFromFraction(state.editRecord.time);
+
     setHours(hours);
     setMinutes(minutes);
     setSeconds(seconds);
@@ -40,7 +42,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
 
   React.useEffect(() => {
     if (state.editRecord) {
-      hoursRef.current.setSelectionRange(0, 0);
+      hoursRef.current.setSelectionRange(0, 2);
       hoursRef.current.focus();
     } else {
       timerRef.current.disabled = true;
@@ -58,7 +60,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
     if (target.value === '' || regex.test(target.value)) {
       switch (target.name) {
         case 'hours':
-          +target.value <= 59 && setHours(target.value);
+          +target.value <= 12 && setHours(target.value);
           break;
         case 'minutes':
           +target.value <= 59 && setMinutes(target.value);
@@ -69,16 +71,13 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
         default:
           break;
       }
-      const hours = hoursRef.current.value === '' ? '00' : hoursRef.current.value;
-      const minutes = minutesRef.current.value === '' ? '00' : minutesRef.current.value;
-      const seconds = secondsRef.current.value === '' ? '00' : secondsRef.current.value;
 
       const time = `${hours}:${minutes}:${seconds}`;
-      console.log(`${hours}:${minutes}:${seconds}`);
       console.log(getSeconds(time));
       dispatch({
-        type: 'UPDATE_EDIT',
+        type: EDIT_RECORD,
         payload: {
+          showEdit: true,
           record: { ...state.editRecord, time: getSeconds(time) },
         },
       });
@@ -87,14 +86,13 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    const time = `${hours}:${minutes}:${seconds}`;
 
     dispatch({
-      type: 'SEND_MESSAGE',
+      type: UPDATE_ROW,
       payload: {
-        action: UPDATE_ROW,
-        message: {
-          record: { ...state.editRecord, time: getFraction(state.editRecord.time) },
-        },
+        showEdit: false,
+        record: { ...state.editRecord, time: getFraction(getSeconds(time)) },
       },
     });
   };
@@ -121,10 +119,10 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
               name='hours'
               value={hours}
               onChange={handleChange}
-              onBlur={(e) => {
-                console.log(e.target.value);
-                e.target.value === '' && setHours('00');
-              }}
+              // onBlur={(e) => {
+              //   console.log(e.target.value);
+              //   e.target.value === '' ? setHours('00') : null;
+              // }}
             />
             :
             <input
@@ -135,9 +133,10 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
               name='minutes'
               value={minutes}
               onChange={handleChange}
-              onBlur={(e) => {
-                e.target.value === '' && setSeconds('00');
-              }}
+              // onBlur={(e) => {
+              //   console.log(e.target.value);
+              //   e.target.value === '' ? setMinutes('00') : null;
+              // }}
             />
             :
             <input
@@ -148,9 +147,10 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
               name='seconds'
               value={seconds}
               onChange={handleChange}
-              onBlur={(e) => {
-                e.target.value === '' && setMinutes('00');
-              }}
+              // onBlur={(e) => {
+              //   console.log(e.target.value);
+              //   e.target.value === '' ? setSeconds('00') : null;
+              // }}
             />
           </span>
         </div>
@@ -161,8 +161,9 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
           value={state.editRecord ? state.editRecord.description : state.lastRecord.description}
           onChange={(e) => {
             dispatch({
-              type: 'UPDATE_EDIT',
+              type: EDIT_RECORD,
               payload: {
+                showEdit: true,
                 record: { ...state.editRecord, description: e.target.value },
               },
             });
@@ -175,8 +176,9 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
           value={state.editRecord ? state.editRecord.project : state.lastRecord.project}
           onChange={(e) => {
             dispatch({
-              type: 'UPDATE_EDIT',
+              type: EDIT_RECORD,
               payload: {
+                showEdit: true,
                 record: { ...state.editRecord, project: e.target.value },
               },
             });
@@ -189,8 +191,9 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
           value={state.editRecord ? state.editRecord.ticket : state.lastRecord.ticket}
           onChange={(e) => {
             dispatch({
-              type: 'UPDATE_EDIT',
+              type: EDIT_RECORD,
               payload: {
+                showEdit: true,
                 record: { ...state.editRecord, ticket: e.target.value },
               },
             });
@@ -207,7 +210,15 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
           <div className='flex items-center w-full my-3'>
             <button
               className='w-1/2 py-3 mr-1 text-base text-gray-600 border border-gray-600 rounded-md shadow-md hover:bg-gray-200 focus:outline-none focus:shadow-outline'
-              onClick={(): void => dispatch({ type: TOGGLE_EDIT })}
+              onClick={(): void =>
+                dispatch({
+                  type: EDIT_RECORD,
+                  payload: {
+                    showEdit: false,
+                    record: null,
+                  },
+                })
+              }
             >
               Cancel
             </button>
@@ -218,13 +229,10 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
                   ? state.editRecord.id.replace(/(^.+\D)(\d+)(\D.+$)/i, '$2')
                   : state.lastRecord.id.replace(`${TABLE_NAME}!A`, '');
                 dispatch({
-                  type: 'SEND_MESSAGE',
+                  type: DELETE_ROW,
                   payload: {
-                    action: DELETE_ROW,
-                    message: {
-                      index,
-                      id: state.editRecord.id,
-                    },
+                    index,
+                    id: state.editRecord.id,
                   },
                 });
               }}

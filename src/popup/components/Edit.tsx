@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import Context, { ContextType } from '../../store/context';
-import { EDIT_RECORD, DELETE_RECORD } from '../../store/actions';
+import { EDIT_RECORD, DELETE_RECORD, SHOW_EDIT } from '../../store/actions';
 import {
   getTimeObjectFromFraction,
   getTimeObjectFromSeconds,
@@ -12,10 +12,9 @@ import { RecordType } from '../../../backup/popups/hooks/useGoogle';
 
 export interface EditProps {
   timer?: number;
-  showEdit: () => void;
 }
 
-const Edit = ({ timer, showEdit }: EditProps): JSX.Element => {
+const Edit = ({ timer }: EditProps): JSX.Element => {
   const { state, dispatch } = React.useContext<ContextType>(Context);
 
   const [selectionRange, setSelectionRange] = React.useState<boolean>(false);
@@ -30,6 +29,15 @@ const Edit = ({ timer, showEdit }: EditProps): JSX.Element => {
   const hoursRef = React.useRef<HTMLInputElement>(null);
   const minutesRef = React.useRef<HTMLInputElement>(null);
   const secondsRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    return () => {
+      dispatch({
+        type: SHOW_EDIT,
+        payload: { showEdit: false, showEditRunning: false },
+      });
+    };
+  }, []);
 
   React.useEffect(() => {
     const { hours, minutes, seconds }: any = timer
@@ -188,7 +196,12 @@ const Edit = ({ timer, showEdit }: EditProps): JSX.Element => {
             <button
               type='button'
               className='w-1/2 py-3 mr-1 text-base text-gray-600 border border-gray-600 rounded-md shadow-md hover:bg-gray-200 focus:outline-none focus:shadow-outline'
-              onClick={showEdit}
+              onClick={(): void =>
+                dispatch({
+                  type: SHOW_EDIT,
+                  payload: { showEdit: false, showEditRunning: false },
+                })
+              }
             >
               Cancel
             </button>

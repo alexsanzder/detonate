@@ -67,7 +67,7 @@ const Timer = (): JSX.Element => {
 
   const handleStop = async (): Promise<void> => {
     setTimer(0);
-    setRunning(!isRunning);
+    setRunning(false);
 
     // More funny commits //
     const response = await (await fetch('http://whatthecommit.com/index.json')).json();
@@ -128,11 +128,11 @@ const Timer = (): JSX.Element => {
                 value={description}
                 onChange={handleInputChange}
               />
-              {runningRecord && runningRecord.project && (
-                <label className='inline-flex items-center text-sm text-gray-700'>
+              {isRunning && runningRecord.project && (
+                <div className='inline-flex items-center text-sm text-gray-700'>
                   <div className='w-2 h-2 mr-1 bg-blue-500 rounded-full'></div>
-                  {`${runningRecord.project}`}
-                </label>
+                  {runningRecord.project}
+                </div>
               )}
             </div>
             {isRunning && (
@@ -170,7 +170,7 @@ const Timer = (): JSX.Element => {
           </div>
         </form>
       ) : (
-        <Edit timer={timer} showEdit={handleShowEdit} />
+        <Edit timer={timer} />
       )}
     </>
   );

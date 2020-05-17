@@ -36,24 +36,11 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
   console.log('Actions', action);
 
   switch (type) {
-    case SYNC:
-      const message = {
-        action: SYNC,
-      };
-
-      const response = sendMessage(message);
-      return {
-        ...state,
-        ...response,
-      };
-
     case ADD_RECORD: {
       const message = {
         action: ADD_ROW,
         message: payload,
       };
-      console.log('ADD_RECORD', message);
-
       const response = sendMessage(message);
       return {
         ...state,
@@ -68,8 +55,6 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         action: STOP_RECORD,
         message: payload,
       };
-      // console.log('STOP_RECORD', message);
-
       const response = sendMessage(message);
       return {
         ...state,
@@ -84,7 +69,6 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         action: UPDATE_ROW,
         message: payload,
       };
-
       const response = sendMessage(message);
       return {
         ...state,
@@ -99,17 +83,12 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         action: DELETE_ROW,
         message: payload,
       };
-      // console.log('DELETE_ROW', message);
-
       const response = sendMessage(message);
       return {
         ...state,
         ...response,
         showEdit: false,
         showEditRunning: false,
-        start: payload.timer ? 0 : state.start,
-        isRunning: payload.timer ? false : state.isRunning,
-        runningRecord: payload.timer ? null : state.runningRecord,
       };
     }
 
@@ -117,6 +96,17 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
       return {
         ...state,
         ...payload,
+      };
+    }
+
+    case SYNC: {
+      const message = {
+        action: SYNC,
+      };
+      const response = sendMessage(message);
+      return {
+        ...state,
+        ...response,
       };
     }
 

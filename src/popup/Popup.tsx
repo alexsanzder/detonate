@@ -15,7 +15,7 @@ const Popup = (): JSX.Element => {
     dispatch({
       type: EDIT_RECORD,
       payload: {
-        showEdit: !state.showEdit,
+        showEdit: true,
       },
     });
 
@@ -25,14 +25,11 @@ const Popup = (): JSX.Element => {
         <Header />
         <Timer />
       </div>
-      {!state.showEdit ? (
-        <div className='h-full p-3 overflow-y-scroll'>
-          <Summary />
-          <Footer />
-        </div>
-      ) : (
-        <Edit showEdit={handleShowEdit} />
-      )}
+      <div className='h-full p-3 overflow-y-scroll'>
+        <Summary />
+        <Footer />
+      </div>
+      {state.showEdit && <Edit />}
     </div>
   );
 };

@@ -1,7 +1,14 @@
 /* global chrome gapi */
 import { browser } from 'webextension-polyfill-ts';
 
-import { CLEAR_STORAGE, SYNC, ADD_ROW, UPDATE_ROW, FINISH_ROW, DELETE_ROW } from '../store/actions';
+import {
+  ADD_ROW,
+  UPDATE_ROW,
+  DELETE_ROW,
+  STOP_RECORD,
+  SYNC,
+  CLEAR_STORAGE,
+} from '../store/actions';
 
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 const SPREADSHEET_ID = process.env.REACT_APP_SPREADSHEET_ID;
@@ -65,19 +72,22 @@ const loadTable = async (): Promise<void> => {
 
   // Last record
   const lastRecord = records.slice(-1)[0];
-  if (lastRecord.time === 0) {
+  const isRunning = lastRecord.time === 0;
+  if (isRunning) {
     records.pop();
     browser.browserAction.setBadgeText({
       text: '▶️',
+    });
+    browser.storage.local.set({
+      isRunning,
+      runningRecord: lastRecord,
     });
   }
 
   // save table data in the brower local storage
   browser.storage.local.set({
     projects,
-    lastRecord,
     records: records.slice(Math.max(records.length - 20, 0)).reverse(),
-    isRunning: lastRecord.time === 0,
   });
 
   console.log('Table data loaded!');
@@ -131,19 +141,15 @@ const addRow = async ({ record }): Promise<RecordType> => {
     },
   });
 
-  const lastRecord = { ...organizedRecord, id: updatedRange };
-  browser.storage.local.set({
-    lastRecord,
-    // updatedRange,
-  });
-
-  return lastRecord;
+  const runningRecord = { ...organizedRecord, id: updatedRange };
+  return runningRecord;
 };
 
 // Update row
 const updateRow = async ({ id: range, ...record }): Promise<RecordType> => {
   const organizedRecord = organize(record);
   const values = Object.values(organizedRecord);
+
   const {
     result: { updatedRange },
   } = await gapi.client.sheets.spreadsheets.values.update({
@@ -155,13 +161,8 @@ const updateRow = async ({ id: range, ...record }): Promise<RecordType> => {
     },
   });
 
-  const lastRecord = { ...organizedRecord, id: updatedRange };
-  browser.storage.local.set({
-    lastRecord,
-    //updatedRange
-  });
-
-  return lastRecord;
+  const updatedRecord = { ...organizedRecord, id: updatedRange };
+  return updatedRecord;
 };
 
 // Delete row
@@ -206,29 +207,37 @@ browser.runtime.onMessage.addListener(
       switch (action) {
         case ADD_ROW: {
           browser.browserAction.setBadgeText({ text: '▶️' });
-          const addRecord = await addRow(message);
+          const runningRecord = await addRow(message);
+          console.log(runningRecord);
 
           const now = Date.now();
           browser.storage.local.set({
+            runningRecord,
             isRunning: true,
             start: now,
           });
 
           const storage = await getLocalStorage();
-          return Promise.resolve({ status: 'ADD_SUCCESS', payload: { ...storage } });
+          return Promise.resolve({ status: 'ADD_SUCCESS', payload: { ...storage, runningRecord } });
         }
 
         case UPDATE_ROW: {
           const updatedRecord = await updateRow(message.record);
           console.log(updatedRecord);
 
-          const { records } = await getLocalStorage('records');
-          const recordIndex = records.findIndex((record) => record.id === updatedRecord.id);
-          records[recordIndex] = updatedRecord;
+          if (message.isTimer) {
+            browser.storage.local.set({
+              runningRecord: updatedRecord,
+            });
+          } else {
+            const { records } = await getLocalStorage('records');
+            const recordIndex = records.findIndex((record) => record.id === updatedRecord.id);
+            records[recordIndex] = updatedRecord;
 
-          browser.storage.local.set({
-            records: records,
-          });
+            browser.storage.local.set({
+              records: records,
+            });
+          }
 
           const storage = await getLocalStorage();
           console.log(storage.records);
@@ -239,20 +248,21 @@ browser.runtime.onMessage.addListener(
           });
         }
 
-        case FINISH_ROW: {
+        case STOP_RECORD: {
           browser.browserAction.setBadgeText({ text: '' });
           const { records, start } = await browser.storage.local.get(['records', 'start']);
           const time = Math.abs(Date.now() - start) / 36e5;
           const newRecord = { ...message.record, time };
 
-          const finishRecord = await updateRow(newRecord);
+          const stopRecord = await updateRow(newRecord);
 
           browser.storage.local.set({
             isRunning: false,
             start: 0,
-            records: [finishRecord, ...records],
-            lastRecord: {},
+            records: [stopRecord, ...records],
           });
+
+          browser.storage.local.remove('runningRecord');
 
           const storage = await getLocalStorage();
           return Promise.resolve({
@@ -278,9 +288,7 @@ browser.runtime.onMessage.addListener(
         }
 
         case SYNC: {
-          browser.storage.local.remove('updatedRange');
-          browser.storage.local.remove('editRecord');
-          browser.storage.local.remove('records');
+          //browser.storage.local.clear();
           await loadTable();
           const storage = await getLocalStorage();
           return Promise.resolve({ status: 'SYNC_SUCCESS', payload: storage });

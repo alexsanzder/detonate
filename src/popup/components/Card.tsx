@@ -4,7 +4,7 @@ import tw from 'twin.macro';
 import { Play, Edit3, AlertTriangle } from 'react-feather';
 
 import Context, { ContextType } from '../../store/context';
-import { ADD_ROW, FINISH_ROW, EDIT_RECORD } from '../../store/actions';
+import { ADD_RECORD, SHOW_EDIT } from '../../store/actions';
 import { RecordType } from '../../@types';
 import { getTimeObjectFromFraction } from '../../utils/converTime';
 
@@ -54,9 +54,19 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
             >
               {record.description}
             </div>
-            <RecordTime time={record.time}>
+            <RecordTime
+              time={record.time}
+              className={record.time < 0.5 || record.time > 24 ? 'cursor-pointer' : 'cursor-text'}
+              onClick={(): void => {
+                (record.time < 0.5 || record.time > 24) &&
+                  dispatch({
+                    type: SHOW_EDIT,
+                    payload: { editRecord: record, showEdit: true },
+                  });
+              }}
+            >
               <AlertTriangle
-                className={record.time < 0.5 ? 'block mr-1' : 'hidden'}
+                className={record.time < 0.5 || record.time > 24 ? 'block mr-1' : 'hidden'}
                 width='14'
                 height='14'
               />
@@ -68,17 +78,17 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
           <div className='flex items-center justify-between pt-2 pb-4'>
             <div className='flex items-center justify-between'>
               {record.company && (
-                <div className='inline-flex items-center h-6 px-2 mx-0 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
+                <div className='inline-flex items-center h-6 px-2 mr-2 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
                   {record.company}
                 </div>
               )}
               {record.project && (
-                <div className='inline-flex items-center h-6 px-2 mx-1 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
+                <div className='inline-flex items-center h-6 px-2 mr-2 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
                   {record.project}
                 </div>
               )}
               {record.ticket && (
-                <div className='inline-flex items-center h-6 px-2 mx-1 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
+                <div className='inline-flex items-center h-6 px-2 mr-2 text-xs font-medium tracking-tighter bg-gray-100 bg-opacity-50 border border-gray-300 rounded-full'>
                   {record.ticket}
                 </div>
               )}
@@ -90,8 +100,8 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 aria-label='Edit this record'
                 onClick={(): void =>
                   dispatch({
-                    type: EDIT_RECORD,
-                    payload: { record, showEdit: true },
+                    type: SHOW_EDIT,
+                    payload: { editRecord: record, showEdit: true },
                   })
                 }
               >

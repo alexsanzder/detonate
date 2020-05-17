@@ -7,17 +7,20 @@ import Context from './context';
 
 import { RecordType } from '../@types';
 
-export interface GlobalStateType {
-  timer: number;
-  showEdit: boolean;
+export interface StorageStateType {
   isRunning: boolean;
-  lastRecord: RecordType;
-  editRecord: RecordType;
   profile: any;
   projects: any;
   range: string;
   records: RecordType[];
   start: number;
+}
+export interface GlobalStateType extends StorageStateType {
+  timer: number;
+  showEdit: boolean;
+  showEditRunning: boolean;
+  runningRecord: RecordType;
+  editRecord: RecordType;
 }
 
 interface GlobalStateProviderProps {
@@ -36,8 +39,6 @@ const useGlobalStateProvider = ({
       setState({ ...state, ...items });
     });
   }, []);
-
-  console.log('Context', state);
 
   return <Context.Provider value={useGlobalState(state)}>{children}</Context.Provider>;
 };

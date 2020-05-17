@@ -3,7 +3,17 @@ import { browser } from 'webextension-polyfill-ts';
 
 import { GlobalStateType } from './GlobalStateProvider';
 import { ContextType } from './context';
-import { SYNC, EDIT_RECORD, ADD_ROW, UPDATE_ROW, DELETE_ROW, FINISH_ROW } from './actions';
+import {
+  SYNC,
+  ADD_RECORD,
+  EDIT_RECORD,
+  EDIT_RUNNING,
+  SHOW_EDIT,
+  ADD_ROW,
+  UPDATE_ROW,
+  DELETE_ROW,
+  STOP_RECORD,
+} from './actions';
 import { MessageType } from '../@types';
 
 export interface Actions {
@@ -37,18 +47,50 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         ...response,
       };
 
-    case ADD_ROW: {
+    case ADD_RECORD: {
       const message = {
         action: ADD_ROW,
         message: payload,
       };
-      // console.log('ADD_ROW', message);
+      console.log('ADD_RECORD', message);
 
       const response = sendMessage(message);
       return {
         ...state,
         ...response,
         showEdit: false,
+        showEditRunning: false,
+      };
+    }
+
+    case STOP_RECORD: {
+      const message = {
+        action: STOP_RECORD,
+        message: payload,
+      };
+      // console.log('STOP_RECORD', message);
+
+      const response = sendMessage(message);
+      return {
+        ...state,
+        ...response,
+        showEdit: false,
+        showEditRunning: false,
+      };
+    }
+
+    case EDIT_RECORD: {
+      const message = {
+        action: UPDATE_ROW,
+        message: payload,
+      };
+      console.log('UPDATE_ROW', message);
+      const response = sendMessage(message);
+      return {
+        ...state,
+        ...response,
+        showEdit: false,
+        showEditRunning: false,
       };
     }
 
@@ -57,28 +99,13 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         action: UPDATE_ROW,
         message: payload,
       };
-      // console.log('UPDATE_ROW', message);
-
+      console.log('UPDATE_ROW', message);
       const response = sendMessage(message);
       return {
         ...state,
         ...response,
         showEdit: false,
-      };
-    }
-
-    case FINISH_ROW: {
-      const message = {
-        action: FINISH_ROW,
-        message: payload,
-      };
-      // console.log('FINISH_ROW', message);
-
-      const response = sendMessage(message);
-      return {
-        ...state,
-        ...response,
-        showEdit: false,
+        showEditRunning: false,
       };
     }
 
@@ -94,15 +121,27 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         ...state,
         ...response,
         showEdit: false,
+        showEditRunning: false,
+        start: payload.timer ? 0 : state.start,
+        isRunning: payload.timer ? false : state.isRunning,
+        runningRecord: payload.timer ? null : state.runningRecord,
       };
     }
 
-    case EDIT_RECORD:
+    case SHOW_EDIT: {
+      console.log(payload);
       return {
         ...state,
-        showEdit: payload.showEdit,
-        editRecord: payload.record,
+        ...payload,
       };
+    }
+
+    case EDIT_RUNNING: {
+      return {
+        ...state,
+        showEditRunning: payload.showEditRunning,
+      };
+    }
 
     default:
       return state;

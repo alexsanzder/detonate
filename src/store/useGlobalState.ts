@@ -6,13 +6,13 @@ import { ContextType } from './context';
 import {
   SYNC,
   ADD_RECORD,
+  STOP_RECORD,
   EDIT_RECORD,
-  EDIT_RUNNING,
+  DELETE_RECORD,
   SHOW_EDIT,
   ADD_ROW,
   UPDATE_ROW,
   DELETE_ROW,
-  STOP_RECORD,
 } from './actions';
 import { MessageType } from '../@types';
 
@@ -84,7 +84,7 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
         action: UPDATE_ROW,
         message: payload,
       };
-      console.log('UPDATE_ROW', message);
+
       const response = sendMessage(message);
       return {
         ...state,
@@ -94,22 +94,7 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
       };
     }
 
-    case UPDATE_ROW: {
-      const message = {
-        action: UPDATE_ROW,
-        message: payload,
-      };
-      console.log('UPDATE_ROW', message);
-      const response = sendMessage(message);
-      return {
-        ...state,
-        ...response,
-        showEdit: false,
-        showEditRunning: false,
-      };
-    }
-
-    case DELETE_ROW: {
+    case DELETE_RECORD: {
       const message = {
         action: DELETE_ROW,
         message: payload,
@@ -129,17 +114,9 @@ const reducer = (state: GlobalStateType, action: Actions): GlobalStateType => {
     }
 
     case SHOW_EDIT: {
-      console.log(payload);
       return {
         ...state,
         ...payload,
-      };
-    }
-
-    case EDIT_RUNNING: {
-      return {
-        ...state,
-        showEditRunning: payload.showEditRunning,
       };
     }
 

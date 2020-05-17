@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import Context, { ContextType } from '../../store/context';
-import { EDIT_RECORD, UPDATE_ROW, DELETE_ROW, EDIT_RUNNING } from '../../store/actions';
+import { EDIT_RECORD, DELETE_RECORD } from '../../store/actions';
 import {
   getTimeObjectFromFraction,
   getTimeObjectFromSeconds,
@@ -17,7 +17,6 @@ export interface EditProps {
 
 const Edit = ({ timer, showEdit }: EditProps): JSX.Element => {
   const { state, dispatch } = React.useContext<ContextType>(Context);
-  console.log('EDIT_STATE>>>>>>>><', state);
 
   const [selectionRange, setSelectionRange] = React.useState<boolean>(false);
   const [hours, setHours] = React.useState<string>('');
@@ -84,7 +83,7 @@ const Edit = ({ timer, showEdit }: EditProps): JSX.Element => {
     e.preventDefault();
     const time = `${hours}:${minutes}:${seconds}`;
     dispatch({
-      type: UPDATE_ROW,
+      type: EDIT_RECORD,
       payload: {
         isTimer: !!timer,
         record: { ...record, time: getFraction(getSeconds(time)) },
@@ -199,11 +198,11 @@ const Edit = ({ timer, showEdit }: EditProps): JSX.Element => {
               onClick={(): void => {
                 const index = record.id.replace(/(^.+\D)(\d+)(\D.+$)/i, '$2');
                 dispatch({
-                  type: DELETE_ROW,
+                  type: DELETE_RECORD,
                   payload: {
+                    isTimer: !!timer,
                     index,
                     id: record.id,
-                    timer,
                   },
                 });
               }}

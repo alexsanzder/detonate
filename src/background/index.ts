@@ -208,7 +208,7 @@ browser.runtime.onMessage.addListener(
         case ADD_ROW: {
           browser.browserAction.setBadgeText({ text: '▶️' });
           const runningRecord = await addRow(message);
-          console.log(runningRecord);
+          // console.log(runningRecord);
 
           const now = Date.now();
           browser.storage.local.set({
@@ -275,10 +275,12 @@ browser.runtime.onMessage.addListener(
           //confirm('¯_(ツ)_/¯ ' + message.id);
           await deleteRow(message);
           await loadTable();
-          const { records } = await getLocalStorage('records');
-          const deleted = records.filter((record) => record.id !== message.id);
+          const { records, runningRecord } = await getLocalStorage();
+          const filteredRecords = records.filter((record) => record.id !== message.id);
+
           browser.storage.local.set({
-            records: deleted,
+            runningRecord,
+            records: filteredRecords,
           });
           const storage = await getLocalStorage();
           return Promise.resolve({

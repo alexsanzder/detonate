@@ -46,7 +46,7 @@ const Timer = (): JSX.Element => {
     descriptionRef.current.setSelectionRange(0, 0);
 
     browser.storage.onChanged.addListener(({ runningRecord }: any) => {
-      if (runningRecord) {
+      if (runningRecord && runningRecord.newValue) {
         setRunningRecord(runningRecord.newValue);
         setDescription(runningRecord.newValue.description);
       }

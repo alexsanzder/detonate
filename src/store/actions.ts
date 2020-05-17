@@ -4,6 +4,7 @@ export const SYNC = 'SYNC';
 export const ADD_RECORD = 'ADD_RECORD';
 export const STOP_RECORD = 'STOP_RECORD';
 export const EDIT_RECORD = 'EDIT_RECORD';
+export const DELETE_RECORD = 'DELETE_RECORD';
 
 export const SHOW_EDIT = 'SHOW_EDIT';
 export const EDIT_RUNNING = 'EDIT_RUNNING';

@@ -102,6 +102,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-white'>
       <form className='relative w-full max-w-sm mx-auto' onSubmit={handleSubmit}>
+        {record && record.id}
         <div
           ref={timerRef}
           className='w-full p-3 my-3 text-lg text-3xl font-medium text-center border rounded-md hover:border-blue-500 focus-within:border-blue-500 focus:outline-none'
@@ -156,7 +157,6 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
             />
           </span>
         </div>
-        {record && record.id}
         <input
           ref={descriptionRef}
           className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'

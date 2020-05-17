@@ -128,7 +128,7 @@ const Timer = (): JSX.Element => {
                 value={description}
                 onChange={handleInputChange}
               />
-              {isRunning && runningRecord.project && (
+              {isRunning && runningRecord && runningRecord.project && (
                 <div className='inline-flex items-center text-sm text-gray-700'>
                   <div className='w-2 h-2 mr-1 bg-blue-500 rounded-full'></div>
                   {runningRecord.project}

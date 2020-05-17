@@ -223,7 +223,7 @@ browser.runtime.onMessage.addListener(
 
         case UPDATE_ROW: {
           const updatedRecord = await updateRow(message.record);
-          console.log(updatedRecord);
+          // console.log(updatedRecord);
 
           if (message.isTimer) {
             browser.storage.local.set({
@@ -240,8 +240,6 @@ browser.runtime.onMessage.addListener(
           }
 
           const storage = await getLocalStorage();
-          console.log(storage.records);
-
           return Promise.resolve({
             status: 'UPDATE_SUCCESS',
             payload: { ...storage },
@@ -254,15 +252,15 @@ browser.runtime.onMessage.addListener(
           const time = Math.abs(Date.now() - start) / 36e5;
           const newRecord = { ...message.record, time };
 
-          const stopRecord = await updateRow(newRecord);
+          const stoppedRecord = await updateRow(newRecord);
+          // console.log(stoppedRecord);
 
+          browser.storage.local.remove('runningRecord');
           browser.storage.local.set({
             isRunning: false,
             start: 0,
-            records: [stopRecord, ...records],
+            records: [stoppedRecord, ...records],
           });
-
-          browser.storage.local.remove('runningRecord');
 
           const storage = await getLocalStorage();
           return Promise.resolve({
@@ -274,14 +272,16 @@ browser.runtime.onMessage.addListener(
         case DELETE_ROW: {
           //confirm('¯_(ツ)_/¯ ' + message.id);
           await deleteRow(message);
-          await loadTable();
+          //await loadTable();
           const { records, runningRecord } = await getLocalStorage();
           const filteredRecords = records.filter((record) => record.id !== message.id);
+          // console.log(filteredRecords);
 
           browser.storage.local.set({
             runningRecord,
             records: filteredRecords,
           });
+
           const storage = await getLocalStorage();
           return Promise.resolve({
             status: 'DELETE_SUCCESS',
@@ -290,7 +290,6 @@ browser.runtime.onMessage.addListener(
         }
 
         case SYNC: {
-          //browser.storage.local.clear();
           await loadTable();
           const storage = await getLocalStorage();
           return Promise.resolve({ status: 'SYNC_SUCCESS', payload: storage });
@@ -298,7 +297,8 @@ browser.runtime.onMessage.addListener(
 
         case CLEAR_STORAGE:
           await browser.storage.local.clear();
-          return Promise.resolve({ status: 'SUCCESS', payload: undefined });
+          const storage = await getLocalStorage();
+          return Promise.resolve({ status: 'SUCCESS', payload: storage });
 
         default:
           return Promise.resolve({

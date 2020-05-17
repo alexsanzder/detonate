@@ -111,6 +111,14 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
                 type='button'
                 className='p-2 ml-1 rounded-full hover:text-green-600 hover:bg-gray-300 hover:bg-opacity-50 focus:outline-none focus:shadow-outline'
                 aria-label='Continue tracking whith this record'
+                onClick={() => {
+                  dispatch({
+                    type: ADD_RECORD,
+                    payload: {
+                      record,
+                    },
+                  });
+                }}
               >
                 <Play className='fill-current stroke-1' width='16' height='16' />
               </button>

@@ -21,7 +21,7 @@ export interface CardProps {
 const Card = ({ records, date }: CardProps): JSX.Element => {
   const { state, dispatch } = React.useContext<ContextType>(Context);
 
-  const formatedDate = (date: string): string => {
+  const formatedDate = (): string => {
     const splits = date.split('.');
     return new Date(splits.reverse().join('-')).toLocaleDateString('de', {
       weekday: 'long',
@@ -31,8 +31,8 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
     });
   };
 
-  const totalTime = (records: RecordType[]): any => {
-    const total = records?.reduce((acc: number, curr: any) => {
+  const totalTime = (): any => {
+    const total = records[date]?.reduce((acc: number, curr: any) => {
       return acc + curr.time;
     }, 0);
     return getTimeObjectFromFraction(total, true);
@@ -41,8 +41,8 @@ const Card = ({ records, date }: CardProps): JSX.Element => {
   return (
     <div className='w-full px-3 mb-4 border rounded-md shadow-sm'>
       <div className='flex items-center justify-between py-4 text-base font-semibold text-gray-800'>
-        <div className='tracking-tight'>{formatedDate(date)}</div>
-        <div className='tracking-tighter'>{totalTime(records[date])}</div>
+        <div className='tracking-tight'>{formatedDate()}</div>
+        <div className='tracking-tighter'>{totalTime()}</div>
       </div>
       {records[date].map((record: RecordType) => (
         <div className='text-gray-700 border-t' key={record.id}>

@@ -49,8 +49,8 @@
         "https://*.google.com/"
     ],
     "oauth2": {
-        "client_id": "your.apps.googleusercontent.com",
-        "spreadsheetId": "yourSpreadsheetId",
+        "client_id": "87622167375-sqh7cj732qtf2p9hn4ghq53ct9u1r4ko.apps.googleusercontent.com",
+        "spreadsheetId": "1aPo1wlEXueb6poGt7X3XjYVy-VPDaGJhOO5pNBMdl48",
         "scopes": [
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/userinfo.profile",

@@ -201,7 +201,7 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
       >
         <Container component='main' maxWidth='xs' className={classes.container}>
           <PopoverTitle onClose={handleClose} onStop={handleStop}>
-            Stop timer
+            Stop timer!
           </PopoverTitle>
           <TextField
             variant='outlined'

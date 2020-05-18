@@ -3,8 +3,11 @@ import * as ReactDOM from 'react-dom';
 
 import Content from './Content';
 
+import '../styles/tailwind.css';
+
 const mountingPoint = document.createElement('span');
 mountingPoint.setAttribute('id', 'ghx-detoante-button');
+mountingPoint.setAttribute('class', 'fixed');
 
 const scrapeIssueInfo = () => {
   // Jira Issue description
@@ -34,7 +37,7 @@ const observer = new MutationObserver((mutations: MutationRecord[], observer: Mu
 
 const observedNodes = document.querySelectorAll(
   // "#summary-val, .ghx-detail-view-blanket"
-  '#ghx-detail-issue', // Board
+  'body', // Board
 );
 observedNodes.forEach((observedNode) => {
   observer.observe(observedNode, {
@@ -46,11 +49,11 @@ observedNodes.forEach((observedNode) => {
   });
 });
 
-// chrome.runtime.onConnect.addListener(port => {
-//   port.onMessage.addListener(request => {
-//     const { message } = request;
-//     if (message === "complete") {
-//       port.postMessage({ message: "Content rendered!" });
-//     }
-//   });
-// });
+chrome.runtime.onConnect.addListener((port) => {
+  port.onMessage.addListener((request) => {
+    const { message } = request;
+    if (message === 'complete') {
+      port.postMessage({ message: 'Content rendered!' });
+    }
+  });
+});

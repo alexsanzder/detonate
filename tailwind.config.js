@@ -48,6 +48,9 @@ module.exports = {
       },
     },
   },
-  variants: { borderColor: ['responsive', 'hover', 'focus', 'focus-within'] },
+  variants: {
+    borderColor: ['responsive', 'hover', 'focus', 'focus-within'],
+    borderWidth: ['responsive', 'hover', 'focus'],
+  },
   plugins: [],
 };

@@ -26,7 +26,6 @@
             ],
             "js": [
                 "./lib/browser-polyfill.js",
-                "./lib/gapi-client.js",
                 "./static/js/content-script.bundle.js"
             ]
         }

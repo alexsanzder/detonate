@@ -5,9 +5,13 @@ import Content from './Content';
 
 import '../styles/tailwind.css';
 
+const modalMountingPoint = document.createElement('div');
+modalMountingPoint.setAttribute('id', 'detonate-modal');
+document.querySelector('body').append(modalMountingPoint);
+
 const mountingPoint = document.createElement('span');
-mountingPoint.setAttribute('id', 'ghx-detoante-button');
-mountingPoint.setAttribute('class', 'fixed');
+mountingPoint.setAttribute('id', 'detonate-button');
+mountingPoint.setAttribute('class', 'select-none fixed top-0 pt-3');
 
 const scrapeIssueInfo = () => {
   // Jira Issue description
@@ -49,11 +53,11 @@ observedNodes.forEach((observedNode) => {
   });
 });
 
-chrome.runtime.onConnect.addListener((port) => {
-  port.onMessage.addListener((request) => {
-    const { message } = request;
-    if (message === 'complete') {
-      port.postMessage({ message: 'Content rendered!' });
-    }
-  });
-});
+// chrome.runtime.onConnect.addListener((port) => {
+//   port.onMessage.addListener((request) => {
+//     const { message } = request;
+//     if (message === 'complete') {
+//       port.postMessage({ message: 'Content rendered!' });
+//     }
+//   });
+// });

@@ -159,7 +159,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
         </div>
         <input
           ref={descriptionRef}
-          className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
+          className='w-full p-3 my-2 text-base font-normal text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add description'
           value={record && record.description}
           onChange={(e) => {
@@ -168,7 +168,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
         />
 
         <input
-          className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
+          className='w-full p-3 my-2 text-base font-normal text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add project'
           value={record.project}
           onChange={(e) => {
@@ -177,7 +177,7 @@ const Edit = ({ timer }: EditProps): JSX.Element => {
         />
 
         <input
-          className='w-full p-3 my-2 text-base font-normal font-medium text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
+          className='w-full p-3 my-2 text-base font-normal text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
           placeholder='Add ticket'
           value={record.ticket}
           onChange={(e) => {

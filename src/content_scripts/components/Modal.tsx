@@ -35,7 +35,7 @@ const Modal = ({ anchor, title, closeModal, children }: ModalProps): JSX.Element
       <div className='flex items-center justify-between p-4'>
         <ButtonDetonate onClick={closeModal} title={title} />
         <button
-          className='flex items-center justify-center block w-8 h-8 px-1 m-1 -m-1 text-2xl font-medium text-gray-500 rounded-full hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:shadow-outline'
+          className='flex items-center justify-center block w-8 h-8 px-1 m-1 -m-1 text-2xl font-medium text-gray-500 rounded-full hover:bg-gray-100 hover:text-magenta-600 focus:outline-none focus:shadow-outline'
           type='button'
           aria-label='Close'
           onClick={closeModal}

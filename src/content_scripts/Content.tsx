@@ -2,14 +2,11 @@ import * as React from 'react';
 import ButtonDetonate from './components/ButtonDetonate';
 import { useModal } from './components/useModal';
 
-export interface ContentProps {
-  description?: string;
-  ticket?: string;
-}
-
-const Content = ({ description, ticket }: ContentProps): JSX.Element => {
+const Content = (): JSX.Element => {
+  const [description, setDescription] = React.useState<string>('');
+  const [project, setProject] = React.useState<string>('');
+  const [ticket, setTicket] = React.useState<string>('');
   const [isRunning, setRunning] = React.useState<boolean>(false);
-  const [style, setStyle] = React.useState<any>({});
   const { show, Portal } = useModal(); // we could also spread 'hide' here, if we somehow needed it outside of the modal
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const descRef = React.useRef<HTMLInputElement>(null);
@@ -22,6 +19,34 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
   React.useEffect(() => {
     setFocus();
   }, [descRef, setFocus]);
+
+  const scrapeIssueInfo = () => {
+    // Jira Issue description
+    const summary = document.querySelector('#summary-val').innerHTML;
+
+    // Jira Parent issue ticket
+    const parentIssueKey = document.querySelector('#parent_issue_summary');
+    const parentTicket = parentIssueKey && parentIssueKey.getAttribute('data-issue-key');
+    const project = parentIssueKey && parentIssueKey.getAttribute('original-title');
+    console.log('PRO', project);
+
+    // Jira Issue ticket
+    const issueKey = document.querySelector('#key-val');
+    const issueTicket = issueKey && issueKey.getAttribute('data-issue-key');
+
+    return {
+      description: `${issueTicket} ${summary}`,
+      project: project,
+      ticket: parentTicket ? parentTicket : issueTicket,
+    };
+  };
+
+  React.useLayoutEffect(() => {
+    const { description, project, ticket } = scrapeIssueInfo();
+    setDescription(description);
+    setProject(project);
+    setTicket(ticket);
+  }, []);
 
   // const handleClose = () => {
   //   setAnchor(null);
@@ -51,12 +76,14 @@ const Content = ({ description, ticket }: ContentProps): JSX.Element => {
           <input
             className='w-full px-4 py-2 mb-2 text-base font-normal text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
             placeholder='Add project'
+            value={project}
           />
           <input
             className='w-full px-4 py-2 mb-2 text-base font-normal text-gray-700 border rounded-md hover:border-blue-500 focus:outline-none focus:shadow-outline'
             placeholder='Add ticket'
+            value={ticket}
           />
-          <button className='w-full px-4 py-2 mt-2 text-white border rounded-md shadow-sm border-magenta-500 bg-magenta-500 hover:bg-magenta-600 hover:border-magenta-600 focus:outline-none focus:shadow-outline'>
+          <button className='w-full px-4 py-2 mt-3 text-white border rounded-md shadow-sm border-magenta-500 bg-magenta-500 hover:bg-magenta-600 hover:border-magenta-600 focus:outline-none focus:shadow-outline'>
             Done
           </button>
         </form>

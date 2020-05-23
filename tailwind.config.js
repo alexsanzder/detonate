@@ -10,6 +10,8 @@ module.exports = {
     extend: {
       spacing: {
         '36': '9rem',
+        '80': '20rem',
+        '84': '21rem',
         '96': '24rem',
       },
       colors: {

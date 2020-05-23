@@ -19,7 +19,7 @@ const Modal = ({ anchor, title, closeModal, children }: ModalProps): JSX.Element
     const pos = anchor.current.getBoundingClientRect();
     //console.log(pos);
     // setStyle({ top: pos.top, left: pos.left, position: 'fixed' });
-    const style = `top: ${pos.top}px; left: ${pos.left}px; position: fixed;`;
+    const style = `top: ${pos.top}px; left: ${pos.left}px;`;
     domEl.setAttribute('style', style);
   }, [anchor]);
 
@@ -27,7 +27,7 @@ const Modal = ({ anchor, title, closeModal, children }: ModalProps): JSX.Element
   // use this component inside our React tree
   return ReactDOM.createPortal(
     <div
-      className='z-50 -mt-3 -ml-4 bg-white border rounded-md shadow-md w-96'
+      className='z-50 -mt-3 -ml-4 bg-white border rounded-md shadow-md'
       role='dialog'
       aria-labelledby='modal-label'
       aria-modal='true'

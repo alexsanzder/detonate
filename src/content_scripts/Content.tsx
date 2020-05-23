@@ -2,10 +2,15 @@ import * as React from 'react';
 import ButtonDetonate from './components/ButtonDetonate';
 import { useModal } from './components/useModal';
 
-const Content = (): JSX.Element => {
-  const [description, setDescription] = React.useState<string>('');
-  const [project, setProject] = React.useState<string>('');
-  const [ticket, setTicket] = React.useState<string>('');
+export interface ContentProps {
+  description?: string;
+  project?: string;
+  ticket?: string;
+}
+
+const Content = ({ description, project, ticket }: ContentProps): JSX.Element => {
+  const [record, setRecord] = React.useState({});
+
   const [isRunning, setRunning] = React.useState<boolean>(false);
   const { show, Portal } = useModal(); // we could also spread 'hide' here, if we somehow needed it outside of the modal
   const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -19,38 +24,6 @@ const Content = (): JSX.Element => {
   React.useEffect(() => {
     setFocus();
   }, [descRef, setFocus]);
-
-  const scrapeIssueInfo = () => {
-    // Jira Issue description
-    const summary = document.querySelector('#summary-val').innerHTML;
-
-    // Jira Parent issue ticket
-    const parentIssueKey = document.querySelector('#parent_issue_summary');
-    const parentTicket = parentIssueKey && parentIssueKey.getAttribute('data-issue-key');
-    const project = parentIssueKey && parentIssueKey.getAttribute('original-title');
-    console.log('PRO', project);
-
-    // Jira Issue ticket
-    const issueKey = document.querySelector('#key-val');
-    const issueTicket = issueKey && issueKey.getAttribute('data-issue-key');
-
-    return {
-      description: `${issueTicket} ${summary}`,
-      project: project,
-      ticket: parentTicket ? parentTicket : issueTicket,
-    };
-  };
-
-  React.useLayoutEffect(() => {
-    const { description, project, ticket } = scrapeIssueInfo();
-    setDescription(description);
-    setProject(project);
-    setTicket(ticket);
-  }, []);
-
-  // const handleClose = () => {
-  //   setAnchor(null);
-  // };
 
   // const handleStart = () => {};
 

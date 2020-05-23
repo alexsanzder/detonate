@@ -359,3 +359,27 @@ chrome.identity.getAuthToken({ interactive: true }, (token) => {
   //load Google's javascript client libraries
   loadScript('https://apis.google.com/js/client.js');
 });
+
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // read changeInfo data and do something with it
+  // like send the new url to contentscripts.js
+  console.log(changeInfo);
+  if (changeInfo.status === 'complete') {
+    chrome.tabs.sendMessage(tabId, {
+      response: 'COMPLETE',
+      tab,
+    });
+  }
+  if (changeInfo.status === 'loading') {
+    chrome.tabs.sendMessage(tabId, {
+      response: 'LOADING',
+      tab,
+    });
+  }
+  if (changeInfo.url) {
+    chrome.tabs.sendMessage(tabId, {
+      response: 'CHANGE_URL',
+      tab,
+    });
+  }
+});

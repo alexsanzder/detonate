@@ -235,7 +235,7 @@ browser.runtime.onMessage.addListener(
             records[recordIndex] = updatedRecord;
 
             browser.storage.local.set({
-              records: records,
+              records,
             });
           }
 
@@ -361,9 +361,7 @@ chrome.identity.getAuthToken({ interactive: true }, (token) => {
 });
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  // read changeInfo data and do something with it
-  // like send the new url to contentscripts.js
-  console.log(changeInfo);
+  // read changeInfo data and send the new url to contentscripts.js
   if (changeInfo.status === 'complete') {
     chrome.tabs.sendMessage(tabId, {
       response: 'COMPLETE',

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 export const cachedScripts: Map<string, string> = new Map();
 
@@ -6,7 +6,7 @@ export const useScript = (src: string, name: string): boolean[] => {
   // Keeping track of script loaded and error state
   const [state, setState] = useState({
     loaded: false,
-    error: false
+    error: false,
   });
 
   useEffect(() => {
@@ -15,13 +15,13 @@ export const useScript = (src: string, name: string): boolean[] => {
     if (cachedScripts.get(name)) {
       setState({
         loaded: true,
-        error: false
+        error: false,
       });
     } else {
       cachedScripts.set(name, src);
 
       // Create script
-      const script = document.createElement("script");
+      const script = document.createElement('script');
       script.src = src;
       script.async = false;
 
@@ -29,7 +29,7 @@ export const useScript = (src: string, name: string): boolean[] => {
       const onScriptLoad = (): void => {
         setState({
           loaded: true,
-          error: false
+          error: false,
         });
       };
 
@@ -43,18 +43,18 @@ export const useScript = (src: string, name: string): boolean[] => {
 
         setState({
           loaded: true,
-          error: true
+          error: true,
         });
       };
 
-      script.addEventListener("load", onScriptLoad);
-      script.addEventListener("error", onScriptError);
+      script.addEventListener('load', onScriptLoad);
+      script.addEventListener('error', onScriptError);
 
       document.body.appendChild(script);
 
       return (): void => {
-        script.removeEventListener("load", onScriptLoad);
-        script.removeEventListener("error", onScriptError);
+        script.removeEventListener('load', onScriptLoad);
+        script.removeEventListener('error', onScriptError);
       };
     }
   }, [name, src]); // Only re-run effect if script src and name changes

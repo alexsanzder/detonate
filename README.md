@@ -9,6 +9,8 @@ Browser extension using Google Sheets as data storage written in React
 - [ ] Edge
 - [ ] Opera
 
+[<img src="docs/Detonate Popup.png?sanitize=true" width="80%">]()
+
 ## Features
 
 - Google Sheet as database storage

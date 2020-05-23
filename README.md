@@ -28,7 +28,7 @@ Browser extension using Google Sheets as data storage written in React
 - Custom Webpack
   - Watch mode dev server
 
-[<img src="docs/Detonate Popup.png?sanitize=true" width="80%">]()
+[<img src="docs/Detonate Popup.png?sanitize=true" width="85%">]()
 
 ## Getting started
 

@@ -16,7 +16,7 @@ Browser extension using Google Sheets as data storage written in React
   - Sheets is way better at handling numbers than me. You can do all kinds of analysis using graphs, formulas, etc.
 - Tracking Daily Projects Task
 - Daily summary
-- Select Cliets, Projects and releted Tickets
+- Select Clients, Projects and related Tickets
 - React Popup App and Content Script
   - React Hooks
   - useReducer and Context Api
